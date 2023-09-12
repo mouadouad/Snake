@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "718745033984",
+    "firebase_url": "https://snake-9017c.firebaseio.com",
+    "project_id": "snake-9017c",
+    "storage_bucket": "snake-9017c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718745033984:android:7cfb8ffe7d283a52f3a7e5",
+        "android_client_info": {
+          "package_name": "com.example.mouad.snake"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "718745033984-fagrdm9arimguj0ad4f8as60ek894ucb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mouad.snake",
+            "certificate_hash": "3e9709cd4a4f82a77387eed66541905ee07befc0"
+          }
+        },
+        {
+          "client_id": "718745033984-gtoi1re1nedsitncre6k4eos4ar5qitn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_-7PtlAcsm8zUVSJYjV3xWPUECil5ESs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "718745033984-gtoi1re1nedsitncre6k4eos4ar5qitn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
