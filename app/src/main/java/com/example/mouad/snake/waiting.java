@@ -325,7 +325,7 @@ public class waiting extends AppCompatActivity {
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         layout.addView(adView,layoutParams);
 
-        MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
+        //MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 

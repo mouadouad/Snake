@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
 
     <application
         android:allowBackup="true"
@@ -10,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".settings"></activity>
+        <activity android:name=".settings" />
         <activity android:name=".start" />
         <activity android:name=".normal" />
         <activity android:name=".game_finished" />
@@ -18,7 +19,8 @@
         <activity android:name=".waiting" />
         <activity android:name=".create" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".start_game">
+        <activity android:name=".start_game"
+                android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

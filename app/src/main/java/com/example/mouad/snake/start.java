@@ -23,7 +23,7 @@ import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
+//import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 import java.net.URISyntaxException;
@@ -41,7 +41,7 @@ public class start extends AppCompatActivity {
 
 
     ImageView container,bar;
-    InterstitialAd mInterstitialAd;
+    //InterstitialAd mInterstitialAd;
     Button create, join, random;
     public static String name;
     int width,height;
@@ -86,9 +86,9 @@ public class start extends AppCompatActivity {
         xp=sharedPreferences.getInt(Xp,0);
 
         //ADD INTERSTITIAL
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+//        mInterstitialAd = new InterstitialAd(this);
+//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+//        mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
         xp_bar();
         banner();
@@ -109,7 +109,7 @@ public class start extends AppCompatActivity {
                 Intent intent= new Intent(start.this,start_game.class);
                 startActivity(intent);
                 back_clicked=true;
-                mInterstitialAd.show();
+//                mInterstitialAd.show();
             }
         });
     }
@@ -265,7 +265,7 @@ public class start extends AppCompatActivity {
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         layout.addView(adView,layoutParams);
 
-        MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
+        //MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
@@ -287,7 +287,7 @@ public class start extends AppCompatActivity {
         Intent intent = new Intent(start.this,start_game.class);
         startActivity(intent);
         back_clicked=true;
-        mInterstitialAd.show();
+        //mInterstitialAd.show();
     }
 
     public int setx(int x){

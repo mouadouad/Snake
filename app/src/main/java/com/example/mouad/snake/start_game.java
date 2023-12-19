@@ -18,7 +18,7 @@ import android.widget.RelativeLayout;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+//import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 public class start_game extends AppCompatActivity {
@@ -31,7 +31,7 @@ public class start_game extends AppCompatActivity {
     public static int width,height;
     Button multi, Normal,Settings;
     ImageView icon;
-    InterstitialAd mInterstitialAd;
+    //InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +67,9 @@ public class start_game extends AppCompatActivity {
 
 
         //ADD INTERSTITIAL
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+//        mInterstitialAd = new InterstitialAd(this);
+//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+//        mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
         button_onclicks();
     }
@@ -81,7 +81,7 @@ public class start_game extends AppCompatActivity {
 
                     Intent intent = new Intent(start_game.this, start.class);
                     startActivity(intent);
-                    mInterstitialAd.show();
+                   // mInterstitialAd.show();
 
             }
         });

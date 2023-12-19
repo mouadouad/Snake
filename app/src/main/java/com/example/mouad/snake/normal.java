@@ -54,7 +54,6 @@ public class normal extends AppCompatActivity {
     int GAUCHE,BAS,HAUT;
     int firstbump,firstbump1;
     int list_iterator = 0;
-    //int[] my_list = {0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 0, 2, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 2, 0, 0, 1, 0, 0, 0, 1 , 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2};
     protected Interpreter tflite;
     protected Interpreter.Options tfliteOptions;
 
@@ -199,7 +198,7 @@ public class normal extends AppCompatActivity {
                 if (!finished) {
 
                     //rects.my_variables.get(rects.my_counter - 1)[1] = (rects.my_variables.get(rects.my_counter - 1)[1] - 5);
-                    rects.his_variables.get(rects.his_counter - 1)[1] = (rects.his_variables.get(rects.his_counter - 1)[1] - 3);
+                    rects.his_variables.get(rects.his_counter - 1)[1] = (rects.his_variables.get(rects.his_counter - 1)[1] - 10);
 
                     still_traveling = true;
                     repeat();
@@ -811,17 +810,13 @@ public class normal extends AppCompatActivity {
 
     public int setx(int x){
         int i;
-
         i=  ((x*width)/1080);
-
         return i;
     }
 
     public int sety(int x){
         int i;
-
         i=  ((x*height)/1770);
-
         return i;
     }
 
@@ -832,11 +827,9 @@ public class normal extends AppCompatActivity {
         app_closed app_closed = new app_closed();
         app_closed.activity_closed();
     }
-
     @Override
     public void onResume() {
         super.onResume();
-
         opened=1;
 
         if (start_game.musicBoolean){
