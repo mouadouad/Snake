@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.activities;
 
 import static java.lang.Math.abs;
 
@@ -23,6 +23,9 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.example.mouad.snake.AppClosed;
+import com.example.mouad.snake.R;
+import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.components.GameView;
 import com.example.mouad.snake.components.Rectangle;
 import com.example.mouad.snake.components.Rectangles;
@@ -37,24 +40,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 
 public class Normal extends AppCompatActivity {
     public static Boolean back_clicked = false;
     public static int opened = 0;
-    private static final short INCREMENT = 3, gridRows = 54, gridColumns = 36;
-    final static int width = Shared.width, height = Shared.height;
-    private static final String black = "#20292A", blue = "#1D8189";
-    RelativeLayout layout;
-    final static Rect topBar = new Rect(), bottomBar = new Rect(), leftBar = new Rect(), rightBar = new Rect();
+    private static final short TIMEOUT = 10, pixels = 30;
+    protected short timeout = TIMEOUT;
+    private Boolean started = false, stillTraveling = true, finished = false;
+    static Rect topBar, bottomBar, leftBar, rightBar;
     FrameLayout dim;
-    Button left, right, back;
+    Button back;
     Dialog alertDialog;
-    Boolean started = false, stillTraveling = true, finished = false;
     protected Interpreter tfLite;
     protected Interpreter.Options tfliteOptions;
-    protected short timeout = 10;
     Rectangles playerRectangles, botRectangles;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -63,12 +64,29 @@ public class Normal extends AppCompatActivity {
 
         initializeLayout();
         loadModelFile();
-        makeScreenDim();
+        backButton();
+    }
+
+    private void initializeLayout() {
+        final GameView gameView = new GameView(this);
+        setContentView(gameView);
+
+        playerRectangles = new Rectangles(this);
+        gameView.addView(playerRectangles);
+
+        botRectangles = new Rectangles(this);
+        gameView.addView(botRectangles);
+
+        final Resources res = getResources();
+        final Drawable shape = ResourcesCompat.getDrawable(res, R.drawable.shape, null);
+        dim = new FrameLayout(this);
+        dim.setForeground(shape);
 
         final int side = setSide();
 
         // CHOOSE THE PLACE WHERE TO START
-        layout.setOnTouchListener((view, motionEvent) -> {
+        gameView.setOnTouchListener((view, motionEvent) -> {
+            if(view.performClick()) { return false;}
             float playerYStart = motionEvent.getY();
             float playerXStart = motionEvent.getX();
             // CHECK IF THE RIGHT SIDE IS CLICKED
@@ -82,61 +100,39 @@ public class Normal extends AppCompatActivity {
             return false;
         });
 
-        backButton();
-    }
-
-    private void initializeLayout(){
-        final GameView gameView = new GameView(this);
-        setContentView(gameView);
-
-        playerRectangles = new Rectangles(this);
-        gameView.addView(playerRectangles);
-
-        botRectangles = new Rectangles(this);
-        gameView.addView(botRectangles);
-
-        layout = new RelativeLayout(this);
-        left = new Button(this);
-        right = new Button(this);
-
-        leftBar.set(0, 0, 20, 1600);
-        rightBar.set(1080 - 20, 0, 1080, 1600);
-        topBar.set(0, 0, 1080, 20);
-        bottomBar.set(0, 1580, 1080, 1600);
+        leftBar = new Rect(0, 0, 20, 1600);
+        rightBar = new Rect(1080 - 20, 0, 1080, 1600);
+        topBar = new Rect(0, 0, 1080, 20);
+        bottomBar = new Rect(0, 1580, 1080, 1600);
     }
 
     private void placeControllers() {
+        final Button left = new Button(this);
+        final Button right = new Button(this);
 
         left.setBackgroundResource(R.drawable.left_button);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
         addContentView(left, layoutParams2);
 
-        left.setY(height - Shared.statusBarHeight - Shared.setY(200));
+        left.setY(MainActivity.height - Shared.statusBarHeight - Shared.setY(200));
         left.setX(Shared.setX(415));
 
         right.setBackgroundResource(R.drawable.right_button);
         RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
         addContentView(right, layoutParams3);
 
-        right.setY(height - Shared.statusBarHeight - Shared.setY(200));
+        right.setY(MainActivity.height - Shared.statusBarHeight - Shared.setY(200));
         right.setX(Shared.setX(565));
 
-        left.setOnClickListener(view -> {
-            //TURN LEFT
-            playerTurnLeft();
-        });
-
-        right.setOnClickListener(view -> {
-            //TURN RIGHT
-            playerTurnRight();
-        });
+        left.setOnClickListener(view -> playerTurnLeft());
+        right.setOnClickListener(view -> playerTurnRight());
 
     }
 
-    private void loadModelFile(){
+    private void loadModelFile() {
         try {
             tfliteOptions = new Interpreter.Options();
-            tfLite = new Interpreter(loadModelFile(this), tfliteOptions);
+            tfLite = new Interpreter(Objects.requireNonNull(loadModelFile(this)), tfliteOptions);
             Log.d("input", String.valueOf(tfLite.getInputTensorCount()));
             Log.d("input", Arrays.toString(tfLite.getInputTensor(0).shape()));
         } catch (IOException e) {
@@ -152,37 +148,20 @@ public class Normal extends AppCompatActivity {
             long startOffset = fileDescriptor.getStartOffset();
             long declaredLength = fileDescriptor.getDeclaredLength();
             return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private void makeScreenDim() {
-        final Resources res = getResources();
-        final Drawable shape = ResourcesCompat.getDrawable(res, R.drawable.shape, null);
-        dim = new FrameLayout(this);
-        dim.setForeground(shape);
-
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, height);
-        addContentView(layout, layoutParams);
     }
 
     private int setSide() {
         final Random random = new Random();
         final int side = random.nextInt(2);
 
-        if (side == 1) {
-            dim.setY(Shared.setY(800));
-            final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((width), (height));
-            addContentView(dim, layoutParams);
+        dim.setY(side * Shared.setY(800));
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(MainActivity.width, Shared.setY(800) + Shared.setY(800) * side);
+        addContentView(dim, layoutParams);
 
-        } else {
-            dim.setY(0);
-            final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, (Shared.setY(1600) / 2));
-            addContentView(dim, layoutParams);
-
-        }
         dim.getForeground().setAlpha(200);
         return side;
     }
@@ -190,21 +169,21 @@ public class Normal extends AppCompatActivity {
     private static float[] findClosestEdge(float x, float y, int side) {
 
         if (side == 0) {
-            if (Shared.setY(1600) - y < width - x && Shared.setY(1600) - y < x) {
-                y = height;
+            if (Shared.setY(1600) - y < MainActivity.width - x && Shared.setY(1600) - y < x) {
+                y = MainActivity.height;
             } else {
-                if (x > width - x) {
-                    x = width;
+                if (x > MainActivity.width - x) {
+                    x = MainActivity.width;
                 } else {
                     x = 0;
                 }
             }
         } else {
-            if (y < width - x && y < x) {
+            if (y < MainActivity.width - x && y < x) {
                 y = 0;
             } else {
-                if (x > width - x) {
-                    x = width;
+                if (x > MainActivity.width - x) {
+                    x = MainActivity.width;
                 } else {
                     x = 0;
                 }
@@ -215,7 +194,7 @@ public class Normal extends AppCompatActivity {
 
     private static float[] generateBotPosition(int hisSide) {
         final Random random = new Random();
-        final int x = random.nextInt(width);
+        final int x = random.nextInt(MainActivity.width);
         int y = random.nextInt(Shared.setY(800));
         if (hisSide == 1) {
             y += Shared.setY(800);
@@ -294,14 +273,14 @@ public class Normal extends AppCompatActivity {
         final int[] firstRect = startingRect((int) botPosition[0], (int) botPosition[1], (int) botPosition[2]);
 
         botRectangles.addRectangle(firstRect);
-        Rectangle rectangle = new Rectangle(this, firstRect, black);
+        Rectangle rectangle = new Rectangle(this, firstRect, Shared.BLACK);
         botRectangles.addView(rectangle);
 
-        final float[] playerPosition = findStartingPosition(playerCoordinates[0] * 1080 / width, playerCoordinates[1] * 1770 / height);
+        final float[] playerPosition = findStartingPosition(playerCoordinates[0] * 1080 / MainActivity.width, playerCoordinates[1] * 1770 / MainActivity.height);
         int[] firstRectPlayer = startingRect((int) playerPosition[0], (int) playerPosition[1], (int) playerPosition[2]);
 
         playerRectangles.addRectangle(firstRectPlayer);
-        rectangle = new Rectangle(this, firstRectPlayer, blue);
+        rectangle = new Rectangle(this, firstRectPlayer, Shared.BLUE);
         playerRectangles.addView(rectangle);
     }
 
@@ -321,8 +300,8 @@ public class Normal extends AppCompatActivity {
 
             final Runnable runnable = () -> {
                 if (!finished) {
-                    playerRectangles.getLastRectangle()[1] -= INCREMENT;
-                    botRectangles.getLastRectangle()[1] -= INCREMENT;
+                    playerRectangles.getLastRectangle()[1] -= (pixels / TIMEOUT);
+                    botRectangles.getLastRectangle()[1] -= (pixels / TIMEOUT);
 
                     stillTraveling = true;
                     repeat();
@@ -497,7 +476,7 @@ public class Normal extends AppCompatActivity {
             } else if (action == 2) {
                 botTurnLeft();
             }
-            timeout = 10;
+            timeout = TIMEOUT;
         } else {
             timeout--;
         }
@@ -563,14 +542,16 @@ public class Normal extends AppCompatActivity {
     }
 
     private float[][][] preprocess(ArrayList<int[]> botVariables, ArrayList<int[]> playerVariables) {
+        final int gridRows = 1600 / pixels;
+        final int gridColumns = 1080 / pixels;
         float[][][] arr = new float[1][gridRows][gridColumns];
         int[] last = new int[2];
 
         final ArrayList<int[]> borders = new ArrayList<>();
-        borders.add( new int[]{0, 0, 1080, 0});
-        borders.add( new int[]{1080 - 30, 0, 1080, 0});
-        borders.add( new int[]{0, -1080, 0, 90});
-        borders.add(  new int[]{1570, -1080, 0, 90});
+        borders.add(new int[]{0, 0, 1080, 0});
+        borders.add(new int[]{1080 - 30, 0, 1080, 0});
+        borders.add(new int[]{0, -1080, 0, 90});
+        borders.add(new int[]{1570, -1080, 0, 90});
 
         addToGrid(playerVariables, arr);
         addToGrid(borders, arr);
@@ -671,7 +652,7 @@ public class Normal extends AppCompatActivity {
 
 
         playerRectangles.addRectangle(rect);
-        Rectangle rectangle = new Rectangle(this, rect, blue);
+        Rectangle rectangle = new Rectangle(this, rect, Shared.BLUE);
         playerRectangles.addView(rectangle);
 
     }
@@ -696,7 +677,7 @@ public class Normal extends AppCompatActivity {
 
 
         playerRectangles.addRectangle(rect);
-        Rectangle rectangle = new Rectangle(this, rect, blue);
+        Rectangle rectangle = new Rectangle(this, rect, Shared.BLUE);
         playerRectangles.addView(rectangle);
     }
 
@@ -718,7 +699,7 @@ public class Normal extends AppCompatActivity {
         rect[3] = lastDirection;
 
         botRectangles.addRectangle(rect);
-        Rectangle rectangle = new Rectangle(this, rect, black);
+        Rectangle rectangle = new Rectangle(this, rect, Shared.BLACK);
         botRectangles.addView(rectangle);
     }
 
@@ -740,7 +721,7 @@ public class Normal extends AppCompatActivity {
         rect[3] = lastDirection;
 
         botRectangles.addRectangle(rect);
-        Rectangle rectangle = new Rectangle(this, rect, black);
+        Rectangle rectangle = new Rectangle(this, rect, Shared.BLACK);
         botRectangles.addView(rectangle);
     }
 
@@ -773,16 +754,7 @@ public class Normal extends AppCompatActivity {
         play_again.setBackgroundResource(R.drawable.play_again_button);
         message_box.addView(play_again, layoutParams5);
 
-        play_again.setOnClickListener(view -> {
-
-            //CLEAR EVERYTHING AND RESTART
-            recreate();
-            Rects.my_variables.clear();
-            Rects.his_variables.clear();
-            Rects.my_counter = 0;
-            Rects.his_counter = 0;
-
-        });
+        play_again.setOnClickListener(view -> recreate());
 
         alertDialog = new Dialog(this);
         alertDialog.setContentView(message_box);
@@ -804,19 +776,14 @@ public class Normal extends AppCompatActivity {
         back.setX(Shared.setX(50));
 
         back.setOnClickListener(view -> {
-
             //CLEAR EVERYTHING AND BACK
             finished = true;
             back_clicked = true;
             Intent intent = new Intent(Normal.this, MainActivity.class);
             startActivity(intent);
-            Rects.my_variables.clear();
-            Rects.his_variables.clear();
-            Rects.my_counter = 0;
-            Rects.his_counter = 0;
-
         });
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -825,10 +792,6 @@ public class Normal extends AppCompatActivity {
         finished = true;
         Intent intent = new Intent(Normal.this, MainActivity.class);
         startActivity(intent);
-        Rects.my_variables.clear();
-        Rects.his_variables.clear();
-        Rects.my_counter = 0;
-        Rects.his_counter = 0;
     }
 
     @Override

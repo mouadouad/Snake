@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +15,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import com.example.mouad.snake.AppClosed;
+import com.example.mouad.snake.R;
+import com.example.mouad.snake.Shared;
 
 //import com.google.android.gms.ads.InterstitialAd;
 
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         make_icon();
 
         //ANIMATION FOR SPLASH SCREEN
-        Animation from_bottom= AnimationUtils.loadAnimation(this,R.anim.from_bottom);
+        Animation from_bottom= AnimationUtils.loadAnimation(this, R.anim.from_bottom);
         Animation from_top= AnimationUtils.loadAnimation(this,R.anim.from_top);
 
         Normal.setAnimation(from_bottom);
@@ -62,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         musicBoolean =sharedPreferences.getBoolean(music_SHAREDPREFS,true);
 
         //SEE IF COMING FROM SETTING OR FROM LEVELS
-        if (!MultiplayerMenu.back_clicked&&!com.example.mouad.snake.Normal.back_clicked) {
+        if (!MultiplayerMenu.back_clicked&&!com.example.mouad.snake.activities.Normal.back_clicked) {
             music = MediaPlayer.create(this, R.raw.snake_sound);
         }
 
@@ -90,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         Normal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, com.example.mouad.snake.Normal.class);
+                Intent i = new Intent(MainActivity.this, com.example.mouad.snake.activities.Normal.class);
                 startActivity(i);
             }
         });
@@ -98,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         Settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, com.example.mouad.snake.Settings.class);
+                Intent i = new Intent(MainActivity.this, com.example.mouad.snake.activities.Settings.class);
                 startActivity(i);
             }
         });

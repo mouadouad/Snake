@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.activities;
 
 
 import android.content.Intent;
@@ -17,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.mouad.snake.AppClosed;
+import com.example.mouad.snake.R;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -46,7 +48,7 @@ public class MultiplayerMenu extends AppCompatActivity {
     int width,height;
     public static Socket socket;
     public static int level,xp;
-    public static int round=1,my_score=0,his_score=0;
+    public static int round=1, my_score=0, his_score=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

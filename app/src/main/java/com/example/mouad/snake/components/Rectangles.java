@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.components;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,15 +11,15 @@ public class Rectangles extends ViewGroup {
 
     final private ArrayList<int[]> Variables;
 
-    public void addRectangle(int[] rect){
+    public void addRectangle(int[] rect) {
         Variables.add(rect);
     }
 
-    public int[] getLastRectangle(){
+    public int[] getLastRectangle() {
         return Variables.get(Variables.size() - 1);
     }
 
-    public ArrayList<int[]> getRectangles(){
+    public ArrayList<int[]> getRectangles() {
         return Variables;
     }
 

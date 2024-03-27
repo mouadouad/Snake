@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +12,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.example.mouad.snake.AppClosed;
+import com.example.mouad.snake.R;
 
 public class GameFinished extends AppCompatActivity {
 

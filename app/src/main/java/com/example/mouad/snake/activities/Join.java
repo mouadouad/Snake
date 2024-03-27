@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -10,6 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+
+import com.example.mouad.snake.AppClosed;
+import com.example.mouad.snake.R;
 import com.github.nkzawa.emitter.Emitter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;

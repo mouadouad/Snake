@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.components;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,14 +8,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.View;
 
-public class Rectangle extends View {
+import com.example.mouad.snake.Shared;
 
+public class Rectangle extends View {
     public int[] rect;
     private String color;
 
     public Rectangle(Context context) {
         super(context);
-
     }
 
     public Rectangle(Context context, int[] rect, String color) {
@@ -28,10 +28,10 @@ public class Rectangle extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        @SuppressLint("DrawAllocation") final Paint blackPaint=new Paint();
-        int black_color= Color.parseColor(color);
-        blackPaint.setColor(black_color);
-        blackPaint.setStyle(Paint.Style.FILL);
+        @SuppressLint("DrawAllocation") final Paint paint = new Paint();
+        int black_color = Color.parseColor(color);
+        paint.setColor(black_color);
+        paint.setStyle(Paint.Style.FILL);
 
         int GAUCHE, HAUT, BAS;
 
@@ -39,24 +39,23 @@ public class Rectangle extends View {
         HAUT = rect[1];
         BAS = rect[2];
 
-        @SuppressLint("DrawAllocation") final Rect rectangle= new Rect();
+        @SuppressLint("DrawAllocation") final Rect rectangle = new Rect();
 
-        switch (rect[3]){
+        switch (rect[3]) {
             case 90:
-                rectangle.set(Shared.setX(-BAS),Shared.setY( GAUCHE),Shared.setX(-HAUT), Shared.setY(GAUCHE +30));
+                rectangle.set(Shared.setX(-BAS), Shared.setY(GAUCHE), Shared.setX(-HAUT), Shared.setY(GAUCHE + 30));
                 break;
             case -90:
-                rectangle.set(Shared.setX(HAUT),Shared.setY(-GAUCHE -30),Shared.setX( BAS),Shared.setY(-GAUCHE));
+                rectangle.set(Shared.setX(HAUT), Shared.setY(-GAUCHE - 30), Shared.setX(BAS), Shared.setY(-GAUCHE));
                 break;
             case 180:
-                rectangle.set(Shared.setX(-GAUCHE -30),Shared.setY(-BAS),Shared.setX(-GAUCHE),Shared.setY(-HAUT));
+                rectangle.set(Shared.setX(-GAUCHE - 30), Shared.setY(-BAS), Shared.setX(-GAUCHE), Shared.setY(-HAUT));
                 break;
             case 0:
-                rectangle.set(Shared.setX(GAUCHE), Shared.setY(HAUT),Shared.setX( GAUCHE +30), Shared.setY(BAS));
+                rectangle.set(Shared.setX(GAUCHE), Shared.setY(HAUT), Shared.setX(GAUCHE + 30), Shared.setY(BAS));
                 break;
         }
 
-        canvas.drawRect(rectangle,blackPaint);
-
+        canvas.drawRect(rectangle, paint);
     }
 }

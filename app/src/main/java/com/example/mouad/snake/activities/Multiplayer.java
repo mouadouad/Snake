@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -18,6 +18,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.example.mouad.snake.AppClosed;
+import com.example.mouad.snake.R;
+import com.example.mouad.snake.Rects;
 import com.github.nkzawa.emitter.Emitter;
 import org.json.JSONArray;
 import org.json.JSONException;

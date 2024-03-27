@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.activities;
 
 
 import android.content.SharedPreferences;
@@ -14,6 +14,9 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.example.mouad.snake.AppClosed;
+import com.example.mouad.snake.R;
 
 public class Settings extends AppCompatActivity {
 
