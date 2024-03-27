@@ -14,10 +14,9 @@ import com.github.nkzawa.emitter.Emitter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 
 
-public class join extends AppCompatActivity {
+public class Join extends AppCompatActivity {
 
     public final static String who_key = "com.mouad0.hp.snake.who_key";
     public static int opened=0;
@@ -45,14 +44,14 @@ public class join extends AppCompatActivity {
 
 
         //GET MY SIDE FROM SERVER
-        start.socket.on("side", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("side", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        waiting.side = (Integer) args[0];
+                        Waiting.side = (Integer) args[0];
 
                     }
                 });
@@ -69,10 +68,10 @@ public class join extends AppCompatActivity {
             public void onClick(View view) {
 
                 //SAY TO SERVER THE ROOM I WANT TO ENTER TO
-                start.name=name_of_lobby.getText().toString();
-                start.socket.emit("join",start.name);
+                MultiplayerMenu.name=name_of_lobby.getText().toString();
+                MultiplayerMenu.socket.emit("join", MultiplayerMenu.name);
 
-                start.socket.on("entred1", new Emitter.Listener() {
+                MultiplayerMenu.socket.on("entred1", new Emitter.Listener() {
                     @Override
                     public void call(final Object... args) { //SEE IF ROOM EXISTS
                         runOnUiThread(new Runnable() {
@@ -80,8 +79,8 @@ public class join extends AppCompatActivity {
                             public void run() {
                                 entred= (Boolean) args[0];
                                 if (entred){ //ROOM EXISTS AND IS AVAILABLE GO WAITING
-                                    start.name=name_of_lobby.getText().toString();
-                                    Intent intent=new Intent(join.this, waiting.class);
+                                    MultiplayerMenu.name=name_of_lobby.getText().toString();
+                                    Intent intent=new Intent(Join.this, Waiting.class);
                                     intent.putExtra(who_key,"join");
                                     startActivity(intent);
                                 }
@@ -105,7 +104,7 @@ public class join extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent= new Intent(join.this,start.class);
+                Intent intent= new Intent(Join.this, MultiplayerMenu.class);
                 startActivity(intent);
             }
         });
@@ -141,7 +140,7 @@ public class join extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent = new Intent(join.this,start.class);
+        Intent intent = new Intent(Join.this, MultiplayerMenu.class);
         startActivity(intent);
     }
 
@@ -196,7 +195,7 @@ public class join extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         opened=0;
-        app_closed app_closed = new app_closed();
+        AppClosed app_closed = new AppClosed();
         app_closed.activity_closed();
     }
 
@@ -206,9 +205,9 @@ public class join extends AppCompatActivity {
 
         opened=1;
 
-        if (start_game.musicBoolean){
-            start_game.music.start();
-            start_game.music.setLooping(true);
+        if (MainActivity.musicBoolean){
+            MainActivity.music.start();
+            MainActivity.music.setLooping(true);
 
         }
     }

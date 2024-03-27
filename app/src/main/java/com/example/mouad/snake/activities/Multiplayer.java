@@ -24,7 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class MainActivity extends AppCompatActivity {
+public class Multiplayer extends AppCompatActivity {
 
     public final static String who_key = "com.mouad0.hp.snake.who_key";
     public static int opened=0;
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         height = size.y;
 
 
-        final rects rects=new rects(this);
+        final Rects rects=new Rects(this);
         setContentView(rects);
 
         Intent a = getIntent();
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
         //SEE WHICH SIDE MAKE DIM
         if (my_player.equals("player1")) {
-            side=waiting.side;
+            side= Waiting.side;
             if (side == 1) {
 
                 dim.setY(sety(800) );
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
         }else {
 
-            side=1-waiting.side;
+            side=1- Waiting.side;
             if (side == 1) {
 
                 dim.setY(sety(800) );
@@ -164,9 +164,9 @@ public class MainActivity extends AppCompatActivity {
 
                         }
 
-                        start.socket.emit("ready",X_start/width,Y_start/height,my_player); // SEND START COORDINATES AND SAY THAT AM READY
+                        MultiplayerMenu.socket.emit("ready",X_start/width,Y_start/height,my_player); // SEND START COORDINATES AND SAY THAT AM READY
 
-                        start.socket.on("readyBack", new Emitter.Listener() {
+                        MultiplayerMenu.socket.on("readyBack", new Emitter.Listener() {
                             @Override
                             public void call(final Object... args) {
                                 runOnUiThread(new Runnable() {
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //GET DATA FROM SERVER
-        start.socket.on("repeat", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("repeat", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 runOnUiThread(new Runnable() {
@@ -226,10 +226,10 @@ public class MainActivity extends AppCompatActivity {
                                     Jint[a]=json.getJSONArray(i).getInt(a);
                                 }
 
-                                if (com.example.mouad.snake.rects.my_variables.toArray().length<i+1){
-                                    com.example.mouad.snake.rects.my_variables.add(Jint);
+                                if (Rects.my_variables.toArray().length<i+1){
+                                    Rects.my_variables.add(Jint);
                                 }else {
-                                    com.example.mouad.snake.rects.my_variables.set(i, Jint);
+                                    Rects.my_variables.set(i, Jint);
                                 }
 
                             }
@@ -240,17 +240,17 @@ public class MainActivity extends AppCompatActivity {
                                 for (int a=0;a<json1.getJSONArray(i).length();a++){
                                     Jint[a]=json1.getJSONArray(i).getInt(a);
                                 }
-                                if (com.example.mouad.snake.rects.his_variables.toArray().length<i+1){
-                                    com.example.mouad.snake.rects.his_variables.add(Jint);
+                                if (Rects.his_variables.toArray().length<i+1){
+                                    Rects.his_variables.add(Jint);
                                 }else {
-                                    com.example.mouad.snake.rects.his_variables.set(i, Jint);
+                                    Rects.his_variables.set(i, Jint);
                                 }
 
                             }
 
                             //ASSIGN COUNTERS
-                            com.example.mouad.snake.rects.my_counter= room.getJSONObject(my_player).getInt("counter");
-                            com.example.mouad.snake.rects.his_counter= room.getJSONObject(his_player).getInt("counter");
+                            Rects.my_counter= room.getJSONObject(my_player).getInt("counter");
+                            Rects.his_counter= room.getJSONObject(his_player).getInt("counter");
 
                         //SEE IF ALREADY SET CONTENT VIEW
                         if (!contentV) {
@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //GET WHO WON
-        start.socket.on("won", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("won", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 runOnUiThread(new Runnable() {
@@ -293,17 +293,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //IF QUIT
-        start.socket.on("quit", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("quit", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
-                        start.socket.disconnect();
-                        start.my_score=0;
-                        start.his_score=0;
-                        Intent i = new Intent(MainActivity.this,game_finished.class);
+                        MultiplayerMenu.socket.disconnect();
+                        MultiplayerMenu.my_score=0;
+                        MultiplayerMenu.his_score=0;
+                        Intent i = new Intent(Multiplayer.this, GameFinished.class);
                         startActivity(i);
                     }
                 });
@@ -311,24 +311,24 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //WHEN FINISHED
-        start.socket.on("Rfinished", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("Rfinished", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                         start.round = (int) args[0];
+                         MultiplayerMenu.round = (int) args[0];
 
 
                         if (my_player.equals("player1")){
-                            start.my_score=(int) args[1];
-                            start.his_score=(int) args[2];
+                            MultiplayerMenu.my_score=(int) args[1];
+                            MultiplayerMenu.his_score=(int) args[2];
                         }else{
-                            start.my_score=(int) args[2];
-                            start.his_score=(int) args[1];
+                            MultiplayerMenu.my_score=(int) args[2];
+                            MultiplayerMenu.his_score=(int) args[1];
                         }
 
-                        if(start.round<4){
+                        if(MultiplayerMenu.round<4){
 
                             alertDialog.cancel();
                             recreate();
@@ -336,8 +336,8 @@ public class MainActivity extends AppCompatActivity {
 
                         }else{
 
-                            start.socket.disconnect();
-                            Intent i = new Intent(MainActivity.this,game_finished.class);
+                            MultiplayerMenu.socket.disconnect();
+                            Intent i = new Intent(Multiplayer.this, GameFinished.class);
                             startActivity(i);
 
                         }
@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
         roundtv.setTypeface(fredoka);
         roundtv.setTextSize(setx(20));
         roundtv.setText(R.string.round);
-        roundtv.append(String.valueOf(start.round));
+        roundtv.append(String.valueOf(MultiplayerMenu.round));
     }
 
     public void start(){
@@ -398,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 //TURN LEFT
-                start.socket.emit("turn_left",my_player);
+                MultiplayerMenu.socket.emit("turn_left",my_player);
             }
         });
 
@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 //TURN RIGHT
-               start.socket.emit("turn_right",my_player);
+               MultiplayerMenu.socket.emit("turn_right",my_player);
 
             }});
 
@@ -505,10 +505,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent= new Intent(MainActivity.this,start.class);
+                Intent intent= new Intent(Multiplayer.this, MultiplayerMenu.class);
                 startActivity(intent);
-                start.socket.emit("quit");
-                start.socket.disconnect();
+                MultiplayerMenu.socket.emit("quit");
+                MultiplayerMenu.socket.disconnect();
 
 
 
@@ -519,11 +519,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent= new Intent(MainActivity.this,start.class);
+        Intent intent= new Intent(Multiplayer.this, MultiplayerMenu.class);
         startActivity(intent);
 
-        start.socket.emit("quit");
-        start.socket.disconnect();
+        MultiplayerMenu.socket.emit("quit");
+        MultiplayerMenu.socket.disconnect();
 
 
     }
@@ -531,7 +531,7 @@ public class MainActivity extends AppCompatActivity {
     public int setx(int x){
         int i;
 
-        i= (int) ((x*MainActivity.width)/1080);
+        i= (int) ((x* Multiplayer.width)/1080);
 
         return i;
     }
@@ -539,7 +539,7 @@ public class MainActivity extends AppCompatActivity {
     public int sety(int x){
         int i;
 
-        i= (int) ((x*MainActivity.height)/1770);
+        i= (int) ((x* Multiplayer.height)/1770);
 
         return i;
     }
@@ -550,10 +550,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (!recreate){
             opened=0;
-            app_closed app_closed = new app_closed();
+            AppClosed app_closed = new AppClosed();
             app_closed.activity_closed();
-            start.socket.emit("quit");
-            start.socket.disconnect();
+            MultiplayerMenu.socket.emit("quit");
+            MultiplayerMenu.socket.disconnect();
             quit=true;
 
         }
@@ -566,13 +566,13 @@ public class MainActivity extends AppCompatActivity {
         if (!recreate) {
             opened = 1;
 
-            if (start_game.musicBoolean) {
-                start_game.music.start();
-                start_game.music.setLooping(true);
+            if (MainActivity.musicBoolean) {
+                MainActivity.music.start();
+                MainActivity.music.setLooping(true);
 
             }
             if (quit) {
-                Intent intent = new Intent(MainActivity.this, start.class);
+                Intent intent = new Intent(Multiplayer.this, MultiplayerMenu.class);
                 startActivity(intent);
             }
         }

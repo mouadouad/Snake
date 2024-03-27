@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class game_finished extends AppCompatActivity {
+public class GameFinished extends AppCompatActivity {
 
     public static final String SHAREDPREFS="sharedprefs";
     public static final  String Level="level";
@@ -39,39 +39,39 @@ public class game_finished extends AppCompatActivity {
 
 
         //SEE HOW MANY XP I GOT
-        if (start.my_score-start.his_score==2){
-            start.xp+=100;
+        if (MultiplayerMenu.my_score- MultiplayerMenu.his_score==2){
+            MultiplayerMenu.xp+=100;
             result.setText(R.string.won);
-        }else if (start.my_score-start.his_score==1){
-            start.xp+=70;
+        }else if (MultiplayerMenu.my_score- MultiplayerMenu.his_score==1){
+            MultiplayerMenu.xp+=70;
             result.setText(R.string.won);
-        }else if(start.my_score-start.his_score==-1){
-            start.xp+=25;
+        }else if(MultiplayerMenu.my_score- MultiplayerMenu.his_score==-1){
+            MultiplayerMenu.xp+=25;
             result.setText(R.string.lost);
-        }else if (start.my_score-start.his_score==-2){
-            start.xp+=15;
+        }else if (MultiplayerMenu.my_score- MultiplayerMenu.his_score==-2){
+            MultiplayerMenu.xp+=15;
             result.setText(R.string.lost);
-        }else if (start.my_score==start.his_score){
-            start.xp+=40;
+        }else if (MultiplayerMenu.my_score== MultiplayerMenu.his_score){
+            MultiplayerMenu.xp+=40;
             result.setText(R.string.draw);
         }
 
-        if (start.my_score==0&&start.his_score==0){
-            start.xp+=100;
+        if (MultiplayerMenu.my_score==0&& MultiplayerMenu.his_score==0){
+            MultiplayerMenu.xp+=100;
             result.setText(R.string.won);
         }else {
-            result.append("\n" + start.my_score + "/" + start.his_score);
+            result.append("\n" + MultiplayerMenu.my_score + "/" + MultiplayerMenu.his_score);
         }
 
         //UPDATE XP AND LEVEL
-        if (start.xp>=start.level*100){
-            start.xp-= start.level*100;
-            start.level++;
+        if (MultiplayerMenu.xp>= MultiplayerMenu.level*100){
+            MultiplayerMenu.xp-= MultiplayerMenu.level*100;
+            MultiplayerMenu.level++;
 
         }
 
         levelTV.setText(R.string.level);
-        levelTV.append(String.valueOf(start.level));
+        levelTV.append(String.valueOf(MultiplayerMenu.level));
 
         save();
         xp_bar();
@@ -93,8 +93,8 @@ public class game_finished extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent i = new Intent(game_finished.this, start.class);
-                start.round=1;
+                Intent i = new Intent(GameFinished.this, MultiplayerMenu.class);
+                MultiplayerMenu.round=1;
                 startActivity(i);
 
             }
@@ -106,8 +106,8 @@ public class game_finished extends AppCompatActivity {
         SharedPreferences sharedPreferences= getSharedPreferences(SHAREDPREFS,MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putInt(Level,start.level);
-        editor.putInt(Xp,start.xp);
+        editor.putInt(Level, MultiplayerMenu.level);
+        editor.putInt(Xp, MultiplayerMenu.xp);
 
         editor.apply();
     }
@@ -124,7 +124,7 @@ public class game_finished extends AppCompatActivity {
         container.setY(sety(800));
         container.setX(setx(290));
 
-        RelativeLayout.LayoutParams layoutParams6 = new RelativeLayout.LayoutParams(setx((500*start.xp)/(start.level*100)),sety(100));
+        RelativeLayout.LayoutParams layoutParams6 = new RelativeLayout.LayoutParams(setx((500* MultiplayerMenu.xp)/(MultiplayerMenu.level*100)),sety(100));
         addContentView(bar,layoutParams6);
         bar.setBackgroundResource(R.drawable.bar);
         bar.setX(setx(290));
@@ -179,14 +179,14 @@ public class game_finished extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent = new Intent(game_finished.this,start.class);
+        Intent intent = new Intent(GameFinished.this, MultiplayerMenu.class);
         startActivity(intent);
     }
 
     public int setx(int x){
         int i;
 
-        i= (int) ((x*MainActivity.width)/1080);
+        i= (int) ((x* Multiplayer.width)/1080);
 
         return i;
     }
@@ -194,7 +194,7 @@ public class game_finished extends AppCompatActivity {
     public int sety(int x){
         int i;
 
-        i= (int) ((x*MainActivity.height)/1770);
+        i= (int) ((x* Multiplayer.height)/1770);
 
         return i;
     }
@@ -203,7 +203,7 @@ public class game_finished extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         opened=0;
-        app_closed app_closed = new app_closed();
+        AppClosed app_closed = new AppClosed();
         app_closed.activity_closed();
     }
 
@@ -213,9 +213,9 @@ public class game_finished extends AppCompatActivity {
 
         opened=1;
 
-        if (start_game.musicBoolean){
-            start_game.music.start();
-            start_game.music.setLooping(true);
+        if (MainActivity.musicBoolean){
+            MainActivity.music.start();
+            MainActivity.music.setLooping(true);
 
         }
     }

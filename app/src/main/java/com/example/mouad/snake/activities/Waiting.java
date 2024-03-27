@@ -21,9 +21,8 @@ import com.github.nkzawa.emitter.Emitter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 
-public class waiting extends AppCompatActivity {
+public class Waiting extends AppCompatActivity {
 
 
     public final static String who_key = "com.mouad0.hp.snake.who_key";
@@ -66,7 +65,7 @@ public class waiting extends AppCompatActivity {
             name_lobby_tv();
 
             who="create";
-            start.socket.on("entred", new Emitter.Listener() {
+            MultiplayerMenu.socket.on("entred", new Emitter.Listener() {
                 @Override
                 public void call(final Object... args) { // SEE IF OTHER PLAYER JOINED SO WE CAN START
 
@@ -98,12 +97,12 @@ public class waiting extends AppCompatActivity {
             play.setBackgroundResource(R.drawable.play_on_button);
 
         }else{
-            start.socket.emit("random",(start.level/5)+1);
+            MultiplayerMenu.socket.emit("random",(MultiplayerMenu.level/5)+1);
 
         }
 
         //GET MY SIDE !! JOIN HAS ALREADY HIS SIDE!!
-        start.socket.on("side", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("side", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
 
@@ -117,7 +116,7 @@ public class waiting extends AppCompatActivity {
             }
         });
 
-        start.socket.on("player_found", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("player_found", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
 
@@ -135,7 +134,7 @@ public class waiting extends AppCompatActivity {
             }
         });
 
-        start.socket.on("game_found", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("game_found", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
 
@@ -154,17 +153,17 @@ public class waiting extends AppCompatActivity {
         });
 
         //IF QUIT
-        start.socket.on("quit", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("quit", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
-                        start.socket.disconnect();
-                        start.my_score=0;
-                        start.his_score=0;
-                        Intent i = new Intent(waiting.this,game_finished.class);
+                        MultiplayerMenu.socket.disconnect();
+                        MultiplayerMenu.my_score=0;
+                        MultiplayerMenu.his_score=0;
+                        Intent i = new Intent(Waiting.this, GameFinished.class);
                         startActivity(i);
                     }
                 });
@@ -177,7 +176,7 @@ public class waiting extends AppCompatActivity {
 
                 // SEE IF ALL PLAYERS ARE READY AND GO TO MAIN
                     if (joined){
-                        Intent intent=new Intent(waiting.this,MainActivity.class);
+                        Intent intent=new Intent(Waiting.this, Multiplayer.class);
                         intent.putExtra(who_key,who);
                         startActivity(intent);
                     }
@@ -200,15 +199,15 @@ public class waiting extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!who.equals("join")&&!joined){
-                    start.socket.emit("destroy");
+                    MultiplayerMenu.socket.emit("destroy");
                 }
                 if(joined){
-                    start.socket.emit("quit");
-                    start.socket.disconnect();
+                    MultiplayerMenu.socket.emit("quit");
+                    MultiplayerMenu.socket.disconnect();
 
                 }
 
-                Intent intent= new Intent(waiting.this,start.class);
+                Intent intent= new Intent(Waiting.this, MultiplayerMenu.class);
                 startActivity(intent);
             }
         });
@@ -238,13 +237,13 @@ public class waiting extends AppCompatActivity {
         div.addView(name_lobby,layoutParams3);
         name_lobby.setTextSize(setx(24));
 
-        String st1=getString(R.string.name_lobby)+ start.name;
+        String st1=getString(R.string.name_lobby)+ MultiplayerMenu.name;
 
         SpannableString ss= new SpannableString(st1);
         ForegroundColorSpan blue=new ForegroundColorSpan(Color.parseColor("#1D8189"));
         ss.setSpan(blue,0,15, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         ForegroundColorSpan yellow=new ForegroundColorSpan(Color.parseColor("#D18D1B"));
-        ss.setSpan(yellow,15,15+start.name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(yellow,15,15+ MultiplayerMenu.name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         name_lobby.setText(ss);
         name_lobby.setY(sety(800));
@@ -264,14 +263,14 @@ public class waiting extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (!who.equals("join")&&!joined){
-            start.socket.emit("destroy");
-            start.socket.disconnect();
+            MultiplayerMenu.socket.emit("destroy");
+            MultiplayerMenu.socket.disconnect();
 
         }
 
         if(joined){
-            start.socket.emit("quit");
-            start.socket.disconnect();
+            MultiplayerMenu.socket.emit("quit");
+            MultiplayerMenu.socket.disconnect();
 
         }
     }
@@ -281,16 +280,16 @@ public class waiting extends AppCompatActivity {
         super.onBackPressed();
 
         if (!who.equals("join")){
-            start.socket.emit("destroy");
+            MultiplayerMenu.socket.emit("destroy");
         }
 
         if(joined){
-            start.socket.emit("quit");
-            start.socket.disconnect();
+            MultiplayerMenu.socket.emit("quit");
+            MultiplayerMenu.socket.disconnect();
 
         }
 
-        Intent intent = new Intent(waiting.this,start.class);
+        Intent intent = new Intent(Waiting.this, MultiplayerMenu.class);
         startActivity(intent);
     }
 
@@ -345,7 +344,7 @@ public class waiting extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         opened=0;
-        app_closed app_closed = new app_closed();
+        AppClosed app_closed = new AppClosed();
         app_closed.activity_closed();
     }
 
@@ -355,9 +354,9 @@ public class waiting extends AppCompatActivity {
 
         opened=1;
 
-        if (start_game.musicBoolean){
-            start_game.music.start();
-            start_game.music.setLooping(true);
+        if (MainActivity.musicBoolean){
+            MainActivity.music.start();
+            MainActivity.music.setLooping(true);
 
         }
     }

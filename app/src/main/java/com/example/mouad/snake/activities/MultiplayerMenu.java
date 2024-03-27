@@ -24,12 +24,11 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 //import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
 
 import java.net.URISyntaxException;
 import java.util.Calendar;
 
-public class start extends AppCompatActivity {
+public class MultiplayerMenu extends AppCompatActivity {
 
     public final static String who_key = "com.mouad0.hp.snake.who_key";
     public static final String SHAREDPREFS="sharedprefs";
@@ -106,7 +105,7 @@ public class start extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent= new Intent(start.this,start_game.class);
+                Intent intent= new Intent(MultiplayerMenu.this, MainActivity.class);
                 startActivity(intent);
                 back_clicked=true;
 //                mInterstitialAd.show();
@@ -137,7 +136,7 @@ public class start extends AppCompatActivity {
         levelTV.setTextSize(setx(40));
         levelTV.setY(sety(1100));
         levelTV.setText(R.string.level);
-        levelTV.append(String.valueOf(start.level));
+        levelTV.append(String.valueOf(MultiplayerMenu.level));
 
         //SET THE XP BAR
         container= new ImageView(this);
@@ -150,7 +149,7 @@ public class start extends AppCompatActivity {
         container.setY(sety(1300));
         container.setX(setx(290));
 
-        RelativeLayout.LayoutParams layoutParams6 = new RelativeLayout.LayoutParams(setx((500*start.xp)/(start.level*100)),sety(100));
+        RelativeLayout.LayoutParams layoutParams6 = new RelativeLayout.LayoutParams(setx((500* MultiplayerMenu.xp)/(MultiplayerMenu.level*100)),sety(100));
         addContentView(bar,layoutParams6);
         bar.setBackgroundResource(R.drawable.bar);
         bar.setX(setx(290));
@@ -163,7 +162,7 @@ public class start extends AppCompatActivity {
         final long time =rightNow.getTimeInMillis();
         socket.emit("ping");
 
-        start.socket.on("pong", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("pong", new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 runOnUiThread(new Runnable() {
@@ -211,7 +210,7 @@ public class start extends AppCompatActivity {
             public void onClick(View view) {
 
                 //GO TO CREATE
-                Intent i =new Intent(start.this,create.class);
+                Intent i =new Intent(MultiplayerMenu.this, Create.class);
                 startActivity(i);
 
             }
@@ -222,7 +221,7 @@ public class start extends AppCompatActivity {
             public void onClick(View view) {
 
                 //GO TO JOIN
-                Intent i =new Intent(start.this,join.class);
+                Intent i =new Intent(MultiplayerMenu.this, Join.class);
                 startActivity(i);
 
             }
@@ -232,7 +231,7 @@ public class start extends AppCompatActivity {
             public void onClick(View view) {
 
                 //GO TO WAITING
-                Intent i =new Intent(start.this,waiting.class);
+                Intent i =new Intent(MultiplayerMenu.this, Waiting.class);
                 i.putExtra(who_key,"random");
                 startActivity(i);
 
@@ -284,7 +283,7 @@ public class start extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent = new Intent(start.this,start_game.class);
+        Intent intent = new Intent(MultiplayerMenu.this, MainActivity.class);
         startActivity(intent);
         back_clicked=true;
         //mInterstitialAd.show();
@@ -310,7 +309,7 @@ public class start extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         opened=0;
-        app_closed app_closed = new app_closed();
+        AppClosed app_closed = new AppClosed();
         app_closed.activity_closed();
     }
 
@@ -320,9 +319,9 @@ public class start extends AppCompatActivity {
 
         opened=1;
 
-        if (start_game.musicBoolean){
-            start_game.music.start();
-            start_game.music.setLooping(true);
+        if (MainActivity.musicBoolean){
+            MainActivity.music.start();
+            MainActivity.music.setLooping(true);
 
         }
     }

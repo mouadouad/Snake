@@ -14,12 +14,11 @@ import com.github.nkzawa.emitter.Emitter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 
 import java.util.Random;
 
 
-public class create extends AppCompatActivity {
+public class Create extends AppCompatActivity {
 
     public final static String who_key = "com.mouad0.hp.snake.who_key";
     public static int opened=0;
@@ -65,7 +64,7 @@ public class create extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent= new Intent(create.this,start.class);
+                Intent intent= new Intent(Create.this, MultiplayerMenu.class);
                 startActivity(intent);
             }
         });
@@ -82,11 +81,11 @@ public class create extends AppCompatActivity {
                   name_of_lobby.setError("Please choose another lobby");
 
               }else {
-                  start.name = name_of_lobby.getText().toString();
-                  start.socket.emit("create", start.name);
+                  MultiplayerMenu.name = name_of_lobby.getText().toString();
+                  MultiplayerMenu.socket.emit("create", MultiplayerMenu.name);
               }
 
-                start.socket.on("created", new Emitter.Listener() {
+                MultiplayerMenu.socket.on("created", new Emitter.Listener() {
                     @Override
                     public void call(final Object... args) { //SEE IF ROOM IS AVAILABLE
                         runOnUiThread(new Runnable() {
@@ -94,8 +93,8 @@ public class create extends AppCompatActivity {
                             public void run() {
                                 entred= (Boolean) args[0];
                                 if (entred){ //ROOM AVAILABLE GO TO WAITING
-                                    start.name = name_of_lobby.getText().toString();
-                                    Intent intent=new Intent(create.this, waiting.class);
+                                    MultiplayerMenu.name = name_of_lobby.getText().toString();
+                                    Intent intent=new Intent(Create.this, Waiting.class);
                                     intent.putExtra(who_key,"create");
                                     startActivity(intent);
                                 }
@@ -123,9 +122,9 @@ public class create extends AppCompatActivity {
         }
 
         //SAY THAT I WANT THIS ROOM
-        start.socket.emit("create", generated);
+        MultiplayerMenu.socket.emit("create", generated);
 
-        start.socket.on("created", new Emitter.Listener() {
+        MultiplayerMenu.socket.on("created", new Emitter.Listener() {
             @Override
             public void call(final Object... args) { //SEE IF ROOM IS AVAILABLE
                 runOnUiThread(new Runnable() {
@@ -133,8 +132,8 @@ public class create extends AppCompatActivity {
                     public void run() {
                         entred= (Boolean) args[0];
                         if (entred){ //ROOM AVAILABLE GO TO WAITING
-                            start.name=generated;
-                            Intent intent=new Intent(create.this,waiting.class);
+                            MultiplayerMenu.name=generated;
+                            Intent intent=new Intent(Create.this, Waiting.class);
                             intent.putExtra(who_key,"create");
                             startActivity(intent);
                         }else{
@@ -185,7 +184,7 @@ public class create extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent = new Intent(create.this,start.class);
+        Intent intent = new Intent(Create.this, MultiplayerMenu.class);
         startActivity(intent);
     }
 
@@ -240,7 +239,7 @@ public class create extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         opened=0;
-        app_closed app_closed = new app_closed();
+        AppClosed app_closed = new AppClosed();
         app_closed.activity_closed();
     }
 
@@ -250,9 +249,9 @@ public class create extends AppCompatActivity {
 
         opened=1;
 
-        if (start_game.musicBoolean){
-            start_game.music.start();
-            start_game.music.setLooping(true);
+        if (MainActivity.musicBoolean){
+            MainActivity.music.start();
+            MainActivity.music.setLooping(true);
 
         }
     }

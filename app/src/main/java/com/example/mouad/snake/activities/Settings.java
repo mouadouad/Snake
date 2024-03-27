@@ -5,19 +5,17 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-public class settings extends AppCompatActivity {
+public class Settings extends AppCompatActivity {
 
     public final static String SHARED_PREFS="shared_prefs";
     public final static String music_SHAREDPREFS="music_SHAREDPREFS";
@@ -61,12 +59,12 @@ public class settings extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (music_switch.isChecked()){
-                    start_game.music.start();
-                    start_game.music.setLooping(true);
+                    MainActivity.music.start();
+                    MainActivity.music.setLooping(true);
                 }else{
-                    start_game.music.pause();
+                    MainActivity.music.pause();
                 }
-                start_game.musicBoolean= music_switch.isChecked();
+                MainActivity.musicBoolean= music_switch.isChecked();
                 save();
             }
         });
@@ -191,7 +189,7 @@ public class settings extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         opened=0;
-        app_closed app_closed = new app_closed();
+        AppClosed app_closed = new AppClosed();
         app_closed.activity_closed();
     }
 
@@ -201,9 +199,9 @@ public class settings extends AppCompatActivity {
 
         opened=1;
 
-        if (start_game.musicBoolean){
-            start_game.music.start();
-            start_game.music.setLooping(true);
+        if (MainActivity.musicBoolean){
+            MainActivity.music.start();
+            MainActivity.music.setLooping(true);
 
         }
     }

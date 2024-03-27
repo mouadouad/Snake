@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.media.MediaPlayer;
-import android.os.Handler;
+
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Display;
@@ -16,12 +16,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
 //import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
 
-public class start_game extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity {
 
     public final static String SHARED_PREFS="shared_prefs";
     public final static String music_SHAREDPREFS="music_SHAREDPREFS";
@@ -37,12 +35,15 @@ public class start_game extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         Display display = getWindowManager().getDefaultDisplay();
         Point size= new Point() ;
         display.getSize(size);
         width = size.x;
         height = size.y;
+
+        Shared.statusBarHeight = getStatusBarHeight();
+        Shared.height = height;
+        Shared.width = width;
 
         background();
         create_buttons();
@@ -61,7 +62,7 @@ public class start_game extends AppCompatActivity {
         musicBoolean =sharedPreferences.getBoolean(music_SHAREDPREFS,true);
 
         //SEE IF COMING FROM SETTING OR FROM LEVELS
-        if (!start.back_clicked&&!com.example.mouad.snake.normal.back_clicked) {
+        if (!MultiplayerMenu.back_clicked&&!com.example.mouad.snake.Normal.back_clicked) {
             music = MediaPlayer.create(this, R.raw.snake_sound);
         }
 
@@ -79,7 +80,7 @@ public class start_game extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                    Intent intent = new Intent(start_game.this, start.class);
+                    Intent intent = new Intent(MainActivity.this, MultiplayerMenu.class);
                     startActivity(intent);
                    // mInterstitialAd.show();
 
@@ -89,7 +90,7 @@ public class start_game extends AppCompatActivity {
         Normal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(start_game.this, normal.class);
+                Intent i = new Intent(MainActivity.this, com.example.mouad.snake.Normal.class);
                 startActivity(i);
             }
         });
@@ -97,7 +98,7 @@ public class start_game extends AppCompatActivity {
         Settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(start_game.this, settings.class);
+                Intent i = new Intent(MainActivity.this, com.example.mouad.snake.Settings.class);
                 startActivity(i);
             }
         });
@@ -163,6 +164,15 @@ public class start_game extends AppCompatActivity {
         return i;
     }
 
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -179,7 +189,7 @@ public class start_game extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         opened=0;
-        app_closed app_closed = new app_closed();
+        AppClosed app_closed = new AppClosed();
         app_closed.activity_closed();
     }
 
