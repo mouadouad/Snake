@@ -19,9 +19,9 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.mouad.snake.AppClosed;
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Rects;
+import com.example.mouad.snake.Shared;
 import com.github.nkzawa.emitter.Emitter;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -551,29 +551,26 @@ public class Multiplayer extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
         if (!recreate){
-            opened=0;
-            AppClosed app_closed = new AppClosed();
-            app_closed.activity_closed();
+            if(!Shared.foreGround){
+                MainActivity.music.pause();
+                MainActivity.isMusicPlaying = false;
+            }
             MultiplayerMenu.socket.emit("quit");
             MultiplayerMenu.socket.disconnect();
             quit=true;
-
         }
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if (!recreate) {
-            opened = 1;
-
-            if (MainActivity.musicBoolean) {
+            Shared.foreGround = true;
+            if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying){
                 MainActivity.music.start();
                 MainActivity.music.setLooping(true);
-
+                MainActivity.isMusicPlaying = true;
             }
             if (quit) {
                 Intent intent = new Intent(Multiplayer.this, MultiplayerMenu.class);
@@ -581,6 +578,13 @@ public class Multiplayer extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Shared.foreGround = false;
+    }
+
 
 
 }

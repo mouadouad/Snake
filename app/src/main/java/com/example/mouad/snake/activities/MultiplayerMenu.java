@@ -4,22 +4,18 @@ package com.example.mouad.snake.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.Typeface;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.mouad.snake.AppClosed;
 import com.example.mouad.snake.R;
-import com.github.nkzawa.emitter.Emitter;
+import com.example.mouad.snake.Shared;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.gms.ads.AdRequest;
@@ -33,19 +29,11 @@ import java.util.Calendar;
 public class MultiplayerMenu extends AppCompatActivity {
 
     public final static String who_key = "com.mouad0.hp.snake.who_key";
-    public static final String SHAREDPREFS="sharedprefs";
     public static final  String Level="level";
     public static final  String Xp="xp";
 
-    public static Boolean back_clicked=false;
-    public static int opened=0;
-
-
-    ImageView container,bar;
     //InterstitialAd mInterstitialAd;
-    Button create, join, random;
     public static String name;
-    int width,height;
     public static Socket socket;
     public static int level,xp;
     public static int round=1, my_score=0, his_score=0;
@@ -54,25 +42,18 @@ public class MultiplayerMenu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size= new Point() ;
-        display.getSize(size);
-        width = size.x;
-        height = size.y;
+        //GET SAVED LEVEL AND XP
+        SharedPreferences sharedPreferences= getSharedPreferences(Shared.SHARED_PREFS,MODE_PRIVATE);
+        level=sharedPreferences.getInt(Level,1);
+        xp=sharedPreferences.getInt(Xp,0);
 
         background();
         back_button();
 
-
-            //CONNECT TO SERVER
         try {
-          // socket = IO.socket("http://10.0.2.2:3000");
-
-          socket = IO.socket("https://snake1234.herokuapp.com/");
-            //create connection
-             socket.connect();
-
-
+            socket = IO.socket("http://10.0.2.2:3000");
+          //socket = IO.socket("https://snake1234.herokuapp.com/");
+            socket.connect();
         } catch (URISyntaxException e) {
             e.printStackTrace();
 
@@ -81,174 +62,130 @@ public class MultiplayerMenu extends AppCompatActivity {
         ping();
         buttons();
 
-        //GET SAVED LEVEL AND XP
-        SharedPreferences sharedPreferences= getSharedPreferences(SHAREDPREFS,MODE_PRIVATE);
-        level=sharedPreferences.getInt(Level,1);
-        xp=sharedPreferences.getInt(Xp,0);
-
         //ADD INTERSTITIAL
-//        mInterstitialAd = new InterstitialAd(this);
-//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-//        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        /*
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build()); */
 
         xp_bar();
         banner();
 
     }
-
     public void back_button(){
-        Button back =new Button(this );
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(setx(100),sety(50));
+        final Button back =new Button(this );
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100),Shared.setY(50));
         back.setBackgroundResource(R.drawable.back_button);
         addContentView(back,layoutParams);
-        back.setY(sety(50));
-        back.setX(setx(50));
+        back.setY(Shared.setY(50));
+        back.setX(Shared.setX(50));
 
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent= new Intent(MultiplayerMenu.this, MainActivity.class);
-                startActivity(intent);
-                back_clicked=true;
+        back.setOnClickListener(view -> {
+            Intent intent= new Intent(MultiplayerMenu.this, MainActivity.class);
+            startActivity(intent);
 //                mInterstitialAd.show();
-            }
         });
     }
-
     public void xp_bar(){
-
-        Typeface fredoka= Typeface.createFromAsset(getAssets(),
+        final Typeface fredoka= Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
 
         //SET THE LAYOUT TO ALIGN OBJECTS
-        RelativeLayout div = new RelativeLayout(this);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        final RelativeLayout div = new RelativeLayout(this);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         addContentView(div,layoutParams);
 
         //SET LEVEL TEXT VIEW
-        TextView levelTV= new TextView(this);
+        final TextView levelTV= new TextView(this);
 
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams3.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        div.addView(levelTV,layoutParams3);
+        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams1.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        div.addView(levelTV,layoutParams1);
 
         int blue= Color.parseColor("#1D8189");
         levelTV.setTextColor(blue);
         levelTV.setTypeface(fredoka);
-        levelTV.setTextSize(setx(40));
-        levelTV.setY(sety(1100));
+        levelTV.setTextSize(Shared.setX(40));
+        levelTV.setY(Shared.setY(1100));
         levelTV.setText(R.string.level);
         levelTV.append(String.valueOf(MultiplayerMenu.level));
 
-        //SET THE XP BAR
+        final ImageView container,bar;
+
         container= new ImageView(this);
         bar= new ImageView(this);
 
-
-        RelativeLayout.LayoutParams layoutParams5 = new RelativeLayout.LayoutParams(setx(500),sety(100));
-        addContentView(container,layoutParams5);
+        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(500),Shared.setY(100));
+        addContentView(container,layoutParams2);
         container.setBackgroundResource(R.drawable.container);
-        container.setY(sety(1300));
-        container.setX(setx(290));
+        container.setY(Shared.setY(1300));
+        container.setX(Shared.setX(290));
 
-        RelativeLayout.LayoutParams layoutParams6 = new RelativeLayout.LayoutParams(setx((500* MultiplayerMenu.xp)/(MultiplayerMenu.level*100)),sety(100));
-        addContentView(bar,layoutParams6);
+        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(Shared.setX((500* MultiplayerMenu.xp)/(MultiplayerMenu.level*100)),Shared.setY(100));
+        addContentView(bar,layoutParams3);
         bar.setBackgroundResource(R.drawable.bar);
-        bar.setX(setx(290));
-        bar.setY(sety(1300));
+        bar.setX(Shared.setX(290));
+        bar.setY(Shared.setY(1300));
     }
 
     private void ping() {
-        //GET LAG
         Calendar rightNow = Calendar.getInstance();
         final long time =rightNow.getTimeInMillis();
         socket.emit("ping");
 
-        MultiplayerMenu.socket.on("pong", new Emitter.Listener() {
-            @Override
-            public void call(final Object... args) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        Calendar rightNow = Calendar.getInstance();
-                        Log.d("LAAAAAAAG", String.valueOf(rightNow.getTimeInMillis()-time));
-
-                    }
-                });
-            }
-        });
+        MultiplayerMenu.socket.on("pong", args -> runOnUiThread(() -> {
+            Calendar rightNow1 = Calendar.getInstance();
+            Log.d("ping", String.valueOf(rightNow1.getTimeInMillis()-time));
+        }));
     }
 
     public void buttons(){
-        //CREATE BUTTONS
+        final Button create, join, random;
+
         create =new Button(this);
         join =new Button(this);
         random =new Button(this);
 
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(setx(300),sety(200));
-        addContentView(create,layoutParams2);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300),Shared.setY(200));
+        addContentView(create,layoutParams);
         create.setBackgroundResource(R.drawable.c_lobby_button);
-        create.setY(sety(200));
-        create.setX(setx(400));
+        create.setY(Shared.setY(200));
+        create.setX(Shared.setX(400));
 
-
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(setx(300),sety(200));
-        addContentView(join,layoutParams3);
+        final RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(300),Shared.setY(200));
+        addContentView(join,layoutParams1);
         join.setBackgroundResource(R.drawable.j_lobby_button);
-        join.setY(sety(500));
-        join.setX(setx(400));
+        join.setY(Shared.setY(500));
+        join.setX(Shared.setX(400));
 
-
-        RelativeLayout.LayoutParams layoutParams4 = new RelativeLayout.LayoutParams(setx(300),sety(180));
-        addContentView(random,layoutParams4);
+        final RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300),Shared.setY(180));
+        addContentView(random,layoutParams2);
         random.setBackgroundResource(R.drawable.random_button);
-        random.setY(sety(800));
-        random.setX(setx(400));
+        random.setY(Shared.setY(800));
+        random.setX(Shared.setX(400));
 
-
-        create.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //GO TO CREATE
-                Intent i =new Intent(MultiplayerMenu.this, Create.class);
-                startActivity(i);
-
-            }
+        create.setOnClickListener(view -> {
+            Intent i =new Intent(MultiplayerMenu.this, Create.class);
+            startActivity(i);
         });
 
-        join.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //GO TO JOIN
-                Intent i =new Intent(MultiplayerMenu.this, Join.class);
-                startActivity(i);
-
-            }
+        join.setOnClickListener(view -> {
+            Intent i =new Intent(MultiplayerMenu.this, Join.class);
+            startActivity(i);
         });
-        random.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //GO TO WAITING
-                Intent i =new Intent(MultiplayerMenu.this, Waiting.class);
-                i.putExtra(who_key,"random");
-                startActivity(i);
-
-            }
+        random.setOnClickListener(view -> {
+            Intent i =new Intent(MultiplayerMenu.this, Waiting.class);
+            i.putExtra(who_key,"random");
+            startActivity(i);
         });
-
     }
 
     private void background() {
-        //BACKGROUND
-        RelativeLayout background=new RelativeLayout(this);
-        RelativeLayout.LayoutParams backparams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        int back_color= Color.parseColor("#3A4647");
+        final RelativeLayout background=new RelativeLayout(this);
+        final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        final int back_color= Color.parseColor("#3A4647");
         background.setBackgroundColor(back_color);
-        addContentView(background,backparams);
+        addContentView(background,params);
     }
 
     public void banner(){
@@ -257,7 +194,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         adView.setAdUnitId("ca-app-pub-3922358669029120/2831354657");
 
         RelativeLayout layout=new RelativeLayout(this);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams( width,  height-getStatusBarHeight());
+        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams( MainActivity.width,  MainActivity.height - Shared.statusBarHeight);
         addContentView(layout,layoutParams1);
 
 
@@ -270,61 +207,35 @@ public class MultiplayerMenu extends AppCompatActivity {
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
-
     }
-
-    public int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(MultiplayerMenu.this, MainActivity.class);
         startActivity(intent);
-        back_clicked=true;
         //mInterstitialAd.show();
     }
-
-    public int setx(int x){
-        int i;
-
-        i=(x*width)/1080;
-
-        return i;
-    }
-
-    public int sety(int x){
-        int i;
-
-        i=(x*height)/1770;
-
-        return i;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        opened=0;
-        AppClosed app_closed = new AppClosed();
-        app_closed.activity_closed();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-
-        opened=1;
-
-        if (MainActivity.musicBoolean){
+        Shared.foreGround = true;
+        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying){
             MainActivity.music.start();
             MainActivity.music.setLooping(true);
-
+            MainActivity.isMusicPlaying = true;
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Shared.foreGround = false;
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!Shared.foreGround){
+            MainActivity.music.pause();
+            MainActivity.isMusicPlaying = false;
         }
     }
 

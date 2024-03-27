@@ -8,15 +8,14 @@ import android.media.MediaPlayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.example.mouad.snake.AppClosed;
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
 
@@ -25,14 +24,9 @@ import com.example.mouad.snake.Shared;
 
 public class MainActivity extends AppCompatActivity {
 
-    public final static String SHARED_PREFS="shared_prefs";
-    public final static String music_SHAREDPREFS="music_SHAREDPREFS";
-    public static int opened=0;
     public static MediaPlayer music;
-    public static boolean  musicBoolean;
+    public static boolean  musicBoolean, isMusicPlaying = false;
     public static int width,height;
-    Button multi, Normal,Settings;
-    ImageView icon;
     //InterstitialAd mInterstitialAd;
 
     @Override
@@ -53,97 +47,71 @@ public class MainActivity extends AppCompatActivity {
         create_buttons();
         make_icon();
 
-        //ANIMATION FOR SPLASH SCREEN
-        Animation from_bottom= AnimationUtils.loadAnimation(this, R.anim.from_bottom);
-        Animation from_top= AnimationUtils.loadAnimation(this,R.anim.from_top);
+        final SharedPreferences sharedPreferences=getSharedPreferences(Shared.SHARED_PREFS,MODE_PRIVATE);
+        musicBoolean =sharedPreferences.getBoolean(Shared.MUSIC_SHARED_PREFS,true);
 
-        Normal.setAnimation(from_bottom);
-        multi.setAnimation(from_bottom);
-        icon.setAnimation(from_top);
-
-        //MUSIC
-        SharedPreferences sharedPreferences=getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
-        musicBoolean =sharedPreferences.getBoolean(music_SHAREDPREFS,true);
-
-        //SEE IF COMING FROM SETTING OR FROM LEVELS
-        if (!MultiplayerMenu.back_clicked&&!com.example.mouad.snake.activities.Normal.back_clicked) {
-            music = MediaPlayer.create(this, R.raw.snake_sound);
-        }
+        music = MediaPlayer.create(this, R.raw.snake_sound);
 
 
-        //ADD INTERSTITIAL
 //        mInterstitialAd = new InterstitialAd(this);
 //        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
 //        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-
-        button_onclicks();
     }
-
-    private void button_onclicks() {
-        multi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                    Intent intent = new Intent(MainActivity.this, MultiplayerMenu.class);
-                    startActivity(intent);
-                   // mInterstitialAd.show();
-
-            }
-        });
-
-        Normal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, com.example.mouad.snake.activities.Normal.class);
-                startActivity(i);
-            }
-        });
-
-        Settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, com.example.mouad.snake.activities.Settings.class);
-                startActivity(i);
-            }
-        });
-    }
-
     private void make_icon() {
-        //MAKING THE ICON
-        icon=new ImageView(this);
+        final Animation from_top = AnimationUtils.loadAnimation(this,R.anim.from_top);
+        final ImageView icon = new ImageView(this);
         icon.setBackgroundResource(R.drawable.icon);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(setx(200),sety(400));
+        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(200),Shared.setY(400));
         addContentView(icon,layoutParams1);
-        icon.setY(sety(260));
-        icon.setX(setx((1080-200)/2));
+        icon.setY(Shared.setY(260));
+        icon.setX(Shared.setX((1080-200)/2));
+        icon.setAnimation(from_top);
     }
-
     private void create_buttons() {
-        //CREATE BUTTONS
+        final Button multi, Normal,Settings;
         multi =new Button(this);
         Normal =new Button(this);
         Settings= new Button(this);
 
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(setx(300),sety(150));
+        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300),Shared.setY(150));
         addContentView(multi,layoutParams2);
         multi.setBackgroundResource(R.drawable.multiplayer_button);
-        multi.setY(sety(1000));
-        multi.setX(setx(390));
+        multi.setY(Shared.setY(1000));
+        multi.setX(Shared.setX(390));
 
-
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(setx(300),sety(150));
+        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(Shared.setX(300),Shared.setY(150));
         addContentView(Normal,layoutParams3);
         Normal.setBackgroundResource(R.drawable.normal_button);
-        Normal.setY(sety(800));
-        Normal.setX(setx(390));
+        Normal.setY(Shared.setY(800));
+        Normal.setX(Shared.setX(390));
 
-        RelativeLayout.LayoutParams layoutParams4 = new RelativeLayout.LayoutParams(setx(300),sety(150));
+        RelativeLayout.LayoutParams layoutParams4 = new RelativeLayout.LayoutParams(Shared.setX(300),Shared.setY(150));
         addContentView(Settings,layoutParams4);
         Settings.setBackgroundResource(R.drawable.settings_button);
-        Settings.setX(setx(700));
-        Settings.setY(sety(50));
-    }
+        Settings.setX(Shared.setX(700));
+        Settings.setY(Shared.setY(50));
 
+        multi.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, MultiplayerMenu.class);
+            startActivity(intent);
+            // mInterstitialAd.show();
+        });
+
+        Normal.setOnClickListener(view -> {
+            Intent i = new Intent(MainActivity.this, com.example.mouad.snake.activities.Normal.class);
+            startActivity(i);
+        });
+
+        Settings.setOnClickListener(view -> {
+            Intent i = new Intent(MainActivity.this, com.example.mouad.snake.activities.Settings.class);
+            startActivity(i);
+        });
+
+        final Animation from_bottom = AnimationUtils.loadAnimation(this, R.anim.from_bottom);
+        Normal.setAnimation(from_bottom);
+        multi.setAnimation(from_bottom);
+
+    }
     private void background() {
         //BACKGROUND
         RelativeLayout background=new RelativeLayout(this);
@@ -152,22 +120,6 @@ public class MainActivity extends AppCompatActivity {
         background.setBackgroundColor(back_color);
         addContentView(background,backparams);
     }
-
-    public int setx(int x){
-        int i;
-
-        i=(x*width)/1080;
-
-        return i;
-    }
-    public int sety(int x){
-        int i;
-
-        i=(x*height)/1770;
-
-        return i;
-    }
-
     public int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -176,25 +128,28 @@ public class MainActivity extends AppCompatActivity {
         }
         return result;
     }
-
     @Override
     public void onResume() {
         super.onResume();
-
-        if (musicBoolean){
+        Shared.foreGround = true;
+        if (musicBoolean && !isMusicPlaying){
             music.start();
             music.setLooping(true);
+            isMusicPlaying = true;
         }
-        opened=1;
     }
-
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Shared.foreGround = false;
+    }
     @Override
     protected void onStop() {
         super.onStop();
-        opened=0;
-        AppClosed app_closed = new AppClosed();
-        app_closed.activity_closed();
+        if(!Shared.foreGround){
+            music.pause();
+            isMusicPlaying = false;
+        }
     }
 
 }

@@ -23,7 +23,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.example.mouad.snake.AppClosed;
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.components.GameView;
@@ -46,8 +45,7 @@ import java.util.Random;
 
 public class Normal extends AppCompatActivity {
     public static Boolean back_clicked = false;
-    public static int opened = 0;
-    private static final short TIMEOUT = 10, pixels = 30;
+    private static final short TIMEOUT = 10, pixels = 30, obsSize = 15;
     protected short timeout = TIMEOUT;
     private Boolean started = false, stillTraveling = true, finished = false;
     static Rect topBar, bottomBar, leftBar, rightBar;
@@ -612,13 +610,12 @@ public class Normal extends AppCompatActivity {
         }
         arr[0][last[0]][last[1]] = 2;
 
-        final short n = 5;
-        float[][][] result = new float[1][n][n];
+        float[][][] result = new float[1][obsSize][obsSize];
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                int x = last[0] - n / 2 + i;
-                int y = last[1] - n / 2 + j;
+        for (int i = 0; i < obsSize; i++) {
+            for (int j = 0; j < obsSize; j++) {
+                int x = last[0] - obsSize / 2 + i;
+                int y = last[1] - obsSize / 2 + j;
                 if (x < 0 || x >= 54 || y < 0 || y >= 36) {
                     result[0][i][j] = -1;
                 } else {
@@ -795,22 +792,26 @@ public class Normal extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        opened = 0;
-        AppClosed app_closed = new AppClosed();
-        app_closed.activity_closed();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        opened = 1;
-
-        if (MainActivity.musicBoolean) {
+        Shared.foreGround = true;
+        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying){
             MainActivity.music.start();
             MainActivity.music.setLooping(true);
-
+            MainActivity.isMusicPlaying = true;
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Shared.foreGround = false;
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!Shared.foreGround){
+            MainActivity.music.pause();
+            MainActivity.isMusicPlaying = false;
         }
     }
 

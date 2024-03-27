@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
-import com.example.mouad.snake.AppClosed;
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.Shared;
 import com.github.nkzawa.emitter.Emitter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -195,23 +195,26 @@ public class Join extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        opened=0;
-        AppClosed app_closed = new AppClosed();
-        app_closed.activity_closed();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-
-        opened=1;
-
-        if (MainActivity.musicBoolean){
+        Shared.foreGround = true;
+        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying){
             MainActivity.music.start();
             MainActivity.music.setLooping(true);
-
+            MainActivity.isMusicPlaying = true;
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Shared.foreGround = false;
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!Shared.foreGround){
+            MainActivity.music.pause();
+            MainActivity.isMusicPlaying = false;
         }
     }
 }

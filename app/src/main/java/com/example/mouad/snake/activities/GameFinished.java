@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.mouad.snake.AppClosed;
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.Shared;
 
 public class GameFinished extends AppCompatActivity {
 
@@ -203,23 +203,26 @@ public class GameFinished extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        opened=0;
-        AppClosed app_closed = new AppClosed();
-        app_closed.activity_closed();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-
-        opened=1;
-
-        if (MainActivity.musicBoolean){
+        Shared.foreGround = true;
+        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying){
             MainActivity.music.start();
             MainActivity.music.setLooping(true);
-
+            MainActivity.isMusicPlaying = true;
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Shared.foreGround = false;
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!Shared.foreGround){
+            MainActivity.music.pause();
+            MainActivity.isMusicPlaying = false;
         }
     }
 
