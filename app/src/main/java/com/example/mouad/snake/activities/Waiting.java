@@ -19,11 +19,6 @@ import android.widget.TextView;
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.enums.States;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-
-
 
 public class Waiting extends AppCompatActivity {
 
@@ -31,20 +26,19 @@ public class Waiting extends AppCompatActivity {
     Button play;
     States who;
     public static int side;
-    Boolean sound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        background();
-        button();
+        Shared.background(this, this);
+        Shared.banner(this, this);
+        playButton();
         back_button();
-        banner();
 
         //SOUND
-        SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
-        sound = sharedPreferences.getBoolean(Shared.SOUND_SHARED_PREFS, true);
+        final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
+        final boolean sound = sharedPreferences.getBoolean(Shared.SOUND_SHARED_PREFS, true);
         final MediaPlayer shine = MediaPlayer.create(this, R.raw.time_start_sound);
 
         Intent a = getIntent(); // GET WHO ENTERED IF CREATE OR JOIN
@@ -107,14 +101,7 @@ public class Waiting extends AppCompatActivity {
             startActivity(i);
         }));
 
-        play.setOnClickListener(view -> {
-            // SEE IF ALL PLAYERS ARE READY AND GO TO MAIN
-            if (joined) {
-                Intent intent = new Intent(Waiting.this, Multiplayer.class);
-                intent.putExtra(Shared.who_key, who);
-                startActivity(intent);
-            }
-        });
+
     }
 
     public void back_button() {
@@ -126,7 +113,7 @@ public class Waiting extends AppCompatActivity {
         back.setX(Shared.setX(50));
 
         back.setOnClickListener(view -> {
-            if (!who.equals("join") && !joined) {
+            if (who != States.JOIN && !joined) {
                 MultiplayerMenu.socket.emit("destroy");
             }
             if (joined) {
@@ -138,13 +125,22 @@ public class Waiting extends AppCompatActivity {
         });
     }
 
-    private void button() {
+    private void playButton() {
         play = new Button(this);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
         addContentView(play, layoutParams2);
         play.setBackgroundResource(R.drawable.play_off_button);
         play.setY(Shared.setY(200));
         play.setX(Shared.setX(400));
+
+        play.setOnClickListener(view -> {
+            // SEE IF ALL PLAYERS ARE READY AND GO TO MAIN
+            if (joined) {
+                Intent intent = new Intent(Waiting.this, Multiplayer.class);
+                intent.putExtra(Shared.who_key, who);
+                startActivity(intent);
+            }
+        });
     }
 
     private void name_lobby_tv() {
@@ -156,36 +152,27 @@ public class Waiting extends AppCompatActivity {
 
         //SET THE NAME OF THE LOBBY
         final TextView name_lobby = new TextView(this);
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(Shared.setX(600), RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams3.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        div.addView(name_lobby, layoutParams3);
+        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(600), RelativeLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams1.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        div.addView(name_lobby, layoutParams1);
         name_lobby.setTextSize(Shared.setX(24));
 
-        String st1 = getString(R.string.name_lobby) + MultiplayerMenu.name;
+        final String st1 = getString(R.string.name_lobby) + MultiplayerMenu.name;
 
-        SpannableString ss = new SpannableString(st1);
-        ForegroundColorSpan blue = new ForegroundColorSpan(Color.parseColor("#1D8189"));
+        final SpannableString ss = new SpannableString(st1);
+        final ForegroundColorSpan blue = new ForegroundColorSpan(Color.parseColor("#1D8189"));
         ss.setSpan(blue, 0, 15, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        ForegroundColorSpan yellow = new ForegroundColorSpan(Color.parseColor("#D18D1B"));
+        final ForegroundColorSpan yellow = new ForegroundColorSpan(Color.parseColor("#D18D1B"));
         ss.setSpan(yellow, 15, 15 + MultiplayerMenu.name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         name_lobby.setText(ss);
         name_lobby.setY(Shared.setY(800));
-
-    }
-
-    private void background() {
-        RelativeLayout background = new RelativeLayout(this);
-        RelativeLayout.LayoutParams backParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        int back_color = Color.parseColor("#3A4647");
-        background.setBackgroundColor(back_color);
-        addContentView(background, backParams);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!who.equals("join") && !joined) {
+        if (who != States.JOIN && !joined) {
             MultiplayerMenu.socket.emit("destroy");
             MultiplayerMenu.socket.disconnect();
         }
@@ -195,12 +182,11 @@ public class Waiting extends AppCompatActivity {
             MultiplayerMenu.socket.disconnect();
         }
     }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
 
-        if (!who.equals("join")) {
+        if (who != States.JOIN) {
             MultiplayerMenu.socket.emit("destroy");
         }
 
@@ -211,28 +197,6 @@ public class Waiting extends AppCompatActivity {
         }
         Intent intent = new Intent(Waiting.this, MultiplayerMenu.class);
         startActivity(intent);
-    }
-
-    public void banner() {
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-3922358669029120/2831354657");
-
-        RelativeLayout layout = new RelativeLayout(this);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.width, Shared.height - Shared.statusBarHeight);
-        addContentView(layout, layoutParams1);
-
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layout.addView(adView, layoutParams);
-
-        //MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-
-
     }
     public void onResume() {
         super.onResume();

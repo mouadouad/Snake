@@ -267,9 +267,7 @@ public class Multiplayer extends AppCompatActivity {
             }
 
         }));
-
         back_button();
-
     }
 
     private void set_rounds_tv() {
@@ -359,15 +357,11 @@ public class Multiplayer extends AppCompatActivity {
         back.setX(Shared.setX(50));
 
         back.setOnClickListener(view -> {
-
-            Intent intent = new Intent(Multiplayer.this, MultiplayerMenu.class);
-            startActivity(intent);
             MultiplayerMenu.socket.emit("quit");
             MultiplayerMenu.socket.disconnect();
-
+            this.finish();
         });
     }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();

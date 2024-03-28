@@ -23,16 +23,12 @@ public class GameFinished extends AppCompatActivity {
     TextView result;
     TextView levelTV;
     RelativeLayout div;
-    Typeface fredoka;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        fredoka = Typeface.createFromAsset(getAssets(),
-                "FredokaOne-Regular.ttf");
-
-        background();
+        Shared.background(this, this);
         make_textViews();
 
         //SEE HOW MANY XP I GOT
@@ -123,6 +119,9 @@ public class GameFinished extends AppCompatActivity {
 
     public void make_textViews() {
 
+        final Typeface fredoka = Typeface.createFromAsset(getAssets(),
+                "FredokaOne-Regular.ttf");
+
         //SET THE LAYOUT TO ALIGN OBJECTS
         div = new RelativeLayout(this);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -153,15 +152,6 @@ public class GameFinished extends AppCompatActivity {
         levelTV.setTypeface(fredoka);
         levelTV.setTextSize(Shared.setX(40));
         levelTV.setY(Shared.setY(600));
-    }
-
-    private void background() {
-        //BACKGROUND
-        RelativeLayout background = new RelativeLayout(this);
-        RelativeLayout.LayoutParams backparams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        int back_color = Color.parseColor("#3A4647");
-        background.setBackgroundColor(back_color);
-        addContentView(background, backparams);
     }
 
     @Override

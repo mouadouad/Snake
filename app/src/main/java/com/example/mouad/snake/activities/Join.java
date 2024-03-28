@@ -1,7 +1,6 @@
 package com.example.mouad.snake.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,20 +12,18 @@ import android.widget.RelativeLayout;
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.enums.States;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 
 public class Join extends AppCompatActivity {
     EditText name_of_lobby;
     Button confirm;
-    Boolean entred = false;
+    Boolean entered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        background();
+        Shared.background(this, this);
+        Shared.banner(this, this);
         buttons_editText();
         back_button();
 
@@ -34,7 +31,6 @@ public class Join extends AppCompatActivity {
         MultiplayerMenu.socket.on("side", args -> runOnUiThread(() -> Waiting.side = (Integer) args[0]));
 
         confirm_click_listener();
-        banner();
     }
 
     private void confirm_click_listener() {
@@ -46,8 +42,8 @@ public class Join extends AppCompatActivity {
 
             MultiplayerMenu.socket.on("entred1", args -> { //SEE IF ROOM EXISTS
                 runOnUiThread(() -> {
-                    entred = (Boolean) args[0];
-                    if (entred) { //ROOM EXISTS AND IS AVAILABLE GO WAITING
+                    entered = (Boolean) args[0];
+                    if (entered) { //ROOM EXISTS AND IS AVAILABLE GO WAITING
                         MultiplayerMenu.name = name_of_lobby.getText().toString();
                         Intent intent = new Intent(Join.this, Waiting.class);
                         intent.putExtra(Shared.who_key, States.JOIN);
@@ -86,37 +82,6 @@ public class Join extends AppCompatActivity {
         confirm.setBackgroundResource(R.drawable.join_button);
         confirm.setY(Shared.setY(500));
         confirm.setX(Shared.setX(400));
-    }
-
-    private void background() {
-        //BACKGROUND
-        RelativeLayout background = new RelativeLayout(this);
-        RelativeLayout.LayoutParams backparams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        int back_color = Color.parseColor("#3A4647");
-        background.setBackgroundColor(back_color);
-        addContentView(background, backparams);
-    }
-
-    public void banner() {
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-3922358669029120/2831354657");
-
-        RelativeLayout layout = new RelativeLayout(this);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.width, Shared.height - Shared.statusBarHeight);
-        addContentView(layout, layoutParams1);
-
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layout.addView(adView, layoutParams);
-
-        //MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-
-
     }
 
     @Override

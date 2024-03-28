@@ -215,8 +215,6 @@ public class Rects extends View {
                 canvas.drawRect(rect1,bluePaint);
 
             }
-
-
         }
 
         //SET THE PLAYGROUND
@@ -224,27 +222,21 @@ public class Rects extends View {
         @SuppressLint("DrawAllocation")  Rect bottomBar=new Rect();
         @SuppressLint("DrawAllocation")  Rect leftBar=new Rect();
         @SuppressLint("DrawAllocation")  Rect rightBar=new Rect();
-
-        int width = (MainActivity.width);
-
+        
         leftBar.set(0,0,Shared.setX(20),Shared.setY(1600));
-        rightBar.set(width-Shared.setX(20),0,width,Shared.setY(1600));
-        topBar.set(0,0,width,Shared.setY(20));
-        bottomBar.set(0,Shared.setY(1580),width,Shared.setY(1600));
+        rightBar.set(Shared.width-Shared.setX(20),0,Shared.width,Shared.setY(1600));
+        topBar.set(0,0,Shared.width,Shared.setY(20));
+        bottomBar.set(0,Shared.setY(1580),Shared.width,Shared.setY(1600));
 
         canvas.drawRect(leftBar,borderPaint);
         canvas.drawRect(rightBar,borderPaint);
-       // canvas.drawRect(topBar,borderPaint);
-        //canvas.drawRect(bottomBar,borderPaint);
-
+        canvas.drawRect(topBar,borderPaint);
+        canvas.drawRect(bottomBar,borderPaint);
 
     }
-
     public void repeat(){
-
         //REFRESH CANVAS
         this.invalidate();
-
     }
 
 }

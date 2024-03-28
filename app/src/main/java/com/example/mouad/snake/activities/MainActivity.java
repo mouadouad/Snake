@@ -2,7 +2,6 @@ package com.example.mouad.snake.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.media.MediaPlayer;
 
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         Shared.height = height;
         Shared.width = width;
 
-        background();
+        Shared.background(this, this);
         create_buttons();
         make_icon();
 
@@ -114,16 +113,6 @@ public class MainActivity extends AppCompatActivity {
         multi.setAnimation(from_bottom);
 
     }
-
-    private void background() {
-        //BACKGROUND
-        RelativeLayout background = new RelativeLayout(this);
-        RelativeLayout.LayoutParams backparams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        int back_color = Color.parseColor("#3A4647");
-        background.setBackgroundColor(back_color);
-        addContentView(background, backparams);
-    }
-
     public int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");

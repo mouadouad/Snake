@@ -21,10 +21,7 @@ import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.enums.States;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-//import com.google.android.gms.ads.InterstitialAd;
+
 
 import java.net.URISyntaxException;
 import java.util.Calendar;
@@ -41,13 +38,16 @@ public class MultiplayerMenu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Shared.background(this, this);
+        Shared.banner(this, this);
+        back_button();
+        setButtons();
+
         //GET SAVED LEVEL AND XP
         SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         level = sharedPreferences.getInt(Shared.Level, 1);
         xp = sharedPreferences.getInt(Shared.Xp, 0);
-
-        background();
-        back_button();
+        xpBar();
 
         try {
             socket = IO.socket("http://10.0.2.2:3000");
@@ -57,19 +57,6 @@ public class MultiplayerMenu extends AppCompatActivity {
             e.printStackTrace();
 
         }
-
-        ping();
-        buttons();
-
-        //ADD INTERSTITIAL
-        /*
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-        mInterstitialAd.loadAd(new AdRequest.Builder().build()); */
-
-        xp_bar();
-        banner();
-
     }
 
     public void back_button() {
@@ -86,7 +73,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         });
     }
 
-    public void xp_bar() {
+    public void xpBar() {
         final Typeface fredoka = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
 
@@ -139,7 +126,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         }));
     }
 
-    public void buttons() {
+    public void setButtons() {
         final Button create, join, random;
 
         create = new Button(this);
@@ -178,35 +165,6 @@ public class MultiplayerMenu extends AppCompatActivity {
             i.putExtra(Shared.who_key, States.RANDOM);
             startActivity(i);
         });
-    }
-
-    private void background() {
-        final RelativeLayout background = new RelativeLayout(this);
-        final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        final int back_color = Color.parseColor("#3A4647");
-        background.setBackgroundColor(back_color);
-        addContentView(background, params);
-    }
-
-    public void banner() {
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-3922358669029120/2831354657");
-
-        RelativeLayout layout = new RelativeLayout(this);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(MainActivity.width, MainActivity.height - Shared.statusBarHeight);
-        addContentView(layout, layoutParams1);
-
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layout.addView(adView, layoutParams);
-
-        //MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-
     }
 
     @Override

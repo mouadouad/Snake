@@ -1,7 +1,6 @@
 package com.example.mouad.snake.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,9 +12,6 @@ import android.widget.RelativeLayout;
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.enums.States;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 
 import java.util.Random;
 
@@ -24,20 +20,21 @@ public class Create extends AppCompatActivity {
 
     EditText nameOfLobby;
     Button confirm, generate;
-    Boolean entred = false;
+    Boolean entered = false;
     String generated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        background();
+        Shared.background(this, this);
+        Shared.banner(this, this);
         buttons_editText();
         back_button();
 
         generate.setOnClickListener(view -> generate());
         confirm_click_listener();
-        banner();
+
     }
 
     public void back_button() {
@@ -69,8 +66,8 @@ public class Create extends AppCompatActivity {
 
             MultiplayerMenu.socket.on("created", args -> { //SEE IF ROOM IS AVAILABLE
                 runOnUiThread(() -> {
-                    entred = (Boolean) args[0];
-                    if (entred) { //ROOM AVAILABLE GO TO WAITING
+                    entered = (Boolean) args[0];
+                    if (entered) { //ROOM AVAILABLE GO TO WAITING
                         MultiplayerMenu.name = nameOfLobby.getText().toString();
                         Intent intent = new Intent(Create.this, Waiting.class);
                         intent.putExtra(Shared.who_key, States.CREATE);
@@ -101,8 +98,8 @@ public class Create extends AppCompatActivity {
 
         MultiplayerMenu.socket.on("created", args -> { //SEE IF ROOM IS AVAILABLE
             runOnUiThread(() -> {
-                entred = (Boolean) args[0];
-                if (entred) { //ROOM AVAILABLE GO TO WAITING
+                entered = (Boolean) args[0];
+                if (entered) { //ROOM AVAILABLE GO TO WAITING
                     MultiplayerMenu.name = generated;
                     Intent intent = new Intent(Create.this, Waiting.class);
                     intent.putExtra(Shared.who_key, States.CREATE);
@@ -139,37 +136,6 @@ public class Create extends AppCompatActivity {
 
         generate.setY(Shared.setY(900));
         generate.setX(Shared.setX(400));
-    }
-
-    private void background() {
-        //BACKGROUND
-        RelativeLayout background = new RelativeLayout(this);
-        RelativeLayout.LayoutParams backparams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        int back_color = Color.parseColor("#3A4647");
-        background.setBackgroundColor(back_color);
-        addContentView(background, backparams);
-    }
-
-    public void banner() {
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-3922358669029120/2831354657");
-
-        RelativeLayout layout = new RelativeLayout(this);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.width, Shared.height - Shared.statusBarHeight);
-        addContentView(layout, layoutParams1);
-
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layout.addView(adView, layoutParams);
-
-        //MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-
-
     }
 
     @Override

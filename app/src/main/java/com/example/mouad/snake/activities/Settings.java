@@ -25,7 +25,8 @@ public class Settings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        background();
+
+        Shared.background(this, this);
         back_button();
 
         //GET THE PREVIOUS VALUE OF THE SWITCH
@@ -108,15 +109,6 @@ public class Settings extends AppCompatActivity {
         addContentView(music_switch, layoutParams1);
         music_switch.setY(Shared.setY(300));
         music_switch.setX(Shared.setX(600));
-    }
-
-    private void background() {
-        //BACKGROUND
-        final RelativeLayout background = new RelativeLayout(this);
-        RelativeLayout.LayoutParams backparams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        int back_color = Color.parseColor("#3A4647");
-        background.setBackgroundColor(back_color);
-        addContentView(background, backparams);
     }
 
     public void back_button() {
