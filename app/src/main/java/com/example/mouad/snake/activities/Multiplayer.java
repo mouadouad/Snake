@@ -21,28 +21,26 @@ import android.widget.TextView;
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Rects;
 import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.enums.GameStates;
+import com.example.mouad.snake.enums.States;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Objects;
 
 
 public class Multiplayer extends AppCompatActivity {
 
-    RelativeLayout layout;
     int side;
     float Y_start, X_start, X1_start, Y1_start;
     Boolean started = false;
     FrameLayout dim;
-    Button left, right;
     String my_player, his_player;
     Boolean contentV = false;
     Dialog alertDialog;
     TextView roundTextView;
     Boolean recreate = false, quit = false;
-
 
     @SuppressLint("ClickableViewAccessibility")
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,27 +49,19 @@ public class Multiplayer extends AppCompatActivity {
         final Rects rects = new Rects(this);
         setContentView(rects);
 
-        Intent a = getIntent();
-
         //SEE WHO ENTERED
-        if (Objects.equals(a.getStringExtra(Shared.who_key), "create")) { //!!CREATE IS PLAYER1 !!JOIN IS PLAYER2
-
+        Intent a = getIntent();
+        if (a.getSerializableExtra(Shared.who_key) == States.CREATE) { //!!CREATE IS PLAYER1 !!JOIN IS PLAYER2
             my_player = "player1";
             his_player = "player2";
-
         } else {
-
             my_player = "player2";
             his_player = "player1";
-
         }
 
         //FIND VARIABLES
-        layout = new RelativeLayout(this);
-        left = new Button(this);
-        right = new Button(this);
+        final RelativeLayout layout = new RelativeLayout(this);
         roundTextView = new TextView(this);
-
 
         //MAKE THE SCREEN DIM
         Resources res = getResources();
@@ -79,20 +69,16 @@ public class Multiplayer extends AppCompatActivity {
         dim = new FrameLayout(this);
         dim.setForeground(shape);
 
-
         //SEE WHICH SIDE MAKE DIM
         if (my_player.equals("player1")) {
             side = Waiting.side;
             if (side == 1) {
-
                 dim.setY(Shared.setY(800));
                 RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.height));
                 addContentView(dim, layoutParams1);
-
             } else {
                 RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.setY(1600) / 2));
                 addContentView(dim, layoutParams1);
-
             }
             dim.getForeground().setAlpha(200);
 
@@ -235,26 +221,22 @@ public class Multiplayer extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }));
-
 
         //GET WHO WON
         MultiplayerMenu.socket.on("won", args -> runOnUiThread(() -> {
             final String won = (String) args[0];
             if (won.equals(my_player)) {
-                won();
+                gameOver(GameStates.WON);
             } else if (won.equals(his_player)) {
-                lost();
+                gameOver(GameStates.LOST);
             } else {
-                draw();
+                gameOver(GameStates.DRAW);
             }
-
         }));
 
         //IF QUIT
         MultiplayerMenu.socket.on("quit", args -> runOnUiThread(() -> {
-
             MultiplayerMenu.socket.disconnect();
             MultiplayerMenu.my_score = 0;
             MultiplayerMenu.his_score = 0;
@@ -275,36 +257,31 @@ public class Multiplayer extends AppCompatActivity {
             }
 
             if (MultiplayerMenu.round < 4) {
-
                 alertDialog.cancel();
                 recreate();
                 recreate = true;
-
             } else {
-
                 MultiplayerMenu.socket.disconnect();
                 Intent i = new Intent(Multiplayer.this, GameFinished.class);
                 startActivity(i);
-
             }
 
         }));
-
 
         back_button();
 
     }
 
     private void set_rounds_tv() {
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(200));
-        addContentView(roundTextView, layoutParams2);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(200));
+        addContentView(roundTextView, layoutParams);
 
-        Typeface fredoka = Typeface.createFromAsset(getAssets(),
+        final Typeface fredoka = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
 
         roundTextView.setY(Shared.setY(200));
         roundTextView.setX(Shared.setX(400));
-        int yellow = Color.parseColor("#D18D1B");
+        final int yellow = Color.parseColor("#D18D1B");
         roundTextView.setTextColor(yellow);
         roundTextView.setTypeface(fredoka);
         roundTextView.setTextSize(Shared.setX(20));
@@ -321,6 +298,8 @@ public class Multiplayer extends AppCompatActivity {
     }
 
     public void place_controllers() {
+        final Button left = new Button(this);
+        final Button right = new Button(this);
 
         left.setBackgroundResource(R.drawable.left_button);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
@@ -337,31 +316,30 @@ public class Multiplayer extends AppCompatActivity {
         right.setX(Shared.setX(565));
 
         left.setOnClickListener(view -> {
-
             //TURN LEFT
             MultiplayerMenu.socket.emit("turn_left", my_player);
         });
 
         right.setOnClickListener(view -> {
-
             //TURN RIGHT
             MultiplayerMenu.socket.emit("turn_right", my_player);
-
         });
 
     }
 
-    public void won() {
-
-        //SETTING THE FINISH MESSAGE
-
+    public void gameOver(GameStates result) {
         final RelativeLayout message_box;
         message_box = new RelativeLayout(this);
 
-        //BOX
-        message_box.setBackgroundResource(R.drawable.win_box);
-        RelativeLayout.LayoutParams layoutParams4 = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
-        message_box.setLayoutParams(layoutParams4);
+        if (result.equals(GameStates.WON)) {
+            message_box.setBackgroundResource(R.drawable.win_box);
+        } else if (result.equals(GameStates.LOST)) {
+            message_box.setBackgroundResource(R.drawable.lost_box);
+        } else {
+            message_box.setBackgroundResource(R.drawable.draw_box);
+        }
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
+        message_box.setLayoutParams(layoutParams);
 
         alertDialog = new Dialog(this);
         alertDialog.setContentView(message_box);
@@ -370,56 +348,6 @@ public class Multiplayer extends AppCompatActivity {
         }
         alertDialog.show();
         alertDialog.setCanceledOnTouchOutside(false);
-
-
-    }
-
-    public void lost() {
-
-        //SETTING THE FINISH MESSAGE
-
-        final RelativeLayout message_box;
-
-        message_box = new RelativeLayout(this);
-
-        //BOX
-        message_box.setBackgroundResource(R.drawable.lost_box);
-        RelativeLayout.LayoutParams layoutParams4 = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
-        message_box.setLayoutParams(layoutParams4);
-
-        alertDialog = new Dialog(this);
-        alertDialog.setContentView(message_box);
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-        alertDialog.show();
-        alertDialog.setCanceledOnTouchOutside(false);
-
-
-    }
-
-    public void draw() {
-
-        //SETTING THE FINISH MESSAGE
-
-        final RelativeLayout message_box;
-
-        message_box = new RelativeLayout(this);
-
-        //BOX
-        message_box.setBackgroundResource(R.drawable.draw_box);
-        RelativeLayout.LayoutParams layoutParams4 = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
-        message_box.setLayoutParams(layoutParams4);
-
-        alertDialog = new Dialog(this);
-        alertDialog.setContentView(message_box);
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-        alertDialog.show();
-        alertDialog.setCanceledOnTouchOutside(false);
-
-
     }
 
     public void back_button() {
@@ -437,7 +365,6 @@ public class Multiplayer extends AppCompatActivity {
             MultiplayerMenu.socket.emit("quit");
             MultiplayerMenu.socket.disconnect();
 
-
         });
     }
 
@@ -449,10 +376,7 @@ public class Multiplayer extends AppCompatActivity {
 
         MultiplayerMenu.socket.emit("quit");
         MultiplayerMenu.socket.disconnect();
-
-
     }
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -466,7 +390,6 @@ public class Multiplayer extends AppCompatActivity {
             quit = true;
         }
     }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -483,7 +406,6 @@ public class Multiplayer extends AppCompatActivity {
             }
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();

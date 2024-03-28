@@ -9,10 +9,10 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.enums.States;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -50,7 +50,7 @@ public class Join extends AppCompatActivity {
                     if (entred) { //ROOM EXISTS AND IS AVAILABLE GO WAITING
                         MultiplayerMenu.name = name_of_lobby.getText().toString();
                         Intent intent = new Intent(Join.this, Waiting.class);
-                        intent.putExtra(Shared.who_key, "join");
+                        intent.putExtra(Shared.who_key, States.JOIN);
                         startActivity(intent);
                     }
                 });

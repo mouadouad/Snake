@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.enums.States;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -72,7 +73,7 @@ public class Create extends AppCompatActivity {
                     if (entred) { //ROOM AVAILABLE GO TO WAITING
                         MultiplayerMenu.name = nameOfLobby.getText().toString();
                         Intent intent = new Intent(Create.this, Waiting.class);
-                        intent.putExtra(Shared.who_key, "create");
+                        intent.putExtra(Shared.who_key, States.CREATE);
                         startActivity(intent);
                     }
                 });
@@ -104,7 +105,7 @@ public class Create extends AppCompatActivity {
                 if (entred) { //ROOM AVAILABLE GO TO WAITING
                     MultiplayerMenu.name = generated;
                     Intent intent = new Intent(Create.this, Waiting.class);
-                    intent.putExtra(Shared.who_key, "create");
+                    intent.putExtra(Shared.who_key, States.CREATE);
                     startActivity(intent);
                 } else {
                     generate(); //REPEAT

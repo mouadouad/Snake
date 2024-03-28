@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.enums.States;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.gms.ads.AdRequest;
@@ -29,10 +30,6 @@ import java.net.URISyntaxException;
 import java.util.Calendar;
 
 public class MultiplayerMenu extends AppCompatActivity {
-
-    public final static String who_key = "com.mouad0.hp.snake.who_key";
-    public static final String Level = "level";
-    public static final String Xp = "xp";
 
     //InterstitialAd mInterstitialAd;
     public static String name;
@@ -46,8 +43,8 @@ public class MultiplayerMenu extends AppCompatActivity {
 
         //GET SAVED LEVEL AND XP
         SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
-        level = sharedPreferences.getInt(Level, 1);
-        xp = sharedPreferences.getInt(Xp, 0);
+        level = sharedPreferences.getInt(Shared.Level, 1);
+        xp = sharedPreferences.getInt(Shared.Xp, 0);
 
         background();
         back_button();
@@ -84,8 +81,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         back.setX(Shared.setX(50));
 
         back.setOnClickListener(view -> {
-            Intent intent = new Intent(MultiplayerMenu.this, MainActivity.class);
-            startActivity(intent);
+            this.finish();
 //                mInterstitialAd.show();
         });
     }
@@ -179,7 +175,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         });
         random.setOnClickListener(view -> {
             Intent i = new Intent(MultiplayerMenu.this, Waiting.class);
-            i.putExtra(who_key, "random");
+            i.putExtra(Shared.who_key, States.RANDOM);
             startActivity(i);
         });
     }
@@ -211,14 +207,6 @@ public class MultiplayerMenu extends AppCompatActivity {
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(MultiplayerMenu.this, MainActivity.class);
-        startActivity(intent);
-        //mInterstitialAd.show();
     }
 
     @Override

@@ -18,19 +18,18 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.enums.States;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
-import java.util.Objects;
 
 
 public class Waiting extends AppCompatActivity {
 
-
     Boolean joined = false;
     Button play;
-    String who = "";
+    States who;
     public static int side;
     Boolean sound;
 
@@ -49,11 +48,10 @@ public class Waiting extends AppCompatActivity {
         final MediaPlayer shine = MediaPlayer.create(this, R.raw.time_start_sound);
 
         Intent a = getIntent(); // GET WHO ENTERED IF CREATE OR JOIN
-        if (Objects.equals(a.getStringExtra(Shared.who_key), "create")) {
+        if (a.getSerializableExtra(Shared.who_key) == States.CREATE) {
 
             name_lobby_tv();
-
-            who = "create";
+            who = States.CREATE;
             MultiplayerMenu.socket.on("entred", args -> { // SEE IF OTHER PLAYER JOINED SO WE CAN START
                 runOnUiThread(() -> {
                     joined = (Boolean) args[0];
@@ -65,12 +63,12 @@ public class Waiting extends AppCompatActivity {
                     }
                 });
             });
-        } else if (Objects.equals(a.getStringExtra(Shared.who_key), "join")) {
+        } else if (a.getSerializableExtra(Shared.who_key) == States.JOIN) {
 
             //JOIN ENTERED
             name_lobby_tv();
 
-            who = "join";
+            who = States.JOIN;
             joined = true;
             play.setBackgroundResource(R.drawable.play_on_button);
 
@@ -86,7 +84,7 @@ public class Waiting extends AppCompatActivity {
             joined = (Boolean) args[0];
             if (joined) {
                 play.setBackgroundResource(R.drawable.play_on_button);
-                who = "create";
+                who = States.CREATE;
             }
 
         }));
@@ -94,7 +92,7 @@ public class Waiting extends AppCompatActivity {
         MultiplayerMenu.socket.on("game_found", args -> runOnUiThread(() -> {
             joined = (Boolean) args[0];
             if (joined) {
-                who = "join";
+                who = States.JOIN;
                 play.setBackgroundResource(R.drawable.play_on_button);
             }
         }));
@@ -236,7 +234,6 @@ public class Waiting extends AppCompatActivity {
 
 
     }
-
     public void onResume() {
         super.onResume();
         Shared.foreGround = true;
@@ -246,13 +243,11 @@ public class Waiting extends AppCompatActivity {
             MainActivity.isMusicPlaying = true;
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         Shared.foreGround = false;
     }
-
     @Override
     protected void onStop() {
         super.onStop();

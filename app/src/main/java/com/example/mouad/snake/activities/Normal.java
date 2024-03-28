@@ -5,7 +5,6 @@ import static java.lang.Math.abs;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.graphics.Rect;
@@ -28,6 +27,7 @@ import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.components.GameView;
 import com.example.mouad.snake.components.Rectangle;
 import com.example.mouad.snake.components.Rectangles;
+import com.example.mouad.snake.enums.GameStates;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -44,8 +44,7 @@ import java.util.Random;
 
 
 public class Normal extends AppCompatActivity {
-    public static Boolean back_clicked = false;
-    private static final short TIMEOUT = 10, pixels = 30, obsSize = 15;
+    private static final short TIMEOUT = 10, pixels = 30, obsSize = 5;
     protected short timeout = TIMEOUT;
     private Boolean started = false, stillTraveling = true, finished = false;
     static Rect topBar, bottomBar, leftBar, rightBar;
@@ -298,8 +297,8 @@ public class Normal extends AppCompatActivity {
 
             final Runnable runnable = () -> {
                 if (!finished) {
-                    playerRectangles.getLastRectangle()[1] -= (pixels / TIMEOUT);
-                    botRectangles.getLastRectangle()[1] -= (pixels / TIMEOUT);
+                    playerRectangles.getLastRectangle()[1] -= 3;
+                    botRectangles.getLastRectangle()[1] -= 3;
 
                     stillTraveling = true;
                     repeat();
@@ -397,11 +396,11 @@ public class Normal extends AppCompatActivity {
         }
 
         if (won && lost) {
-            gameOver("draw");
+            gameOver(GameStates.DRAW);
         } else if (won) {
-            gameOver("won");
+            gameOver(GameStates.WON);
         } else if (lost) {
-            gameOver("lost");
+            gameOver(GameStates.LOST);
         }
     }
 
@@ -722,7 +721,7 @@ public class Normal extends AppCompatActivity {
         botRectangles.addView(rectangle);
     }
 
-    public void gameOver(String result) {
+    public void gameOver(GameStates result) {
         finished = true;
 
         //SETTING THE FINISH MESSAGE
@@ -730,9 +729,9 @@ public class Normal extends AppCompatActivity {
         message_box = new RelativeLayout(this);
 
         //BOX
-        if (result.equals("won")) {
+        if (result.equals(GameStates.WON)) {
             message_box.setBackgroundResource(R.drawable.win_box);
-        } else if (result.equals("lost")) {
+        } else if (result.equals(GameStates.LOST)) {
             message_box.setBackgroundResource(R.drawable.lost_box);
         } else {
             message_box.setBackgroundResource(R.drawable.draw_box);
@@ -763,7 +762,6 @@ public class Normal extends AppCompatActivity {
         alertDialog.setCanceledOnTouchOutside(false);
 
     }
-
     public void backButton() {
         back = new Button(this);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
@@ -772,25 +770,8 @@ public class Normal extends AppCompatActivity {
         back.setY(Shared.setY(50));
         back.setX(Shared.setX(50));
 
-        back.setOnClickListener(view -> {
-            //CLEAR EVERYTHING AND BACK
-            finished = true;
-            back_clicked = true;
-            Intent intent = new Intent(Normal.this, MainActivity.class);
-            startActivity(intent);
-        });
+        back.setOnClickListener(view -> this.finish());
     }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        //CLEAR EVERYTHING AND BACK
-        back_clicked = true;
-        finished = true;
-        Intent intent = new Intent(Normal.this, MainActivity.class);
-        startActivity(intent);
-    }
-
     @Override
     public void onResume() {
         super.onResume();
