@@ -27,7 +27,7 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Shared.background(this, this);
-        back_button();
+        Shared.backButton(this, this,  v -> onBack());
 
         //GET THE PREVIOUS VALUE OF THE SWITCH
         sound_switch = new Switch(this);
@@ -111,19 +111,11 @@ public class Settings extends AppCompatActivity {
         music_switch.setX(Shared.setX(600));
     }
 
-    public void back_button() {
-        final Button back = new Button(this);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
-        back.setBackgroundResource(R.drawable.back_button);
-        addContentView(back, layoutParams);
-        back.setY(Shared.setY(50));
-        back.setX(Shared.setX(50));
-
-        back.setOnClickListener(view -> finish());
+    private void onBack() {
+        finish();
     }
 
     public void save() {
-
         SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -131,7 +123,6 @@ public class Settings extends AppCompatActivity {
         editor.putBoolean(Shared.SOUND_SHARED_PREFS, sound_switch.isChecked());
 
         editor.apply();
-
     }
 
     @Override

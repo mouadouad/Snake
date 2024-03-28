@@ -40,7 +40,8 @@ public class MultiplayerMenu extends AppCompatActivity {
 
         Shared.background(this, this);
         Shared.banner(this, this);
-        back_button();
+        Shared.backButton(this, this,  v -> onBack());
+
         setButtons();
 
         //GET SAVED LEVEL AND XP
@@ -53,24 +54,15 @@ public class MultiplayerMenu extends AppCompatActivity {
             socket = IO.socket("http://10.0.2.2:3000");
             //socket = IO.socket("https://snake1234.herokuapp.com/");
             socket.connect();
+            ping();
         } catch (URISyntaxException e) {
             e.printStackTrace();
-
         }
     }
 
-    public void back_button() {
-        final Button back = new Button(this);
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
-        back.setBackgroundResource(R.drawable.back_button);
-        addContentView(back, layoutParams);
-        back.setY(Shared.setY(50));
-        back.setX(Shared.setX(50));
-
-        back.setOnClickListener(view -> {
-            this.finish();
-//                mInterstitialAd.show();
-        });
+    private void onBack(){
+        Intent intent = new Intent(MultiplayerMenu.this, MainActivity.class);
+        startActivity(intent);
     }
 
     public void xpBar() {

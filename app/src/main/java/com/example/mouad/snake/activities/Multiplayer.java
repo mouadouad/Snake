@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 
@@ -32,14 +31,11 @@ import org.json.JSONObject;
 
 public class Multiplayer extends AppCompatActivity {
 
-    int side;
-    float Y_start, X_start, X1_start, Y1_start;
     Boolean started = false;
-    FrameLayout dim;
     String my_player, his_player;
     Boolean contentV = false;
     Dialog alertDialog;
-    TextView roundTextView;
+
     Boolean recreate = false, quit = false;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -48,6 +44,8 @@ public class Multiplayer extends AppCompatActivity {
 
         final Rects rects = new Rects(this);
         setContentView(rects);
+
+        int side;
 
         //SEE WHO ENTERED
         Intent a = getIntent();
@@ -59,113 +57,63 @@ public class Multiplayer extends AppCompatActivity {
             his_player = "player1";
         }
 
-        //FIND VARIABLES
-        final RelativeLayout layout = new RelativeLayout(this);
-        roundTextView = new TextView(this);
-
         //MAKE THE SCREEN DIM
-        Resources res = getResources();
-        Drawable shape = ResourcesCompat.getDrawable(res, R.drawable.shape, null);
-        dim = new FrameLayout(this);
+        final Resources res = getResources();
+        final Drawable shape = ResourcesCompat.getDrawable(res, R.drawable.shape, null);
+        final FrameLayout dim = new FrameLayout(this);
         dim.setForeground(shape);
 
         //SEE WHICH SIDE MAKE DIM
         if (my_player.equals("player1")) {
             side = Waiting.side;
-            if (side == 1) {
-                dim.setY(Shared.setY(800));
-                RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.height));
-                addContentView(dim, layoutParams1);
-            } else {
-                RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.setY(1600) / 2));
-                addContentView(dim, layoutParams1);
-            }
-            dim.getForeground().setAlpha(200);
-
         } else {
-
             side = 1 - Waiting.side;
-            if (side == 1) {
-                dim.setY(Shared.setY(800));
-                RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.height));
-                addContentView(dim, layoutParams1);
-                dim.getForeground().setAlpha(200);
-            } else {
-                RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.setY(1600) / 2));
-                addContentView(dim, layoutParams1);
-                dim.getForeground().setAlpha(200);
-            }
         }
 
-        set_rounds_tv();
+        if (side == 1) {
+            dim.setY(Shared.setY(800));
+            RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.height));
+            addContentView(dim, layoutParams1);
+            dim.getForeground().setAlpha(200);
+        } else {
+            RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.setY(1600) / 2));
+            addContentView(dim, layoutParams1);
+            dim.getForeground().setAlpha(200);
+        }
 
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.width, Shared.height);
+        final RelativeLayout layout = new RelativeLayout(this);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.width, Shared.height);
         addContentView(layout, layoutParams);
 
         // CHOOSE THE PLACE WHERE TO START
         layout.setOnTouchListener((view, motionEvent) -> {
-            Y_start = motionEvent.getY();
-            X_start = motionEvent.getX();
+            final float y = motionEvent.getY();
+            final float x = motionEvent.getX();
             // CHECK IF THE RIGHT SIDE IS CLICKED
-            if ((side == 1 && Y_start < Shared.setY(800)) || (side == 0 && Y_start > Shared.setY(800))) {
-                //CHECK IF ALREADY STARTED
+            if ((side == 1 && y < Shared.setY(800)) || (side == 0 && y > Shared.setY(800))) {
                 if (!started) {
+                    final float[] coordinates = findClosestEdge(x, y, side);
 
-                    //SEE WHAT EDGE IS TH CLOSEST
-                    if (side == 0) {
-                        if (Shared.setY(1600) - Y_start < Shared.width - X_start && Shared.setY(1600) - Y_start < X_start) {
-                            Y_start = Shared.height;
-                        } else {
-                            if (X_start > Shared.width - X_start) {
-                                X_start = Shared.width;
-                            } else {
-                                X_start = 0;
-                            }
-                        }
-
-                    } else {
-                        if (Y_start < Shared.width - X_start && Y_start < X_start) {
-                            Y_start = 0;
-                        } else {
-                            if (X_start > Shared.width - X_start) {
-                                X_start = Shared.width;
-                            } else {
-                                X_start = 0;
-                            }
-                        }
-
-                    }
-
-                    MultiplayerMenu.socket.emit("ready", X_start / Shared.width, Y_start / Shared.height, my_player); // SEND START COORDINATES AND SAY THAT AM READY
+                    // SEND START COORDINATES AND SAY THAT AM READY
+                    MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width, coordinates[1] / Shared.height, my_player);
 
                     MultiplayerMenu.socket.on("readyBack", args -> runOnUiThread(() -> {
                         JSONObject room = (JSONObject) args[0];
-
                         try {
                             JSONObject player = room.getJSONObject(his_player);
                             int ready = player.getInt("ready"); // SEE IF OTHER PLAYER IS READY
                             if (ready == 1) {
-
-                                //GET OTHER PLAYER START COORDINATES
-                                X1_start = Float.parseFloat(player.getString("x_start")) * Shared.width;
-                                Y1_start = Float.parseFloat(player.getString("y_start")) * Shared.height;
-
-                                start();
-
+                                started = true;
+                                dim.setVisibility(View.GONE);
                             }
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }));
-
                 }
-
             }
             return false;
         });
-
 
         //GET DATA FROM SERVER
         MultiplayerMenu.socket.on("repeat", args -> runOnUiThread(() -> {
@@ -212,8 +160,8 @@ public class Multiplayer extends AppCompatActivity {
                 //SEE IF ALREADY SET CONTENT VIEW
                 if (!contentV) {
                     setContentView(rects);
-                    place_controllers();
-                    back_button();
+                    placeControllers();
+                    Shared.backButton(this, this, v -> onBack());
                     contentV = true;
                 }
                 rects.repeat();
@@ -267,10 +215,38 @@ public class Multiplayer extends AppCompatActivity {
             }
 
         }));
-        back_button();
+
+        setRoundsTextView();
     }
 
-    private void set_rounds_tv() {
+    private static float[] findClosestEdge(float x, float y, int side) {
+
+        if (side == 0) {
+            if (Shared.setY(1600) - y < MainActivity.width - x && Shared.setY(1600) - y < x) {
+                y = MainActivity.height;
+            } else {
+                if (x > MainActivity.width - x) {
+                    x = MainActivity.width;
+                } else {
+                    x = 0;
+                }
+            }
+        } else {
+            if (y < MainActivity.width - x && y < x) {
+                y = 0;
+            } else {
+                if (x > MainActivity.width - x) {
+                    x = MainActivity.width;
+                } else {
+                    x = 0;
+                }
+            }
+        }
+        return new float[]{x, y};
+    }
+    private void setRoundsTextView() {
+        final TextView roundTextView = new TextView(this);
+
         final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(200));
         addContentView(roundTextView, layoutParams);
 
@@ -279,23 +255,14 @@ public class Multiplayer extends AppCompatActivity {
 
         roundTextView.setY(Shared.setY(200));
         roundTextView.setX(Shared.setX(400));
-        final int yellow = Color.parseColor("#D18D1B");
-        roundTextView.setTextColor(yellow);
+        roundTextView.setTextColor(Shared.yellow);
         roundTextView.setTypeface(fredoka);
         roundTextView.setTextSize(Shared.setX(20));
         roundTextView.setText(R.string.round);
         roundTextView.append(String.valueOf(MultiplayerMenu.round));
     }
 
-    public void start() {
-        //WHEN CHOOSE THE PLACE WHERE TO START
-        started = true;
-        //MAKE THE SCREEN CLEAR
-        dim.setVisibility(View.GONE);
-
-    }
-
-    public void place_controllers() {
+    public void placeControllers() {
         final Button left = new Button(this);
         final Button right = new Button(this);
 
@@ -313,15 +280,9 @@ public class Multiplayer extends AppCompatActivity {
         right.setY(Shared.height - Shared.statusBarHeight - Shared.setY(200));
         right.setX(Shared.setX(565));
 
-        left.setOnClickListener(view -> {
-            //TURN LEFT
-            MultiplayerMenu.socket.emit("turn_left", my_player);
-        });
+        left.setOnClickListener(view -> MultiplayerMenu.socket.emit("turn_left", my_player));
 
-        right.setOnClickListener(view -> {
-            //TURN RIGHT
-            MultiplayerMenu.socket.emit("turn_right", my_player);
-        });
+        right.setOnClickListener(view -> MultiplayerMenu.socket.emit("turn_right", my_player));
 
     }
 
@@ -348,28 +309,17 @@ public class Multiplayer extends AppCompatActivity {
         alertDialog.setCanceledOnTouchOutside(false);
     }
 
-    public void back_button() {
-        Button back = new Button(this);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
-        back.setBackgroundResource(R.drawable.back_button);
-        addContentView(back, layoutParams);
-        back.setY(Shared.setY(50));
-        back.setX(Shared.setX(50));
-
-        back.setOnClickListener(view -> {
-            MultiplayerMenu.socket.emit("quit");
-            MultiplayerMenu.socket.disconnect();
-            this.finish();
-        });
-    }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    private void onBack() {
         Intent intent = new Intent(Multiplayer.this, MultiplayerMenu.class);
         startActivity(intent);
 
         MultiplayerMenu.socket.emit("quit");
         MultiplayerMenu.socket.disconnect();
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        onBack();
     }
     @Override
     protected void onStop() {

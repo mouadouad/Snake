@@ -2,6 +2,9 @@ package com.example.mouad.snake;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,9 +18,9 @@ public class Shared {
 
     public static int width, height, statusBarHeight;
     public static final String BLACK = "#20292A", BLUE = "#1D8189";
+    public static final int yellow = Color.parseColor("#D18D1B");
 
     public static boolean foreGround = true;
-
     public final static String SHARED_PREFS = "shared_prefs";
     public final static String MUSIC_SHARED_PREFS = "MUSIC_SHARED_PREFS";
     public final static String SOUND_SHARED_PREFS = "SOUND_SHARED_PREFS";
@@ -29,11 +32,11 @@ public class Shared {
         return ((x * MainActivity.width) / 1080);
 
     }
-
     public static int setY(int x) {
         return ((x * MainActivity.height) / 1770);
 
     }
+
     public static void background(Context context, AppCompatActivity activity) {
         final RelativeLayout background = new RelativeLayout(context);
         final RelativeLayout.LayoutParams backParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -41,7 +44,6 @@ public class Shared {
         background.setBackgroundColor(back_color);
         activity.addContentView(background, backParams);
     }
-
     public static void banner(Context context, AppCompatActivity activity) {
         AdView adView = new AdView(context);
         adView.setAdSize(AdSize.BANNER);
@@ -59,6 +61,16 @@ public class Shared {
         //MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
+    }
+    public static void backButton(Context context, AppCompatActivity activity, View.OnClickListener listener) {
+        final Button back = new Button(context);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
+        back.setBackgroundResource(R.drawable.back_button);
+        activity.addContentView(back, layoutParams);
+        back.setY(Shared.setY(50));
+        back.setX(Shared.setX(50));
+
+        back.setOnClickListener(listener);
     }
 
 }

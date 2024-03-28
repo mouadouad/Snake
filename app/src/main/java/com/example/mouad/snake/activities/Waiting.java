@@ -33,8 +33,8 @@ public class Waiting extends AppCompatActivity {
 
         Shared.background(this, this);
         Shared.banner(this, this);
+        Shared.backButton(this, this,  v -> onBack());
         playButton();
-        back_button();
 
         //SOUND
         final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
@@ -100,29 +100,18 @@ public class Waiting extends AppCompatActivity {
             Intent i = new Intent(Waiting.this, GameFinished.class);
             startActivity(i);
         }));
-
-
     }
 
-    public void back_button() {
-        final Button back = new Button(this);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
-        back.setBackgroundResource(R.drawable.back_button);
-        addContentView(back, layoutParams);
-        back.setY(Shared.setY(50));
-        back.setX(Shared.setX(50));
-
-        back.setOnClickListener(view -> {
-            if (who != States.JOIN && !joined) {
-                MultiplayerMenu.socket.emit("destroy");
-            }
-            if (joined) {
-                MultiplayerMenu.socket.emit("quit");
-                MultiplayerMenu.socket.disconnect();
-            }
-            Intent intent = new Intent(Waiting.this, MultiplayerMenu.class);
-            startActivity(intent);
-        });
+    private void onBack() {
+        if (who != States.JOIN && !joined) {
+            MultiplayerMenu.socket.emit("destroy");
+        }
+        if (joined) {
+            MultiplayerMenu.socket.emit("quit");
+            MultiplayerMenu.socket.disconnect();
+        }
+        Intent intent = new Intent(Waiting.this, MultiplayerMenu.class);
+        startActivity(intent);
     }
 
     private void playButton() {

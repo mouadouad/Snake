@@ -29,7 +29,7 @@ public class GameFinished extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Shared.background(this, this);
-        make_textViews();
+        makeTextViews();
 
         //SEE HOW MANY XP I GOT
         if (MultiplayerMenu.my_score - MultiplayerMenu.his_score == 2) {
@@ -65,11 +65,11 @@ public class GameFinished extends AppCompatActivity {
         levelTV.append(String.valueOf(MultiplayerMenu.level));
 
         save();
-        xp_bar();
-        quit_button();
+        xpBar();
+        quitButton();
     }
 
-    private void quit_button() {
+    private void quitButton() {
         //QUIT BUTTON
         final Button quit = new Button(this);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
@@ -89,8 +89,8 @@ public class GameFinished extends AppCompatActivity {
 
     public void save() {
         //SAVE NEW XP AND LEVEL
-        SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.putInt(Shared.Level, MultiplayerMenu.level);
         editor.putInt(Shared.Xp, MultiplayerMenu.xp);
@@ -98,7 +98,7 @@ public class GameFinished extends AppCompatActivity {
         editor.apply();
     }
 
-    public void xp_bar() {
+    public void xpBar() {
         final ImageView container, bar;
 
         container = new ImageView(this);
@@ -117,7 +117,7 @@ public class GameFinished extends AppCompatActivity {
         bar.setY(Shared.setY(800));
     }
 
-    public void make_textViews() {
+    public void makeTextViews() {
 
         final Typeface fredoka = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
@@ -171,13 +171,11 @@ public class GameFinished extends AppCompatActivity {
             MainActivity.isMusicPlaying = true;
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         Shared.foreGround = false;
     }
-
     @Override
     protected void onStop() {
         super.onStop();

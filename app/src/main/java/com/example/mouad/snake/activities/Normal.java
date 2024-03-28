@@ -61,7 +61,7 @@ public class Normal extends AppCompatActivity {
 
         initializeLayout();
         loadModelFile();
-        backButton();
+        Shared.backButton(this, this,  v -> onBack());
     }
 
     private void initializeLayout() {
@@ -762,15 +762,8 @@ public class Normal extends AppCompatActivity {
         alertDialog.setCanceledOnTouchOutside(false);
 
     }
-    public void backButton() {
-        back = new Button(this);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
-        back.setBackgroundResource(R.drawable.back_button);
-        addContentView(back, layoutParams);
-        back.setY(Shared.setY(50));
-        back.setX(Shared.setX(50));
-
-        back.setOnClickListener(view -> this.finish());
+    private void onBack() {
+        this.finish();
     }
     @Override
     public void onResume() {
