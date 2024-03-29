@@ -60,17 +60,15 @@ public class Create extends AppCompatActivity {
             }
 
             //SEE IF ROOM IS AVAILABLE
-            MultiplayerMenu.socket.on("created", args -> {
-                runOnUiThread(() -> {
-                    final boolean isNameAvailable = (boolean) args[0];
-                    if (isNameAvailable) {
-                        MultiplayerMenu.name = nameOfLobby.getText().toString();
-                        Intent intent = new Intent(Create.this, Waiting.class);
-                        intent.putExtra(Shared.who_key, States.CREATE);
-                        startActivity(intent);
-                    }
-                });
-            });
+            MultiplayerMenu.socket.on("created", args -> runOnUiThread(() -> {
+                final boolean isNameAvailable = (boolean) args[0];
+                if (isNameAvailable) {
+                    MultiplayerMenu.name = nameOfLobby.getText().toString();
+                    Intent intent = new Intent(Create.this, Waiting.class);
+                    intent.putExtra(Shared.who_key, States.CREATE);
+                    startActivity(intent);
+                }
+            }));
         });
     }
 
@@ -115,19 +113,17 @@ public class Create extends AppCompatActivity {
         MultiplayerMenu.socket.emit("create", lobbyName);
 
         //SEE IF ROOM IS AVAILABLE
-        MultiplayerMenu.socket.on("created", args -> {
-            runOnUiThread(() -> {
-                final boolean isNameAvailable = (boolean) args[0];
-                if (isNameAvailable) {
-                    MultiplayerMenu.name = lobbyName;
-                    Intent intent = new Intent(Create.this, Waiting.class);
-                    intent.putExtra(Shared.who_key, States.CREATE);
-                    startActivity(intent);
-                } else {
-                    generate();
-                }
-            });
-        });
+        MultiplayerMenu.socket.on("created", args -> runOnUiThread(() -> {
+            final boolean isNameAvailable = (boolean) args[0];
+            if (isNameAvailable) {
+                MultiplayerMenu.name = lobbyName;
+                Intent intent = new Intent(Create.this, Waiting.class);
+                intent.putExtra(Shared.who_key, States.CREATE);
+                startActivity(intent);
+            } else {
+                generate();
+            }
+        }));
 
     }
 

@@ -41,11 +41,11 @@ public class Waiting extends AppCompatActivity {
         final boolean sound = sharedPreferences.getBoolean(Shared.SOUND_SHARED_PREFS, true);
         final MediaPlayer shine = MediaPlayer.create(this, R.raw.time_start_sound);
 
-        Intent a = getIntent(); // GET WHO ENTERED IF CREATE OR JOIN
-        if (a.getSerializableExtra(Shared.who_key) == States.CREATE) {
+        Intent a = getIntent();
+        who = (States) a.getSerializableExtra(Shared.who_key);
+        if (who == States.CREATE) {
 
-            name_lobby_tv();
-            who = States.CREATE;
+            nameOfLobbyTv();
             MultiplayerMenu.socket.on("entred", args -> { // SEE IF OTHER PLAYER JOINED SO WE CAN START
                 runOnUiThread(() -> {
                     joined = (Boolean) args[0];
@@ -57,23 +57,18 @@ public class Waiting extends AppCompatActivity {
                     }
                 });
             });
-        } else if (a.getSerializableExtra(Shared.who_key) == States.JOIN) {
-
-            //JOIN ENTERED
-            name_lobby_tv();
-
-            who = States.JOIN;
+        } else if (who == States.JOIN) {
+            nameOfLobbyTv();
             joined = true;
             play.setBackgroundResource(R.drawable.play_on_button);
-
         } else {
             MultiplayerMenu.socket.emit("random", (MultiplayerMenu.level / 5) + 1);
-
         }
 
         //GET MY SIDE !! JOIN HAS ALREADY HIS SIDE!!
         MultiplayerMenu.socket.on("side", args -> runOnUiThread(() -> side = (Integer) args[0]));
 
+        //Created random lobby waiting for a player
         MultiplayerMenu.socket.on("player_found", args -> runOnUiThread(() -> {
             joined = (Boolean) args[0];
             if (joined) {
@@ -83,17 +78,16 @@ public class Waiting extends AppCompatActivity {
 
         }));
 
+        //Joined random lobby
         MultiplayerMenu.socket.on("game_found", args -> runOnUiThread(() -> {
             joined = (Boolean) args[0];
             if (joined) {
-                who = States.JOIN;
                 play.setBackgroundResource(R.drawable.play_on_button);
+                who = States.JOIN;
             }
         }));
 
-        //IF QUIT
         MultiplayerMenu.socket.on("quit", args -> runOnUiThread(() -> {
-
             MultiplayerMenu.socket.disconnect();
             MultiplayerMenu.my_score = 0;
             MultiplayerMenu.his_score = 0;
@@ -132,7 +126,7 @@ public class Waiting extends AppCompatActivity {
         });
     }
 
-    private void name_lobby_tv() {
+    private void nameOfLobbyTv() {
 
         //SET THE LAYOUT TO ALIGN OBJECTS
         RelativeLayout div = new RelativeLayout(this);
@@ -187,6 +181,7 @@ public class Waiting extends AppCompatActivity {
         Intent intent = new Intent(Waiting.this, MultiplayerMenu.class);
         startActivity(intent);
     }
+    @Override
     public void onResume() {
         super.onResume();
         Shared.foreGround = true;

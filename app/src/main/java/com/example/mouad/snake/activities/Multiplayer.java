@@ -45,10 +45,8 @@ public class Multiplayer extends AppCompatActivity {
         final Rects rects = new Rects(this);
         setContentView(rects);
 
-        int side;
-
         //SEE WHO ENTERED
-        Intent a = getIntent();
+        final Intent a = getIntent();
         if (a.getSerializableExtra(Shared.who_key) == States.CREATE) { //!!CREATE IS PLAYER1 !!JOIN IS PLAYER2
             my_player = "player1";
             his_player = "player2";
@@ -64,6 +62,7 @@ public class Multiplayer extends AppCompatActivity {
         dim.setForeground(shape);
 
         //SEE WHICH SIDE MAKE DIM
+        int side;
         if (my_player.equals("player1")) {
             side = Waiting.side;
         } else {

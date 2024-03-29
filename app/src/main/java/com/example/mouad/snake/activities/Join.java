@@ -15,7 +15,6 @@ import com.example.mouad.snake.enums.States;
 
 public class Join extends AppCompatActivity {
     EditText nameOfLobby;
-    Boolean entered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +58,7 @@ public class Join extends AppCompatActivity {
 
             MultiplayerMenu.socket.on("entred1", args -> { //SEE IF ROOM EXISTS
                 runOnUiThread(() -> {
-                    entered = (Boolean) args[0];
+                    final boolean entered = (boolean) args[0];
                     if (entered) { //ROOM EXISTS AND IS AVAILABLE GO WAITING
                         MultiplayerMenu.name = nameOfLobby.getText().toString();
                         Intent intent = new Intent(Join.this, Waiting.class);
