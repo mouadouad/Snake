@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
-import com.example.mouad.snake.enums.States;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -58,11 +57,6 @@ public class MultiplayerMenu extends AppCompatActivity {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-    }
-
-    private void onBack(){
-        Intent intent = new Intent(MultiplayerMenu.this, MainActivity.class);
-        startActivity(intent);
     }
 
     public void xpBar() {
@@ -108,14 +102,10 @@ public class MultiplayerMenu extends AppCompatActivity {
     }
 
     private void ping() {
-        Calendar rightNow = Calendar.getInstance();
-        final long time = rightNow.getTimeInMillis();
+        final long time = Calendar.getInstance().getTimeInMillis();
         socket.emit("ping");
 
-        MultiplayerMenu.socket.on("pong", args -> runOnUiThread(() -> {
-            Calendar rightNow1 = Calendar.getInstance();
-            Log.d("ping", String.valueOf(rightNow1.getTimeInMillis() - time));
-        }));
+        MultiplayerMenu.socket.on("pong", args -> runOnUiThread(() -> Log.d("ping", String.valueOf(Calendar.getInstance().getTimeInMillis() - time))));
     }
 
     public void setButtons() {
@@ -147,16 +137,20 @@ public class MultiplayerMenu extends AppCompatActivity {
             Intent i = new Intent(MultiplayerMenu.this, Create.class);
             startActivity(i);
         });
-
         join.setOnClickListener(view -> {
             Intent i = new Intent(MultiplayerMenu.this, Join.class);
             startActivity(i);
         });
         random.setOnClickListener(view -> {
             Intent i = new Intent(MultiplayerMenu.this, Waiting.class);
-            i.putExtra(Shared.who_key, States.RANDOM);
+            socket.emit("random", (MultiplayerMenu.level / 5) + 1);
             startActivity(i);
         });
+    }
+
+    private void onBack(){
+        Intent intent = new Intent(MultiplayerMenu.this, MainActivity.class);
+        startActivity(intent);
     }
 
     @Override

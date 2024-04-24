@@ -11,7 +11,6 @@ import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
-import com.example.mouad.snake.enums.States;
 
 public class Join extends AppCompatActivity {
     EditText nameOfLobby;
@@ -23,9 +22,6 @@ public class Join extends AppCompatActivity {
         Shared.background(this, this);
         Shared.banner(this, this);
         Shared.backButton(this, this,  v -> onBack());
-
-        //GET MY SIDE FROM SERVER
-        MultiplayerMenu.socket.on("side", args -> runOnUiThread(() -> Waiting.side = (Integer) args[0]));
 
         setEditText();
         setConfirmButton();
@@ -52,22 +48,15 @@ public class Join extends AppCompatActivity {
         confirm.setX(Shared.setX(400));
 
         confirm.setOnClickListener(view -> {
-            //SAY TO SERVER THE ROOM I WANT TO ENTER TO
             MultiplayerMenu.name = nameOfLobby.getText().toString();
             MultiplayerMenu.socket.emit("join", MultiplayerMenu.name);
-
-            MultiplayerMenu.socket.on("entred1", args -> { //SEE IF ROOM EXISTS
-                runOnUiThread(() -> {
-                    final boolean entered = (boolean) args[0];
-                    if (entered) { //ROOM EXISTS AND IS AVAILABLE GO WAITING
-                        MultiplayerMenu.name = nameOfLobby.getText().toString();
-                        Intent intent = new Intent(Join.this, Waiting.class);
-                        intent.putExtra(Shared.who_key, States.JOIN);
-                        startActivity(intent);
-                    }
-                });
-            });
         });
+
+        MultiplayerMenu.socket.on("joined", args -> runOnUiThread(() -> {
+            MultiplayerMenu.name = nameOfLobby.getText().toString();
+            Intent intent = new Intent(Join.this, Waiting.class);
+            startActivity(intent);
+        }));
     }
 
     private void onBack() {

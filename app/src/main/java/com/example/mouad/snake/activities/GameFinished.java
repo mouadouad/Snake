@@ -70,7 +70,6 @@ public class GameFinished extends AppCompatActivity {
     }
 
     private void quitButton() {
-        //QUIT BUTTON
         final Button quit = new Button(this);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
         addContentView(quit, layoutParams2);

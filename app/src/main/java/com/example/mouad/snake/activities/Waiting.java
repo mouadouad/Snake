@@ -18,13 +18,12 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
-import com.example.mouad.snake.enums.States;
+
 
 public class Waiting extends AppCompatActivity {
 
-    Boolean joined = false;
+    Boolean canPlay = false;
     Button play;
-    States who;
     public static int side;
 
     @Override
@@ -36,56 +35,27 @@ public class Waiting extends AppCompatActivity {
         Shared.backButton(this, this,  v -> onBack());
         playButton();
 
-        //SOUND
         final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         final boolean sound = sharedPreferences.getBoolean(Shared.SOUND_SHARED_PREFS, true);
         final MediaPlayer shine = MediaPlayer.create(this, R.raw.time_start_sound);
 
-        Intent a = getIntent();
-        who = (States) a.getSerializableExtra(Shared.who_key);
-        if (who == States.CREATE) {
+        nameOfLobbyTv();
 
-            nameOfLobbyTv();
-            MultiplayerMenu.socket.on("entred", args -> { // SEE IF OTHER PLAYER JOINED SO WE CAN START
-                runOnUiThread(() -> {
-                    joined = (Boolean) args[0];
-                    if (joined) { //CHANGE THE BACKGROUND OF BUTTON
-                        play.setBackgroundResource(R.drawable.play_on_button);
-                        if (sound) {
-                            shine.start();
-                        }
-                    }
-                });
-            });
-        } else if (who == States.JOIN) {
-            nameOfLobbyTv();
-            joined = true;
-            play.setBackgroundResource(R.drawable.play_on_button);
-        } else {
-            MultiplayerMenu.socket.emit("random", (MultiplayerMenu.level / 5) + 1);
-        }
+        MultiplayerMenu.socket.emit("enter");
 
-        //GET MY SIDE !! JOIN HAS ALREADY HIS SIDE!!
+        MultiplayerMenu.socket.on("canPlay", args -> runOnUiThread(() -> {
+            canPlay = (boolean) args[0];
+            if (canPlay) {
+                play.setBackgroundResource(R.drawable.play_on_button);
+                if (sound) {
+                    shine.start();
+                }
+            } else {
+                play.setBackgroundResource(R.drawable.play_off_button);
+            }
+        }));
+
         MultiplayerMenu.socket.on("side", args -> runOnUiThread(() -> side = (Integer) args[0]));
-
-        //Created random lobby waiting for a player
-        MultiplayerMenu.socket.on("player_found", args -> runOnUiThread(() -> {
-            joined = (Boolean) args[0];
-            if (joined) {
-                play.setBackgroundResource(R.drawable.play_on_button);
-                who = States.CREATE;
-            }
-
-        }));
-
-        //Joined random lobby
-        MultiplayerMenu.socket.on("game_found", args -> runOnUiThread(() -> {
-            joined = (Boolean) args[0];
-            if (joined) {
-                play.setBackgroundResource(R.drawable.play_on_button);
-                who = States.JOIN;
-            }
-        }));
 
         MultiplayerMenu.socket.on("quit", args -> runOnUiThread(() -> {
             MultiplayerMenu.socket.disconnect();
@@ -97,70 +67,65 @@ public class Waiting extends AppCompatActivity {
     }
 
     private void onBack() {
-        if (who != States.JOIN && !joined) {
+        if (!canPlay) {
             MultiplayerMenu.socket.emit("destroy");
         }
-        if (joined) {
+        if (canPlay) {
             MultiplayerMenu.socket.emit("quit");
             MultiplayerMenu.socket.disconnect();
         }
         Intent intent = new Intent(Waiting.this, MultiplayerMenu.class);
         startActivity(intent);
     }
-
     private void playButton() {
         play = new Button(this);
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(play, layoutParams2);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
+        addContentView(play, layoutParams);
         play.setBackgroundResource(R.drawable.play_off_button);
         play.setY(Shared.setY(200));
         play.setX(Shared.setX(400));
 
         play.setOnClickListener(view -> {
-            // SEE IF ALL PLAYERS ARE READY AND GO TO MAIN
-            if (joined) {
+            if (canPlay) {
                 Intent intent = new Intent(Waiting.this, Multiplayer.class);
-                intent.putExtra(Shared.who_key, who);
                 startActivity(intent);
             }
         });
     }
-
     private void nameOfLobbyTv() {
+        if (MultiplayerMenu.name != null) {
 
-        //SET THE LAYOUT TO ALIGN OBJECTS
-        RelativeLayout div = new RelativeLayout(this);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        addContentView(div, layoutParams);
+            final RelativeLayout div = new RelativeLayout(this);
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            addContentView(div, layoutParams);
 
-        //SET THE NAME OF THE LOBBY
-        final TextView name_lobby = new TextView(this);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(600), RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        div.addView(name_lobby, layoutParams1);
-        name_lobby.setTextSize(Shared.setX(24));
+            final TextView nameOfLobbyTV = new TextView(this);
+            RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(600), RelativeLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams1.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            div.addView(nameOfLobbyTV, layoutParams1);
+            nameOfLobbyTV.setTextSize(Shared.setX(24));
 
-        final String st1 = getString(R.string.name_lobby) + MultiplayerMenu.name;
+            final String nameOfLobbyText = getString(R.string.name_lobby) + MultiplayerMenu.name;
 
-        final SpannableString ss = new SpannableString(st1);
-        final ForegroundColorSpan blue = new ForegroundColorSpan(Color.parseColor("#1D8189"));
-        ss.setSpan(blue, 0, 15, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        final ForegroundColorSpan yellow = new ForegroundColorSpan(Color.parseColor("#D18D1B"));
-        ss.setSpan(yellow, 15, 15 + MultiplayerMenu.name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            final SpannableString styledText = new SpannableString(nameOfLobbyText);
+            final ForegroundColorSpan blue = new ForegroundColorSpan(Color.parseColor("#1D8189"));
+            styledText.setSpan(blue, 0, 15, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            final ForegroundColorSpan yellow = new ForegroundColorSpan(Color.parseColor("#D18D1B"));
+            styledText.setSpan(yellow, 15, 15 + MultiplayerMenu.name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        name_lobby.setText(ss);
-        name_lobby.setY(Shared.setY(800));
+            nameOfLobbyTV.setText(styledText);
+            nameOfLobbyTV.setY(Shared.setY(800));
+        }
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (who != States.JOIN && !joined) {
+        if (!canPlay) {
             MultiplayerMenu.socket.emit("destroy");
             MultiplayerMenu.socket.disconnect();
         }
 
-        if (joined) {
+        if (canPlay) {
             MultiplayerMenu.socket.emit("quit");
             MultiplayerMenu.socket.disconnect();
         }
@@ -169,11 +134,9 @@ public class Waiting extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        if (who != States.JOIN) {
-            MultiplayerMenu.socket.emit("destroy");
-        }
+        MultiplayerMenu.socket.emit("destroy");
 
-        if (joined) {
+        if (canPlay) {
             MultiplayerMenu.socket.emit("quit");
             MultiplayerMenu.socket.disconnect();
 

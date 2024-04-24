@@ -11,7 +11,6 @@ import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
-import com.example.mouad.snake.enums.States;
 
 import java.util.Random;
 
@@ -31,6 +30,18 @@ public class Create extends AppCompatActivity {
         setEditText();
         setConfirmButton();
         setGenerateButton();
+
+        final Intent intent = new Intent(Create.this, Waiting.class);
+
+        MultiplayerMenu.socket.on("created", args -> runOnUiThread(() -> {
+            MultiplayerMenu.name = nameOfLobby.getText().toString();
+            startActivity(intent);
+        }));
+
+        MultiplayerMenu.socket.on("generated", args -> runOnUiThread(() -> {
+            MultiplayerMenu.name = (String) args[0];
+            startActivity(intent);
+        }));
     }
 
     private void onBack() {
@@ -59,16 +70,6 @@ public class Create extends AppCompatActivity {
                 MultiplayerMenu.socket.emit("create", MultiplayerMenu.name);
             }
 
-            //SEE IF ROOM IS AVAILABLE
-            MultiplayerMenu.socket.on("created", args -> runOnUiThread(() -> {
-                final boolean isNameAvailable = (boolean) args[0];
-                if (isNameAvailable) {
-                    MultiplayerMenu.name = nameOfLobby.getText().toString();
-                    Intent intent = new Intent(Create.this, Waiting.class);
-                    intent.putExtra(Shared.who_key, States.CREATE);
-                    startActivity(intent);
-                }
-            }));
         });
     }
 
@@ -81,7 +82,6 @@ public class Create extends AppCompatActivity {
         nameOfLobby.setY(Shared.setY(200));
         nameOfLobby.setX(Shared.setX(400));
     }
-
     private void setGenerateButton() {
         final Button generate = new Button(this);
         final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
@@ -91,49 +91,14 @@ public class Create extends AppCompatActivity {
         generate.setY(Shared.setY(900));
         generate.setX(Shared.setX(400));
 
-        generate.setOnClickListener(view -> generate());
+        generate.setOnClickListener(view -> MultiplayerMenu.socket.emit("generate"));
     }
-    public void generate() {
-        final String alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-        String generated = "";
-
-        //RANDOM NAME
-        for (int i = 0; i < 6; i++) {
-
-            final Random rand = new Random();
-            final int position = rand.nextInt(36);
-
-            generated = String.format("%s%s", generated, alphabets.charAt(position));
-        }
-
-        final String lobbyName = generated;
-
-        //SAY THAT I WANT THIS ROOM
-        MultiplayerMenu.socket.emit("create", lobbyName);
-
-        //SEE IF ROOM IS AVAILABLE
-        MultiplayerMenu.socket.on("created", args -> runOnUiThread(() -> {
-            final boolean isNameAvailable = (boolean) args[0];
-            if (isNameAvailable) {
-                MultiplayerMenu.name = lobbyName;
-                Intent intent = new Intent(Create.this, Waiting.class);
-                intent.putExtra(Shared.who_key, States.CREATE);
-                startActivity(intent);
-            } else {
-                generate();
-            }
-        }));
-
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(Create.this, MultiplayerMenu.class);
         startActivity(intent);
     }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -144,13 +109,11 @@ public class Create extends AppCompatActivity {
             MainActivity.isMusicPlaying = true;
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         Shared.foreGround = false;
     }
-
     @Override
     protected void onStop() {
         super.onStop();

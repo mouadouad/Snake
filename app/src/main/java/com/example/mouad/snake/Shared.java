@@ -2,7 +2,6 @@ package com.example.mouad.snake;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -24,7 +23,6 @@ public class Shared {
     public final static String SHARED_PREFS = "shared_prefs";
     public final static String MUSIC_SHARED_PREFS = "MUSIC_SHARED_PREFS";
     public final static String SOUND_SHARED_PREFS = "SOUND_SHARED_PREFS";
-    public final static String who_key = "com.mouad0.hp.snake.who_key";
     public static final String Level = "level";
     public static final String Xp = "xp";
 

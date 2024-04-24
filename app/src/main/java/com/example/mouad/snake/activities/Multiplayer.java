@@ -21,21 +21,17 @@ import com.example.mouad.snake.R;
 import com.example.mouad.snake.Rects;
 import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.enums.GameStates;
-import com.example.mouad.snake.enums.States;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 
 
 public class Multiplayer extends AppCompatActivity {
 
     Boolean started = false;
-    String my_player, his_player;
     Boolean contentV = false;
     Dialog alertDialog;
-
     Boolean recreate = false, quit = false;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -45,31 +41,13 @@ public class Multiplayer extends AppCompatActivity {
         final Rects rects = new Rects(this);
         setContentView(rects);
 
-        //SEE WHO ENTERED
-        final Intent a = getIntent();
-        if (a.getSerializableExtra(Shared.who_key) == States.CREATE) { //!!CREATE IS PLAYER1 !!JOIN IS PLAYER2
-            my_player = "player1";
-            his_player = "player2";
-        } else {
-            my_player = "player2";
-            his_player = "player1";
-        }
-
         //MAKE THE SCREEN DIM
         final Resources res = getResources();
         final Drawable shape = ResourcesCompat.getDrawable(res, R.drawable.shape, null);
         final FrameLayout dim = new FrameLayout(this);
         dim.setForeground(shape);
 
-        //SEE WHICH SIDE MAKE DIM
-        int side;
-        if (my_player.equals("player1")) {
-            side = Waiting.side;
-        } else {
-            side = 1 - Waiting.side;
-        }
-
-        if (side == 1) {
+        if (Waiting.side == 1) {
             dim.setY(Shared.setY(800));
             RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams((Shared.width), (Shared.height));
             addContentView(dim, layoutParams1);
@@ -89,38 +67,28 @@ public class Multiplayer extends AppCompatActivity {
             final float y = motionEvent.getY();
             final float x = motionEvent.getX();
             // CHECK IF THE RIGHT SIDE IS CLICKED
-            if ((side == 1 && y < Shared.setY(800)) || (side == 0 && y > Shared.setY(800))) {
+            if ((Waiting.side == 1 && y < Shared.setY(800)) || (Waiting.side == 0 && y > Shared.setY(800))) {
                 if (!started) {
-                    final float[] coordinates = findClosestEdge(x, y, side);
+                    final float[] coordinates = findClosestEdge(x, y, Waiting.side);
 
-                    // SEND START COORDINATES AND SAY THAT AM READY
-                    MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width, coordinates[1] / Shared.height, my_player);
+                    MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width,
+                                                coordinates[1] / Shared.height);
 
-                    MultiplayerMenu.socket.on("readyBack", args -> runOnUiThread(() -> {
-                        JSONObject room = (JSONObject) args[0];
-                        try {
-                            JSONObject player = room.getJSONObject(his_player);
-                            int ready = player.getInt("ready"); // SEE IF OTHER PLAYER IS READY
-                            if (ready == 1) {
-                                started = true;
-                                dim.setVisibility(View.GONE);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }));
                 }
             }
             return false;
         });
 
-        //GET DATA FROM SERVER
-        MultiplayerMenu.socket.on("repeat", args -> runOnUiThread(() -> {
-            final JSONObject room = (JSONObject) args[0];
+        MultiplayerMenu.socket.on("startGame", args -> runOnUiThread(() -> {
+            started = true;
+            dim.setVisibility(View.GONE);
+        }));
 
+        MultiplayerMenu.socket.on("update", args -> runOnUiThread(() -> {
+            final JSONArray room = (JSONArray) args[0];
             try {
-                final JSONArray json = room.getJSONObject(my_player).getJSONArray("variables");
-                final JSONArray json1 = room.getJSONObject(his_player).getJSONArray("variables");
+                final JSONArray json = room.getJSONObject(0).getJSONArray("variables");
+                final JSONArray json1 = room.getJSONObject(1).getJSONArray("variables");
 
                 //CONVERT JSON ARRAYS TO ARRAYLISTS
                 for (int i = 0; i < json.length(); i++) {
@@ -153,8 +121,8 @@ public class Multiplayer extends AppCompatActivity {
                 }
 
                 //ASSIGN COUNTERS
-                Rects.my_counter = room.getJSONObject(my_player).getInt("counter");
-                Rects.his_counter = room.getJSONObject(his_player).getInt("counter");
+                Rects.my_counter = room.getJSONObject(0).getInt("counter");
+                Rects.his_counter = room.getJSONObject(1).getInt("counter");
 
                 //SEE IF ALREADY SET CONTENT VIEW
                 if (!contentV) {
@@ -170,17 +138,11 @@ public class Multiplayer extends AppCompatActivity {
             }
         }));
 
-        //GET WHO WON
-        MultiplayerMenu.socket.on("won", args -> runOnUiThread(() -> {
-            final String won = (String) args[0];
-            if (won.equals(my_player)) {
-                gameOver(GameStates.WON);
-            } else if (won.equals(his_player)) {
-                gameOver(GameStates.LOST);
-            } else {
-                gameOver(GameStates.DRAW);
-            }
-        }));
+        MultiplayerMenu.socket.on("won", args -> runOnUiThread(() -> gameOver(GameStates.WON)));
+
+        MultiplayerMenu.socket.on("lost", args -> runOnUiThread(() -> gameOver(GameStates.LOST)));
+
+        MultiplayerMenu.socket.on("draw", args -> runOnUiThread(() -> gameOver(GameStates.DRAW)));
 
         //IF QUIT
         MultiplayerMenu.socket.on("quit", args -> runOnUiThread(() -> {
@@ -191,35 +153,26 @@ public class Multiplayer extends AppCompatActivity {
             startActivity(i);
         }));
 
-        //WHEN FINISHED
-        MultiplayerMenu.socket.on("Rfinished", args -> runOnUiThread(() -> {
+        MultiplayerMenu.socket.on("roundFinished", args -> runOnUiThread(() -> {
             MultiplayerMenu.round = (int) args[0];
+            alertDialog.cancel();
+            recreate();
+            recreate = true;
+        }));
 
-            if (my_player.equals("player1")) {
-                MultiplayerMenu.my_score = (int) args[1];
-                MultiplayerMenu.his_score = (int) args[2];
-            } else {
-                MultiplayerMenu.my_score = (int) args[2];
-                MultiplayerMenu.his_score = (int) args[1];
-            }
+        MultiplayerMenu.socket.on("gameFinished", args -> runOnUiThread(() -> {
+            MultiplayerMenu.my_score = (int) args[0];
+            MultiplayerMenu.his_score = (int) args[1];
 
-            if (MultiplayerMenu.round < 4) {
-                alertDialog.cancel();
-                recreate();
-                recreate = true;
-            } else {
-                MultiplayerMenu.socket.disconnect();
-                Intent i = new Intent(Multiplayer.this, GameFinished.class);
-                startActivity(i);
-            }
-
+            MultiplayerMenu.socket.disconnect();
+            Intent i = new Intent(Multiplayer.this, GameFinished.class);
+            startActivity(i);
         }));
 
         setRoundsTextView();
     }
 
     private static float[] findClosestEdge(float x, float y, int side) {
-
         if (side == 0) {
             if (Shared.setY(1600) - y < MainActivity.width - x && Shared.setY(1600) - y < x) {
                 y = MainActivity.height;
@@ -260,7 +213,6 @@ public class Multiplayer extends AppCompatActivity {
         roundTextView.setText(R.string.round);
         roundTextView.append(String.valueOf(MultiplayerMenu.round));
     }
-
     public void placeControllers() {
         final Button left = new Button(this);
         final Button right = new Button(this);
@@ -279,12 +231,11 @@ public class Multiplayer extends AppCompatActivity {
         right.setY(Shared.height - Shared.statusBarHeight - Shared.setY(200));
         right.setX(Shared.setX(565));
 
-        left.setOnClickListener(view -> MultiplayerMenu.socket.emit("turn_left", my_player));
+        left.setOnClickListener(view -> MultiplayerMenu.socket.emit("turn_left"));
 
-        right.setOnClickListener(view -> MultiplayerMenu.socket.emit("turn_right", my_player));
+        right.setOnClickListener(view -> MultiplayerMenu.socket.emit("turn_right"));
 
     }
-
     public void gameOver(GameStates result) {
         final RelativeLayout message_box;
         message_box = new RelativeLayout(this);
@@ -307,7 +258,6 @@ public class Multiplayer extends AppCompatActivity {
         alertDialog.show();
         alertDialog.setCanceledOnTouchOutside(false);
     }
-
     private void onBack() {
         Intent intent = new Intent(Multiplayer.this, MultiplayerMenu.class);
         startActivity(intent);
