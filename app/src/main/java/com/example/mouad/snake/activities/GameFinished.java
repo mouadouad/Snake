@@ -2,7 +2,6 @@ package com.example.mouad.snake.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Typeface;
 
 import androidx.appcompat.app.AppCompatActivity;

@@ -20,6 +20,7 @@ public class Shared {
     public static final int BLACK = Color.parseColor("#20292A");
     public static final int YELLOW = Color.parseColor("#D18D1B");
     public static final int BLUE = Color.parseColor("#1D8189");
+    public static final int BORDER_COLOR = Color.parseColor("#3A4647");
 
     public static boolean foreGround = true;
     public final static String SHARED_PREFS = "shared_prefs";

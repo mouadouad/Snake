@@ -46,7 +46,7 @@ import java.util.Random;
 public class Normal extends AppCompatActivity {
     private static final short TIMEOUT = 10, pixels = 30, obsSize = 5;
     protected short timeout = TIMEOUT;
-    private Boolean started = false, stillTraveling = true, finished = false;
+    private Boolean started = false, finished = false;
     static Rect topBar, bottomBar, leftBar, rightBar;
     FrameLayout dim;
     Button back;
@@ -61,7 +61,18 @@ public class Normal extends AppCompatActivity {
 
         initializeLayout();
         loadModelFile();
-        Shared.backButton(this, this,  v -> onBack());
+        backButton();
+    }
+
+    private void backButton() {
+        back = new Button(this);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
+        back.setBackgroundResource(R.drawable.back_button);
+        this.addContentView(back, layoutParams);
+        back.setY(Shared.setY(50));
+        back.setX(Shared.setX(50));
+
+        back.setOnClickListener(v -> onBack());
     }
 
     private void initializeLayout() {
@@ -291,8 +302,8 @@ public class Normal extends AppCompatActivity {
     }
 
     private void repeat() {
-        while (stillTraveling && !finished) {
-            stillTraveling = false;
+        if (!finished) {
+
             final Handler handler = new Handler();
 
             final Runnable runnable = () -> {
@@ -300,18 +311,18 @@ public class Normal extends AppCompatActivity {
                     playerRectangles.getLastRectangle()[1] -= 3;
                     botRectangles.getLastRectangle()[1] -= 3;
 
-                    stillTraveling = true;
-                    repeat();
-
                     playerRectangles.getChildAt(playerRectangles.getChildCount() - 1).invalidate();
                     botRectangles.getChildAt(botRectangles.getChildCount() - 1).invalidate();
+
                     botPlay();
+                    checking();
+                    repeat();
                 }
             };
             handler.postDelayed(runnable, 10);
         }
 
-        checking();
+
     }
 
     private void checking() {
@@ -724,11 +735,9 @@ public class Normal extends AppCompatActivity {
     public void gameOver(GameStates result) {
         finished = true;
 
-        //SETTING THE FINISH MESSAGE
         final RelativeLayout message_box;
         message_box = new RelativeLayout(this);
 
-        //BOX
         if (result.equals(GameStates.WON)) {
             message_box.setBackgroundResource(R.drawable.win_box);
         } else if (result.equals(GameStates.LOST)) {
@@ -737,18 +746,17 @@ public class Normal extends AppCompatActivity {
             message_box.setBackgroundResource(R.drawable.draw_box);
         }
 
-        RelativeLayout.LayoutParams layoutParams4 = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
-        message_box.setLayoutParams(layoutParams4);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
+        message_box.setLayoutParams(layoutParams);
         ((ViewGroup) back.getParent()).removeView(back);
         message_box.addView(back);
 
-        // PLAY AGAIN BUTTON
         Button play_again = new Button(this);
-        RelativeLayout.LayoutParams layoutParams5 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        layoutParams5.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layoutParams5.topMargin = Shared.setY(290);
+        RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
+        buttonParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        buttonParams.topMargin = Shared.setY(290);
         play_again.setBackgroundResource(R.drawable.play_again_button);
-        message_box.addView(play_again, layoutParams5);
+        message_box.addView(play_again, buttonParams);
 
         play_again.setOnClickListener(view -> recreate());
 
