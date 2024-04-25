@@ -34,12 +34,11 @@ public class Waiting extends AppCompatActivity {
         Shared.banner(this, this);
         Shared.backButton(this, this,  v -> onBack());
         playButton();
+        nameOfLobbyTv();
 
         final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         final boolean sound = sharedPreferences.getBoolean(Shared.SOUND_SHARED_PREFS, true);
         final MediaPlayer shine = MediaPlayer.create(this, R.raw.time_start_sound);
-
-        nameOfLobbyTv();
 
         MultiplayerMenu.socket.emit("enter");
 
@@ -65,25 +64,10 @@ public class Waiting extends AppCompatActivity {
             startActivity(i);
         }));
     }
-
-    private void onBack() {
-        if (!canPlay) {
-            MultiplayerMenu.socket.emit("destroy");
-        }
-        if (canPlay) {
-            MultiplayerMenu.socket.emit("quit");
-            MultiplayerMenu.socket.disconnect();
-        }
-        Intent intent = new Intent(Waiting.this, MultiplayerMenu.class);
-        startActivity(intent);
-    }
     private void playButton() {
         play = new Button(this);
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(play, layoutParams);
+        Shared.addElement(this, play, 300, 150, 400, 200);
         play.setBackgroundResource(R.drawable.play_off_button);
-        play.setY(Shared.setY(200));
-        play.setX(Shared.setX(400));
 
         play.setOnClickListener(view -> {
             if (canPlay) {
@@ -100,9 +84,9 @@ public class Waiting extends AppCompatActivity {
             addContentView(div, layoutParams);
 
             final TextView nameOfLobbyTV = new TextView(this);
-            RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(600), RelativeLayout.LayoutParams.WRAP_CONTENT);
-            layoutParams1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-            div.addView(nameOfLobbyTV, layoutParams1);
+            RelativeLayout.LayoutParams textViewParams = new RelativeLayout.LayoutParams(Shared.setX(600), RelativeLayout.LayoutParams.WRAP_CONTENT);
+            textViewParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            div.addView(nameOfLobbyTV, textViewParams);
             nameOfLobbyTV.setTextSize(Shared.setX(24));
 
             final String nameOfLobbyText = getString(R.string.name_lobby) + MultiplayerMenu.name;
@@ -116,6 +100,17 @@ public class Waiting extends AppCompatActivity {
             nameOfLobbyTV.setText(styledText);
             nameOfLobbyTV.setY(Shared.setY(800));
         }
+    }
+    private void onBack() {
+        if (!canPlay) {
+            MultiplayerMenu.socket.emit("destroy");
+        }
+        if (canPlay) {
+            MultiplayerMenu.socket.emit("quit");
+            MultiplayerMenu.socket.disconnect();
+        }
+        Intent intent = new Intent(Waiting.this, MultiplayerMenu.class);
+        startActivity(intent);
     }
     @Override
     protected void onDestroy() {

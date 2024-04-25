@@ -3,7 +3,6 @@ package com.example.mouad.snake.components;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.View;
@@ -12,13 +11,13 @@ import com.example.mouad.snake.Shared;
 
 public class Rectangle extends View {
     public int[] rect;
-    private String color;
+    private int color;
 
     public Rectangle(Context context) {
         super(context);
     }
 
-    public Rectangle(Context context, int[] rect, String color) {
+    public Rectangle(Context context, int[] rect, int color) {
         super(context);
         this.rect = rect;
         this.color = color;
@@ -29,8 +28,7 @@ public class Rectangle extends View {
         super.onDraw(canvas);
 
         @SuppressLint("DrawAllocation") final Paint paint = new Paint();
-        int black_color = Color.parseColor(color);
-        paint.setColor(black_color);
+        paint.setColor(color);
         paint.setStyle(Paint.Style.FILL);
 
         int GAUCHE, HAUT, BAS;

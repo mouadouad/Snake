@@ -3,7 +3,6 @@ package com.example.mouad.snake.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Typeface;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,23 +62,19 @@ public class MultiplayerMenu extends AppCompatActivity {
         final Typeface fredoka = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
 
-        //SET THE LAYOUT TO ALIGN OBJECTS
         final RelativeLayout div = new RelativeLayout(this);
         final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         addContentView(div, layoutParams);
 
-        //SET LEVEL TEXT VIEW
         final TextView levelTV = new TextView(this);
+        final RelativeLayout.LayoutParams textViewParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        textViewParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        div.addView(levelTV, textViewParams);
+        levelTV.setY(Shared.setY(1100));
 
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        div.addView(levelTV, layoutParams1);
-
-        int blue = Color.parseColor("#1D8189");
-        levelTV.setTextColor(blue);
+        levelTV.setTextColor(Shared.BLUE);
         levelTV.setTypeface(fredoka);
         levelTV.setTextSize(Shared.setX(40));
-        levelTV.setY(Shared.setY(1100));
         levelTV.setText(R.string.level);
         levelTV.append(String.valueOf(MultiplayerMenu.level));
 
@@ -88,17 +83,13 @@ public class MultiplayerMenu extends AppCompatActivity {
         container = new ImageView(this);
         bar = new ImageView(this);
 
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(500), Shared.setY(100));
-        addContentView(container, layoutParams2);
+        Shared.addElement(this, container, 500, 100, 290, 1300);
         container.setBackgroundResource(R.drawable.container);
-        container.setY(Shared.setY(1300));
-        container.setX(Shared.setX(290));
 
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(Shared.setX((500 * MultiplayerMenu.xp) / (MultiplayerMenu.level * 100)), Shared.setY(100));
-        addContentView(bar, layoutParams3);
+        final int xpBarLength = (500 * MultiplayerMenu.xp) / (MultiplayerMenu.level * 100);
+        Shared.addElement(this, bar, xpBarLength, 100, 290, 1300);
         bar.setBackgroundResource(R.drawable.bar);
-        bar.setX(Shared.setX(290));
-        bar.setY(Shared.setY(1300));
+
     }
 
     private void ping() {
@@ -115,23 +106,14 @@ public class MultiplayerMenu extends AppCompatActivity {
         join = new Button(this);
         random = new Button(this);
 
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(200));
-        addContentView(create, layoutParams);
+        Shared.addElement(this, create, 300, 200, 400, 200);
         create.setBackgroundResource(R.drawable.c_lobby_button);
-        create.setY(Shared.setY(200));
-        create.setX(Shared.setX(400));
 
-        final RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(200));
-        addContentView(join, layoutParams1);
+        Shared.addElement(this, join, 300, 200, 400, 500);
         join.setBackgroundResource(R.drawable.j_lobby_button);
-        join.setY(Shared.setY(500));
-        join.setX(Shared.setX(400));
 
-        final RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(180));
-        addContentView(random, layoutParams2);
+        Shared.addElement(this, random, 300, 180, 400, 800);
         random.setBackgroundResource(R.drawable.random_button);
-        random.setY(Shared.setY(800));
-        random.setX(Shared.setX(400));
 
         create.setOnClickListener(view -> {
             Intent i = new Intent(MultiplayerMenu.this, Create.class);

@@ -7,12 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
-
-import java.util.Random;
 
 
 public class Create extends AppCompatActivity {
@@ -43,20 +40,11 @@ public class Create extends AppCompatActivity {
             startActivity(intent);
         }));
     }
-
-    private void onBack() {
-        Intent intent = new Intent(Create.this, MultiplayerMenu.class);
-        startActivity(intent);
-    }
-
     private void setConfirmButton() {
         final Button confirm = new Button(this);
 
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(confirm, layoutParams);
+        Shared.addElement(this, confirm, 300, 150, 400, 500);
         confirm.setBackgroundResource(R.drawable.create_button);
-        confirm.setY(Shared.setY(500));
-        confirm.setX(Shared.setX(400));
 
         confirm.setOnClickListener(view -> {
 
@@ -72,26 +60,19 @@ public class Create extends AppCompatActivity {
 
         });
     }
-
     private void setEditText() {
         nameOfLobby = new EditText(this);
-
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(nameOfLobby, layoutParams2);
-
-        nameOfLobby.setY(Shared.setY(200));
-        nameOfLobby.setX(Shared.setX(400));
+        Shared.addElement(this, nameOfLobby, 300, 150, 400, 200);
     }
     private void setGenerateButton() {
         final Button generate = new Button(this);
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(generate, layoutParams);
+        Shared.addElement(this, generate, 300, 150, 400, 900);
         generate.setBackgroundResource(R.drawable.generate_button);
-
-        generate.setY(Shared.setY(900));
-        generate.setX(Shared.setX(400));
-
         generate.setOnClickListener(view -> MultiplayerMenu.socket.emit("generate"));
+    }
+    private void onBack() {
+        Intent intent = new Intent(Create.this, MultiplayerMenu.class);
+        startActivity(intent);
     }
     @Override
     public void onBackPressed() {

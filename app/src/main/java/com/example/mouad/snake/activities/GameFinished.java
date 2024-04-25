@@ -32,21 +32,27 @@ public class GameFinished extends AppCompatActivity {
         makeTextViews();
 
         //SEE HOW MANY XP I GOT
-        if (MultiplayerMenu.my_score - MultiplayerMenu.his_score == 2) {
-            MultiplayerMenu.xp += 100;
-            result.setText(R.string.won);
-        } else if (MultiplayerMenu.my_score - MultiplayerMenu.his_score == 1) {
-            MultiplayerMenu.xp += 70;
-            result.setText(R.string.won);
-        } else if (MultiplayerMenu.my_score - MultiplayerMenu.his_score == -1) {
-            MultiplayerMenu.xp += 25;
-            result.setText(R.string.lost);
-        } else if (MultiplayerMenu.my_score - MultiplayerMenu.his_score == -2) {
-            MultiplayerMenu.xp += 15;
-            result.setText(R.string.lost);
-        } else if (MultiplayerMenu.my_score == MultiplayerMenu.his_score) {
-            MultiplayerMenu.xp += 40;
-            result.setText(R.string.draw);
+        switch (MultiplayerMenu.my_score - MultiplayerMenu.his_score) {
+            case 2:
+                MultiplayerMenu.xp += 100;
+                result.setText(R.string.won);
+                break;
+            case 1:
+                MultiplayerMenu.xp += 70;
+                result.setText(R.string.won);
+                break;
+            case -1:
+                MultiplayerMenu.xp += 25;
+                result.setText(R.string.lost);
+                break;
+            case -2:
+                MultiplayerMenu.xp += 15;
+                result.setText(R.string.lost);
+                break;
+            case 0:
+                MultiplayerMenu.xp += 40;
+                result.setText(R.string.draw);
+                break;
         }
 
         if (MultiplayerMenu.my_score == 0 && MultiplayerMenu.his_score == 0) {
@@ -71,29 +77,22 @@ public class GameFinished extends AppCompatActivity {
 
     private void quitButton() {
         final Button quit = new Button(this);
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(quit, layoutParams2);
+        Shared.addElement(this, quit, 300, 150, 390, 1200);
         quit.setBackgroundResource(R.drawable.quit_button);
-        quit.setY(Shared.setY(1200));
-        quit.setX(Shared.setX(390));
 
         quit.setOnClickListener(view -> {
-
             Intent i = new Intent(GameFinished.this, MultiplayerMenu.class);
             MultiplayerMenu.round = 1;
             startActivity(i);
-
         });
     }
 
     public void save() {
-        //SAVE NEW XP AND LEVEL
         final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.putInt(Shared.Level, MultiplayerMenu.level);
         editor.putInt(Shared.Xp, MultiplayerMenu.xp);
-
         editor.apply();
     }
 
@@ -103,17 +102,12 @@ public class GameFinished extends AppCompatActivity {
         container = new ImageView(this);
         bar = new ImageView(this);
 
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(500), Shared.setY(100));
-        addContentView(container, layoutParams);
+        Shared.addElement(this, container, 500, 100, 290, 800);
         container.setBackgroundResource(R.drawable.container);
-        container.setY(Shared.setY(800));
-        container.setX(Shared.setX(290));
 
-        final RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX((500 * MultiplayerMenu.xp) / (MultiplayerMenu.level * 100)), Shared.setY(100));
-        addContentView(bar, layoutParams1);
+        final int xpBarLength = (500 * MultiplayerMenu.xp) / (MultiplayerMenu.level * 100);
+        Shared.addElement(this, bar, xpBarLength, 100, 290, 800);
         bar.setBackgroundResource(R.drawable.bar);
-        bar.setX(Shared.setX(290));
-        bar.setY(Shared.setY(800));
     }
 
     public void makeTextViews() {
@@ -121,33 +115,28 @@ public class GameFinished extends AppCompatActivity {
         final Typeface fredoka = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
 
-        //SET THE LAYOUT TO ALIGN OBJECTS
         div = new RelativeLayout(this);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         addContentView(div, layoutParams);
 
-        //SET RESULT TEXT VIEW
         result = new TextView(this);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        div.addView(result, layoutParams1);
+        RelativeLayout.LayoutParams textViewParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        textViewParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        div.addView(result, textViewParams);
 
         result.setTextSize(Shared.setX(40));
-        int yellow = Color.parseColor("#D18D1B");
-        result.setTextColor(yellow);
+        result.setTextColor(Shared.YELLOW);
         result.setTypeface(fredoka);
         result.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         result.setY(Shared.setY(200));
 
-        //SET LEVEL TEXT VIEW
         levelTV = new TextView(this);
 
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams3.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        div.addView(levelTV, layoutParams3);
+        RelativeLayout.LayoutParams levelParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        levelParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        div.addView(levelTV, levelParams);
 
-        int blue = Color.parseColor("#1D8189");
-        levelTV.setTextColor(blue);
+        levelTV.setTextColor(Shared.BLUE);
         levelTV.setTypeface(fredoka);
         levelTV.setTextSize(Shared.setX(40));
         levelTV.setY(Shared.setY(600));

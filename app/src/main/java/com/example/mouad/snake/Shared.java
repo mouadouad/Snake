@@ -13,11 +13,13 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
+
 public class Shared {
 
     public static int width, height, statusBarHeight;
-    public static final String BLACK = "#20292A", BLUE = "#1D8189";
-    public static final int yellow = Color.parseColor("#D18D1B");
+    public static final int BLACK = Color.parseColor("#20292A");
+    public static final int YELLOW = Color.parseColor("#D18D1B");
+    public static final int BLUE = Color.parseColor("#1D8189");
 
     public static boolean foreGround = true;
     public final static String SHARED_PREFS = "shared_prefs";
@@ -30,8 +32,8 @@ public class Shared {
         return ((x * MainActivity.width) / 1080);
 
     }
-    public static int setY(int x) {
-        return ((x * MainActivity.height) / 1770);
+    public static int setY(int y) {
+        return ((y * MainActivity.height) / 1770);
 
     }
 
@@ -69,6 +71,13 @@ public class Shared {
         back.setX(Shared.setX(50));
 
         back.setOnClickListener(listener);
+    }
+
+    public static void addElement(AppCompatActivity activity, View view, int width, int height, int x, int y) {
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(width), Shared.setY(height));
+        activity.addContentView(view, layoutParams);
+        view.setX(Shared.setX(x));
+        view.setY(Shared.setY(y));
     }
 
 }

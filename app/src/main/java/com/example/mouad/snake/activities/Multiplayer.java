@@ -144,7 +144,6 @@ public class Multiplayer extends AppCompatActivity {
 
         MultiplayerMenu.socket.on("draw", args -> runOnUiThread(() -> gameOver(GameStates.DRAW)));
 
-        //IF QUIT
         MultiplayerMenu.socket.on("quit", args -> runOnUiThread(() -> {
             MultiplayerMenu.socket.disconnect();
             MultiplayerMenu.my_score = 0;
@@ -197,17 +196,13 @@ public class Multiplayer extends AppCompatActivity {
         return new float[]{x, y};
     }
     private void setRoundsTextView() {
-        final TextView roundTextView = new TextView(this);
-
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(200));
-        addContentView(roundTextView, layoutParams);
-
         final Typeface fredoka = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
 
-        roundTextView.setY(Shared.setY(200));
-        roundTextView.setX(Shared.setX(400));
-        roundTextView.setTextColor(Shared.yellow);
+        final TextView roundTextView = new TextView(this);
+        Shared.addElement(this, roundTextView, 300, 200, 400, 200);
+
+        roundTextView.setTextColor(Shared.YELLOW);
         roundTextView.setTypeface(fredoka);
         roundTextView.setTextSize(Shared.setX(20));
         roundTextView.setText(R.string.round);

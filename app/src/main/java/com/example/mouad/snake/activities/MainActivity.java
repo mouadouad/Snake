@@ -13,7 +13,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.Shared;
@@ -43,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
         Shared.width = width;
 
         Shared.background(this, this);
-        create_buttons();
-        make_icon();
+        createButtons();
+        makeIcon();
 
         final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         musicBoolean = sharedPreferences.getBoolean(Shared.MUSIC_SHARED_PREFS, true);
@@ -52,45 +51,32 @@ public class MainActivity extends AppCompatActivity {
         music = MediaPlayer.create(this, R.raw.snake_sound);
 
 
-//        mInterstitialAd = new InterstitialAd(this);
-//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-//        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+       /*mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());*/
     }
 
-    private void make_icon() {
+    private void makeIcon() {
         final Animation from_top = AnimationUtils.loadAnimation(this, R.anim.from_top);
         final ImageView icon = new ImageView(this);
+        Shared.addElement(this, icon, 200, 400, 440, 260);
         icon.setBackgroundResource(R.drawable.icon);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(200), Shared.setY(400));
-        addContentView(icon, layoutParams1);
-        icon.setY(Shared.setY(260));
-        icon.setX(Shared.setX((1080 - 200) / 2));
         icon.setAnimation(from_top);
     }
-
-    private void create_buttons() {
+    private void createButtons() {
         final Button multi, Normal, Settings;
         multi = new Button(this);
         Normal = new Button(this);
         Settings = new Button(this);
 
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(multi, layoutParams2);
+        Shared.addElement(this, multi, 300, 150, 390, 1000);
         multi.setBackgroundResource(R.drawable.multiplayer_button);
-        multi.setY(Shared.setY(1000));
-        multi.setX(Shared.setX(390));
 
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(Normal, layoutParams3);
+        Shared.addElement(this, Normal, 300, 150, 390, 800);
         Normal.setBackgroundResource(R.drawable.normal_button);
-        Normal.setY(Shared.setY(800));
-        Normal.setX(Shared.setX(390));
 
-        RelativeLayout.LayoutParams layoutParams4 = new RelativeLayout.LayoutParams(Shared.setX(300), Shared.setY(150));
-        addContentView(Settings, layoutParams4);
+        Shared.addElement(this, Settings, 300, 150, 700, 50);
         Settings.setBackgroundResource(R.drawable.settings_button);
-        Settings.setX(Shared.setX(700));
-        Settings.setY(Shared.setY(50));
 
         multi.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, MultiplayerMenu.class);
@@ -121,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return result;
     }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -132,13 +117,11 @@ public class MainActivity extends AppCompatActivity {
             isMusicPlaying = true;
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         Shared.foreGround = false;
     }
-
     @Override
     protected void onStop() {
         super.onStop();

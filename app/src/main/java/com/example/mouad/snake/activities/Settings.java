@@ -2,16 +2,14 @@ package com.example.mouad.snake.activities;
 
 
 import android.content.SharedPreferences;
-import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
@@ -19,7 +17,7 @@ import com.example.mouad.snake.Shared;
 
 public class Settings extends AppCompatActivity {
 
-    Switch sound_switch, music_switch;
+    SwitchCompat soundSwitch, musicSwitch;
     SharedPreferences sharedPreferences;
 
     @Override
@@ -29,33 +27,30 @@ public class Settings extends AppCompatActivity {
         Shared.background(this, this);
         Shared.backButton(this, this,  v -> onBack());
 
-        //GET THE PREVIOUS VALUE OF THE SWITCH
-        sound_switch = new Switch(this);
-        music_switch = new Switch(this);
-
-        make_switch();
-        make_tv();
+        makeSwitch();
+        makeTextView();
 
         sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
 
-        music_switch.setChecked(sharedPreferences.getBoolean(Shared.MUSIC_SHARED_PREFS, true));
-        sound_switch.setChecked(sharedPreferences.getBoolean(Shared.SOUND_SHARED_PREFS, true));
+        musicSwitch.setChecked(sharedPreferences.getBoolean(Shared.MUSIC_SHARED_PREFS, true));
+        soundSwitch.setChecked(sharedPreferences.getBoolean(Shared.SOUND_SHARED_PREFS, true));
 
-        music_switch.setOnClickListener(view -> {
-            if (music_switch.isChecked()) {
+        musicSwitch.setOnClickListener(view -> {
+            if (musicSwitch.isChecked()) {
                 MainActivity.music.start();
                 MainActivity.music.setLooping(true);
             } else {
                 MainActivity.music.pause();
             }
-            MainActivity.musicBoolean = music_switch.isChecked();
+            MainActivity.musicBoolean = musicSwitch.isChecked();
             save();
         });
-        sound_switch.setOnClickListener(view -> save());
+
+        soundSwitch.setOnClickListener(view -> save());
 
     }
 
-    private void make_tv() {
+    private void makeTextView() {
         TextView settings_tv, music_tv, sound_tv;
         settings_tv = new TextView(this);
         music_tv = new TextView(this);
@@ -69,11 +64,9 @@ public class Settings extends AppCompatActivity {
         music_tv.setTextSize(Shared.setX(20));
         sound_tv.setTextSize(Shared.setX(20));
 
-        int sett_color = Color.parseColor("#D18D1B");
-        int tv_color = Color.parseColor("#1D8189");
-        settings_tv.setTextColor(sett_color);
-        music_tv.setTextColor(tv_color);
-        sound_tv.setTextColor(tv_color);
+        settings_tv.setTextColor(Shared.YELLOW);
+        music_tv.setTextColor(Shared.BLUE);
+        sound_tv.setTextColor(Shared.BLUE);
 
         Typeface face = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
@@ -85,46 +78,30 @@ public class Settings extends AppCompatActivity {
         addContentView(settings_tv, layoutParams);
         settings_tv.setY(Shared.setY(100));
         settings_tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        //settings_tv.setX((width-settings_tv.getWidth())/2);
 
+        Shared.addElement(this, music_tv, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT, 200, 300);
 
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        addContentView(music_tv, layoutParams1);
-        music_tv.setY(Shared.setY(300));
-        music_tv.setX(Shared.setX(200));
+        Shared.addElement(this, sound_tv, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT, 200, 500);
 
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        addContentView(sound_tv, layoutParams2);
-        sound_tv.setY(Shared.setY(500));
-        sound_tv.setX(Shared.setX(200));
     }
-
-    private void make_switch() {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(150), Shared.setY(100));
-        addContentView(sound_switch, layoutParams);
-        sound_switch.setY(Shared.setY(500));
-        sound_switch.setX(Shared.setX(600));
-
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(Shared.setX(150), Shared.setY(100));
-        addContentView(music_switch, layoutParams1);
-        music_switch.setY(Shared.setY(300));
-        music_switch.setX(Shared.setX(600));
+    private void makeSwitch() {
+        soundSwitch = new SwitchCompat(this);
+        musicSwitch = new SwitchCompat(this);
+        Shared.addElement(this, soundSwitch, 150, 100, 600, 500);
+        Shared.addElement(this, musicSwitch, 150, 100, 600, 300);
     }
-
-    private void onBack() {
-        finish();
-    }
-
     public void save() {
-        SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putBoolean(Shared.MUSIC_SHARED_PREFS, music_switch.isChecked());
-        editor.putBoolean(Shared.SOUND_SHARED_PREFS, sound_switch.isChecked());
+        editor.putBoolean(Shared.MUSIC_SHARED_PREFS, musicSwitch.isChecked());
+        editor.putBoolean(Shared.SOUND_SHARED_PREFS, soundSwitch.isChecked());
 
         editor.apply();
     }
-
+    private void onBack() {
+        finish();
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -135,13 +112,11 @@ public class Settings extends AppCompatActivity {
             MainActivity.isMusicPlaying = true;
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         Shared.foreGround = false;
     }
-
     @Override
     protected void onStop() {
         super.onStop();
