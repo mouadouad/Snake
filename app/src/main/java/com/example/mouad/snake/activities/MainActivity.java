@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         width = size.x;
         height = size.y;
 
-        Shared.statusBarHeight = getStatusBarHeight();
         Shared.height = height;
         Shared.width = width;
 
@@ -98,14 +97,6 @@ public class MainActivity extends AppCompatActivity {
         Normal.setAnimation(from_bottom);
         multi.setAnimation(from_bottom);
 
-    }
-    public int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
     @Override
     public void onResume() {

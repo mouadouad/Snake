@@ -119,17 +119,20 @@ public class Normal extends AppCompatActivity {
         final Button right = new Button(this);
 
         left.setBackgroundResource(R.drawable.left_button);
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
-        addContentView(left, layoutParams2);
-
-        left.setY(MainActivity.height - Shared.statusBarHeight - Shared.setY(200));
-        left.setX(Shared.setX(415));
-
         right.setBackgroundResource(R.drawable.right_button);
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
-        addContentView(right, layoutParams3);
 
-        right.setY(MainActivity.height - Shared.statusBarHeight - Shared.setY(200));
+        final RelativeLayout layout = new RelativeLayout(this);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        addContentView(layout, layoutParams);
+
+        final RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
+        buttonParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        buttonParams.bottomMargin = Shared.setY(200);
+        layout.addView(left, buttonParams);
+        layout.addView(right, buttonParams);
+
+        left.setX(Shared.setX(415));
         right.setX(Shared.setX(565));
 
         left.setOnClickListener(view -> playerTurnLeft());

@@ -61,6 +61,10 @@ public class Renderer extends View {
             variables.add(Jint);
         }
     }
+    public void clear(){
+        my_variables.clear();
+        his_variables.clear();
+    }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -98,7 +102,7 @@ public class Renderer extends View {
             }
         }
     }
-    public void repeat(){
+    public void refresh(){
         this.invalidate();
     }
 

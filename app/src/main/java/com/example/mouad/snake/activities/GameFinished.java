@@ -22,6 +22,7 @@ public class GameFinished extends AppCompatActivity {
     TextView result;
     TextView levelTV;
     RelativeLayout div;
+    public static int myScore = 0, hisScore = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +32,7 @@ public class GameFinished extends AppCompatActivity {
         makeTextViews();
 
         //SEE HOW MANY XP I GOT
-        switch (MultiplayerMenu.my_score - MultiplayerMenu.his_score) {
+        switch (GameFinished.myScore - GameFinished.hisScore) {
             case 2:
                 MultiplayerMenu.xp += 100;
                 result.setText(R.string.won);
@@ -54,11 +55,11 @@ public class GameFinished extends AppCompatActivity {
                 break;
         }
 
-        if (MultiplayerMenu.my_score == 0 && MultiplayerMenu.his_score == 0) {
+        if (GameFinished.myScore == 0 && GameFinished.hisScore == 0) {
             MultiplayerMenu.xp += 100;
             result.setText(R.string.won);
         } else {
-            result.append("\n" + MultiplayerMenu.my_score + "/" + MultiplayerMenu.his_score);
+            result.append("\n" + GameFinished.myScore + "/" + GameFinished.hisScore);
         }
 
         //UPDATE XP AND LEVEL
@@ -81,7 +82,6 @@ public class GameFinished extends AppCompatActivity {
 
         quit.setOnClickListener(view -> {
             Intent i = new Intent(GameFinished.this, MultiplayerMenu.class);
-            MultiplayerMenu.round = 1;
             startActivity(i);
         });
     }

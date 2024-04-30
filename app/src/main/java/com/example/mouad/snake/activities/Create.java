@@ -39,6 +39,9 @@ public class Create extends AppCompatActivity {
             MultiplayerMenu.name = (String) args[0];
             startActivity(intent);
         }));
+
+        MultiplayerMenu.socket.on("errorCreating", args -> runOnUiThread(()
+                -> nameOfLobby.setError(getString(R.string.errorCreating))));
     }
     private void setConfirmButton() {
         final Button confirm = new Button(this);
@@ -52,7 +55,7 @@ public class Create extends AppCompatActivity {
                 nameOfLobby.getText().toString().isEmpty() ||
                 nameOfLobby.getText().toString().length() > 50) {
 
-                nameOfLobby.setError("Please choose another lobby");
+                nameOfLobby.setError(getString(R.string.errorCreating));
             } else {
                 MultiplayerMenu.name = nameOfLobby.getText().toString();
                 MultiplayerMenu.socket.emit("create", MultiplayerMenu.name);

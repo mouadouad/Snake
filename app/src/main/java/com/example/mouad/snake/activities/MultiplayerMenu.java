@@ -30,7 +30,7 @@ public class MultiplayerMenu extends AppCompatActivity {
     public static String name;
     public static Socket socket;
     public static int level, xp;
-    public static int round = 1, my_score = 0, his_score = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +49,8 @@ public class MultiplayerMenu extends AppCompatActivity {
         xpBar();
 
         try {
-            socket = IO.socket("http://192.168.1.5:3000");
-            //socket = IO.socket("http://10.0.2.2:3000");
-            //socket = IO.socket("https://snake1234.herokuapp.com/");
+            socket = IO.socket("http://192.168.1.53:3000");
+            //socket = IO.socket("http://10.0.2.2:3000"); // https://snake1234.herokuapp.com/
             socket.connect();
             ping();
         } catch (URISyntaxException e) {

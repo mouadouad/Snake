@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -29,40 +28,24 @@ import org.json.JSONException;
 
 public class Multiplayer extends AppCompatActivity {
 
-    Boolean started = false;
     Dialog alertDialog;
-    Boolean recreate = false, quit = false;
+    TextView roundTextView;
+    Boolean started = false, gameFinished = false;
+    Renderer renderer;
+    int round = 1;
 
 
-    @SuppressLint("ClickableViewAccessibility")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final Intent intent = new Intent(Multiplayer.this, GameFinished.class);
-        final Renderer renderer = new Renderer(this);
+        renderer = new Renderer(this);
         setContentView(renderer);
 
         makeScreenDim();
         setRoundsTextView();
+        chooseStartingPosition();
 
-        final RelativeLayout layout = new RelativeLayout(this);
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.width, Shared.height);
-        addContentView(layout, layoutParams);
-
-        layout.setOnTouchListener((view, motionEvent) -> {
-            final float y = motionEvent.getY();
-            final float x = motionEvent.getX();
-            // CHECK IF THE RIGHT SIDE IS CLICKED
-            if ((Waiting.side == 1 && y < Shared.setY(800)) || (Waiting.side == 0 && y > Shared.setY(800))) {
-                if (!started) {
-                    final float[] coordinates = findClosestEdge(x, y, Waiting.side);
-
-                    MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width,
-                            coordinates[1] / Shared.height);
-                }
-            }
-            return false;
-        });
+        MultiplayerMenu.socket.emit("enterGame");
 
         MultiplayerMenu.socket.on("startGame", args -> runOnUiThread(() -> {
             started = true;
@@ -86,7 +69,7 @@ public class Multiplayer extends AppCompatActivity {
                     Shared.backButton(this, this, v -> onBack());
                 }
 
-                renderer.repeat();
+                renderer.refresh();
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -99,30 +82,27 @@ public class Multiplayer extends AppCompatActivity {
 
         MultiplayerMenu.socket.on("draw", args -> runOnUiThread(() -> gameOver(GameStates.DRAW)));
 
-        MultiplayerMenu.socket.on("quit", args -> runOnUiThread(() -> {
-            MultiplayerMenu.socket.disconnect();
-            MultiplayerMenu.my_score = 0;
-            MultiplayerMenu.his_score = 0;
-            //startActivity(intent);
-        }));
-
         MultiplayerMenu.socket.on("roundFinished", args -> runOnUiThread(() -> {
-            MultiplayerMenu.round = (int) args[0];
-            alertDialog.cancel();
-            recreate();
-            recreate = true;
+            round = (int) args[0];
+            refresh();
         }));
 
         MultiplayerMenu.socket.on("gameFinished", args -> runOnUiThread(() -> {
-            MultiplayerMenu.my_score = (int) args[0];
-            MultiplayerMenu.his_score = (int) args[1];
-            MultiplayerMenu.socket.disconnect();
+            GameFinished.myScore = (int) args[0];
+            GameFinished.hisScore = (int) args[1];
+            gameFinished = true;
+            finish();
+            final Intent intent = new Intent(Multiplayer.this, GameFinished.class);
             startActivity(intent);
         }));
 
-
+        MultiplayerMenu.socket.on("gameEnded", args -> runOnUiThread(() -> {
+            gameFinished = true;
+            finish();
+            final Intent intent = new Intent(Multiplayer.this, GameFinished.class);
+            startActivity(intent);
+        }));
     }
-
     private void makeScreenDim() {
         final Resources res = getResources();
         final Drawable shape = ResourcesCompat.getDrawable(res, R.drawable.shape, null);
@@ -139,6 +119,27 @@ public class Multiplayer extends AppCompatActivity {
         }
         addContentView(dim, dimParams);
         dim.getForeground().setAlpha(200);
+    }
+    @SuppressLint("ClickableViewAccessibility")
+    private void chooseStartingPosition() {
+        final RelativeLayout layout = new RelativeLayout(this);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.width, Shared.height);
+        addContentView(layout, layoutParams);
+
+        layout.setOnTouchListener((view, motionEvent) -> {
+            final float y = motionEvent.getY();
+            final float x = motionEvent.getX();
+            // CHECK IF THE RIGHT SIDE IS CLICKED
+            if ((Waiting.side == 1 && y < Shared.setY(800)) || (Waiting.side == 0 && y > Shared.setY(800))) {
+                if (!started) {
+                    final float[] coordinates = findClosestEdge(x, y, Waiting.side);
+
+                    MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width,
+                            coordinates[1] / Shared.height);
+                }
+            }
+            return false;
+        });
     }
     private static float[] findClosestEdge(float x, float y, int side) {
         if (side == 0) {
@@ -168,39 +169,38 @@ public class Multiplayer extends AppCompatActivity {
         final Typeface fredoka = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
 
-        final TextView roundTextView = new TextView(this);
+        roundTextView = new TextView(this);
         Shared.addElement(this, roundTextView, 300, 200, 400, 200);
 
         roundTextView.setTextColor(Shared.YELLOW);
         roundTextView.setTypeface(fredoka);
         roundTextView.setTextSize(Shared.setX(20));
         roundTextView.setText(R.string.round);
-        roundTextView.append(String.valueOf(MultiplayerMenu.round));
+        roundTextView.append(String.valueOf(round));
     }
-    public void placeControllers() {
+    private void placeControllers() {
         final Button left = new Button(this);
         final Button right = new Button(this);
 
         left.setBackgroundResource(R.drawable.left_button);
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
-        addContentView(left, layoutParams2);
-
-        left.setY(Shared.height - Shared.statusBarHeight - Shared.setY(200));
-        left.setX(Shared.setX(415));
-
         right.setBackgroundResource(R.drawable.right_button);
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
-        addContentView(right, layoutParams3);
 
-        right.setY(Shared.height - Shared.statusBarHeight - Shared.setY(200));
-        right.setX(Shared.setX(565));
+        final RelativeLayout layout = new RelativeLayout(this);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        addContentView(layout, layoutParams);
 
-        left.setOnClickListener(view -> MultiplayerMenu.socket.emit("turn_left"));
+        final RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
+        buttonParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        buttonParams.bottomMargin = Shared.setY(200);
+        layout.addView(left, buttonParams);
+        layout.addView(right, buttonParams);
 
-        right.setOnClickListener(view -> MultiplayerMenu.socket.emit("turn_right"));
+        left.setOnClickListener(view -> MultiplayerMenu.socket.emit("turnLeft"));
+        right.setOnClickListener(view -> MultiplayerMenu.socket.emit("turnRight"));
 
     }
-    public void gameOver(GameStates result) {
+    private void gameOver(GameStates result) {
         final RelativeLayout message_box;
         message_box = new RelativeLayout(this);
 
@@ -222,51 +222,33 @@ public class Multiplayer extends AppCompatActivity {
         alertDialog.show();
         alertDialog.setCanceledOnTouchOutside(false);
     }
+    private void refresh() {
+        started = false;
+        gameFinished = false;
+        alertDialog.cancel();
+        makeScreenDim();
+        setRoundsTextView();
+        chooseStartingPosition();
+        renderer.clear();
+        renderer.refresh();
+    }
     private void onBack() {
+        finish();
         Intent intent = new Intent(Multiplayer.this, MultiplayerMenu.class);
         startActivity(intent);
-
-        MultiplayerMenu.socket.emit("quit");
-        MultiplayerMenu.socket.disconnect();
     }
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         onBack();
     }
+
     @Override
-    protected void onStop() {
-        super.onStop();
-        if (!recreate) {
-            if (!Shared.foreGround) {
-                MainActivity.music.pause();
-                MainActivity.isMusicPlaying = false;
-            }
-            MultiplayerMenu.socket.emit("quit");
-            MultiplayerMenu.socket.disconnect();
-            quit = true;
+    protected void onDestroy() {
+        super.onDestroy();
+        if(!gameFinished) {
+            MultiplayerMenu.socket.emit("quitGame");
         }
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!recreate) {
-            Shared.foreGround = true;
-            if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying) {
-                MainActivity.music.start();
-                MainActivity.music.setLooping(true);
-                MainActivity.isMusicPlaying = true;
-            }
-            if (quit) {
-                Intent intent = new Intent(Multiplayer.this, MultiplayerMenu.class);
-                startActivity(intent);
-            }
-        }
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Shared.foreGround = false;
     }
 
 }

@@ -29,6 +29,9 @@ public class Join extends AppCompatActivity {
     private void setEditText() {
         nameOfLobby = new EditText(this);
         Shared.addElement(this, nameOfLobby, 300, 150, 400, 200);
+
+        MultiplayerMenu.socket.on("errorJoining", args -> runOnUiThread(()
+                -> nameOfLobby.setError(getString(R.string.errorJoining))));
     }
 
     private void setConfirmButton() {

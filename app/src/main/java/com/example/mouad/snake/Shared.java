@@ -16,7 +16,7 @@ import com.google.android.gms.ads.AdView;
 
 public class Shared {
 
-    public static int width, height, statusBarHeight;
+    public static int width, height;
     public static final int BLACK = Color.parseColor("#20292A");
     public static final int YELLOW = Color.parseColor("#D18D1B");
     public static final int BLUE = Color.parseColor("#1D8189");
@@ -51,13 +51,15 @@ public class Shared {
         adView.setAdUnitId("ca-app-pub-3922358669029120/2831354657");
 
         RelativeLayout layout = new RelativeLayout(context);
-        RelativeLayout.LayoutParams layoutParams1 = new RelativeLayout.LayoutParams(MainActivity.width, MainActivity.height - Shared.statusBarHeight);
-        activity.addContentView(layout, layoutParams1);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        activity.addContentView(layout, layoutParams);
 
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layout.addView(adView, layoutParams);
+        RelativeLayout.LayoutParams bannerParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        bannerParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        bannerParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        layout.addView(adView, bannerParams);
 
         //MobileAds.initialize(this,"ca-app-pub-3922358669029120~3985187056");
         AdRequest adRequest = new AdRequest.Builder().build();
