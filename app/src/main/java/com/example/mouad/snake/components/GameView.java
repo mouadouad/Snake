@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.mouad.snake.components.Border;
 
 public class GameView extends ViewGroup {
 
@@ -40,6 +39,12 @@ public class GameView extends ViewGroup {
             for (int i = 0; i < child.getChildCount(); i++) {
                 View nestedChild = child.getChildAt(i);
                 nestedChild.layout(0, 0, right - left, bottom - top);
+                Rectangle rectangle = (Rectangle) nestedChild;
+                rectangle.setSquared();
+            }
+            if(child.getChildCount() > 0) {
+                Rectangle lastRectangle = (Rectangle) child.getChildAt(child.getChildCount()-1);
+                lastRectangle.setRounded();
             }
             child.layout(0, 0, right - left, bottom - top);
         }

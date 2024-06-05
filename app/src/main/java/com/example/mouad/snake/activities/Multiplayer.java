@@ -196,6 +196,9 @@ public class Multiplayer extends AppCompatActivity {
         layout.addView(left, buttonParams);
         layout.addView(right, buttonParams);
 
+        left.setX(Shared.setX(415));
+        right.setX(Shared.setX(565));
+
         left.setOnClickListener(view -> MultiplayerMenu.socket.emit("turnLeft"));
         right.setOnClickListener(view -> MultiplayerMenu.socket.emit("turnRight"));
 

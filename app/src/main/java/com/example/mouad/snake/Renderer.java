@@ -4,7 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.view.View;
 
 import org.json.JSONArray;
@@ -14,20 +15,22 @@ import java.util.ArrayList;
 
 public class Renderer extends View {
 
-    private final ArrayList<int[]> my_variables, his_variables;
+    private final ArrayList<int[]> myVariables, hisVariables;
     private final Paint blackPaint,bluePaint,borderPaint;
-    private final Rect rectangle, border;
+    private final RectF rectangle, border;
+    float[] topCorners, bottomCorners, leftCorners, rightCorners, corners;
+    Path path;
 
     public Renderer(Context context) {
         super(context);
         int back_color= Color.parseColor("#82B2B6");
         setBackgroundColor(back_color);
 
-        my_variables = new ArrayList<>();
-        his_variables = new ArrayList<>();
+        myVariables = new ArrayList<>();
+        hisVariables = new ArrayList<>();
 
-        rectangle=new Rect();
-        border = new Rect();
+        rectangle=new RectF();
+        border = new RectF();
 
         blackPaint=new Paint();
         bluePaint=new Paint();
@@ -39,14 +42,40 @@ public class Renderer extends View {
         bluePaint.setStyle(Paint.Style.FILL);
         borderPaint.setColor(Shared.BORDER_COLOR);
         borderPaint.setStyle(Paint.Style.FILL);
+
+        topCorners = new float[]{
+                80, 80,
+                80, 80,
+                0, 0,
+                0, 0
+        };
+        bottomCorners = new float[]{
+                0, 0,
+                0, 0,
+                80, 80,
+                80, 80
+        };
+        leftCorners = new float[]{
+                80, 80,
+                0, 0,
+                0, 0,
+                80, 80
+        };
+        rightCorners = new float[]{
+                0, 0,
+                80, 80,
+                80, 80,
+                0, 0
+        };
+        path = new Path();
     }
     public void setVariables(JSONArray my_array, JSONArray his_array){
-        my_variables.clear();
-        his_variables.clear();
+        myVariables.clear();
+        hisVariables.clear();
 
         try {
-            convert(my_array,my_variables);
-            convert(his_array,his_variables);
+            convert(my_array, myVariables);
+            convert(his_array, hisVariables);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -62,15 +91,15 @@ public class Renderer extends View {
         }
     }
     public void clear(){
-        my_variables.clear();
-        his_variables.clear();
+        myVariables.clear();
+        hisVariables.clear();
     }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        drawRectangles(canvas,my_variables, blackPaint);
-        drawRectangles(canvas,his_variables, bluePaint);
+        drawRectangles(canvas, myVariables, blackPaint);
+        drawRectangles(canvas, hisVariables, bluePaint);
         
         border.set(0,0,Shared.setX(20),Shared.setY(1600));
         canvas.drawRect(border,borderPaint);
@@ -85,20 +114,32 @@ public class Renderer extends View {
         for (int i = 0; i < variables.size(); i++){
             final int left = variables.get(i)[0];
             final int top = variables.get(i)[1];
-            final int bot = variables.get(i)[2];
+            final int bottom = variables.get(i)[2];
 
-            if (variables.get(i)[3]==90){
-                rectangle.set(Shared.setX(-bot),Shared.setY(left),Shared.setX(-top), Shared.setY(left +30));
-                canvas.drawRect(rectangle,paint);
-            }else if (variables.get(i)[3]==-90){
-                rectangle.set(Shared.setX(top),Shared.setY(-left -30),Shared.setX( bot),Shared.setY(-left));
-                canvas.drawRect(rectangle,paint);
-            }else if (variables.get(i)[3]==180){
-                rectangle.set(Shared.setX(-left -30),Shared.setY(-bot),Shared.setX(-left),Shared.setY(-top));
-                canvas.drawRect(rectangle,paint);
-            }else if (variables.get(i)[3]==0){
-                rectangle.set(Shared.setX(left), Shared.setY(top),Shared.setX( left +30), Shared.setY(bot));
-                canvas.drawRect(rectangle,paint);
+            switch (variables.get(i)[3]) {
+                case 90:
+                    rectangle.set(Shared.setX(-bottom), Shared.setY(left), Shared.setX(-top), Shared.setY(left + 30));
+                    corners = rightCorners;
+                    break;
+                case -90:
+                    rectangle.set(Shared.setX(top), Shared.setY(-left - 30), Shared.setX(bottom), Shared.setY(-left));
+                    corners = leftCorners;
+                    break;
+                case 180:
+                    rectangle.set(Shared.setX(-left - 30), Shared.setY(-bottom), Shared.setX(-left), Shared.setY(-top));
+                    corners = bottomCorners;
+                    break;
+                case 0:
+                    rectangle.set(Shared.setX(left), Shared.setY(top), Shared.setX(left + 30), Shared.setY(bottom));
+                    corners = topCorners;
+                    break;
+            }
+            if(i == variables.size() - 1){
+                path.reset();
+                path.addRoundRect(rectangle, corners, Path.Direction.CW);
+                canvas.drawPath(path, paint);
+            }else{
+                canvas.drawRect(rectangle, paint);
             }
         }
     }

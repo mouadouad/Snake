@@ -252,6 +252,32 @@ public class Normal extends AppCompatActivity {
         return new float[]{x, y, angle};
     }
 
+    private void start(float[] playerCoordinates, float[] botCoordinates) {
+        started = true;
+        dim.setVisibility(View.GONE);
+
+        addStartingRectangles(playerCoordinates, botCoordinates);
+        placeControllers();
+        repeat();
+    }
+
+    private void addStartingRectangles(float[] playerCoordinates, float[] botCoordinates) {
+
+        final float[] botPosition = findStartingPosition(botCoordinates[0], botCoordinates[1]);
+        final int[] firstRect = startingRect((int) botPosition[0], (int) botPosition[1], (int) botPosition[2]);
+
+        botRectangles.addRectangle(firstRect);
+        Rectangle rectangle = new Rectangle(this, firstRect, Shared.BLACK);
+        botRectangles.addView(rectangle);
+
+        final float[] playerPosition = findStartingPosition(playerCoordinates[0] * 1080 / MainActivity.width, playerCoordinates[1] * 1770 / MainActivity.height);
+        int[] firstRectPlayer = startingRect((int) playerPosition[0], (int) playerPosition[1], (int) playerPosition[2]);
+
+        playerRectangles.addRectangle(firstRectPlayer);
+        rectangle = new Rectangle(this, firstRectPlayer, Shared.BLUE);
+        playerRectangles.addView(rectangle);
+    }
+
     private static int[] startingRect(int x, int y, int angle) {
         final int[] firstRect = new int[4];
 
@@ -276,32 +302,6 @@ public class Normal extends AppCompatActivity {
 
         return firstRect;
 
-    }
-
-    private void addStartingRectangles(float[] playerCoordinates, float[] botCoordinates) {
-
-        final float[] botPosition = findStartingPosition(botCoordinates[0], botCoordinates[1]);
-        final int[] firstRect = startingRect((int) botPosition[0], (int) botPosition[1], (int) botPosition[2]);
-
-        botRectangles.addRectangle(firstRect);
-        Rectangle rectangle = new Rectangle(this, firstRect, Shared.BLACK);
-        botRectangles.addView(rectangle);
-
-        final float[] playerPosition = findStartingPosition(playerCoordinates[0] * 1080 / MainActivity.width, playerCoordinates[1] * 1770 / MainActivity.height);
-        int[] firstRectPlayer = startingRect((int) playerPosition[0], (int) playerPosition[1], (int) playerPosition[2]);
-
-        playerRectangles.addRectangle(firstRectPlayer);
-        rectangle = new Rectangle(this, firstRectPlayer, Shared.BLUE);
-        playerRectangles.addView(rectangle);
-    }
-
-    private void start(float[] playerCoordinates, float[] botCoordinates) {
-        started = true;
-        dim.setVisibility(View.GONE);
-
-        addStartingRectangles(playerCoordinates, botCoordinates);
-        placeControllers();
-        repeat();
     }
 
     private void repeat() {

@@ -2,6 +2,7 @@ package com.example.mouad.snake.components;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,7 +27,6 @@ public class Rectangles extends ViewGroup {
     public Rectangles(Context context) {
         super(context);
         Variables = new ArrayList<>();
-
     }
 
     @Override
