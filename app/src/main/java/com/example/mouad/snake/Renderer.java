@@ -18,8 +18,9 @@ public class Renderer extends View {
     private final ArrayList<int[]> myVariables, hisVariables;
     private final Paint blackPaint,bluePaint,borderPaint;
     private final RectF rectangle, border;
-    float[] topCorners, bottomCorners, leftCorners, rightCorners, corners;
-    Path path;
+    private final float[] topCorners, bottomCorners, leftCorners, rightCorners;
+    private  float[] corners;
+    private final Path path;
 
     public Renderer(Context context) {
         super(context);
@@ -43,30 +44,10 @@ public class Renderer extends View {
         borderPaint.setColor(Shared.BORDER_COLOR);
         borderPaint.setStyle(Paint.Style.FILL);
 
-        topCorners = new float[]{
-                80, 80,
-                80, 80,
-                0, 0,
-                0, 0
-        };
-        bottomCorners = new float[]{
-                0, 0,
-                0, 0,
-                80, 80,
-                80, 80
-        };
-        leftCorners = new float[]{
-                80, 80,
-                0, 0,
-                0, 0,
-                80, 80
-        };
-        rightCorners = new float[]{
-                0, 0,
-                80, 80,
-                80, 80,
-                0, 0
-        };
+        topCorners = new float[]    {80, 80, 80, 80, 0, 0, 0, 0};
+        bottomCorners = new float[] {0, 0, 0, 0, 80, 80, 80, 80};
+        leftCorners = new float[]   {80, 80, 0, 0, 0, 0, 80, 80};
+        rightCorners = new float[]  {0, 0, 80, 80, 80, 80, 0, 0};
         path = new Path();
     }
     public void setVariables(JSONArray my_array, JSONArray his_array){
