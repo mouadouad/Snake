@@ -1,5 +1,6 @@
 package com.example.mouad.snake.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -15,10 +16,10 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.components.Renderer;
 import com.example.mouad.snake.Shared;
 import com.example.mouad.snake.components.Bot;
 import com.example.mouad.snake.components.Game;
-import com.example.mouad.snake.components.GameView;
 import com.example.mouad.snake.enums.GameStates;
 
 import java.util.Random;
@@ -27,44 +28,36 @@ public class Normal extends AppCompatActivity {
     private static final short pixels = 30, obsSize = 5;
     private Boolean started = false;
     private Game game;
-    FrameLayout dim;
-    Button back;
-    Dialog alertDialog;
+    private FrameLayout dim;
+    private Button back;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initializeLayout();
         backButton();
     }
 
-    private void backButton() {
-        back = new Button(this);
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
-        back.setBackgroundResource(R.drawable.back_button);
-        this.addContentView(back, layoutParams);
-        back.setY(Shared.setY(50));
-        back.setX(Shared.setX(50));
-
-        back.setOnClickListener(v -> onBack());
-    }
-
     private void initializeLayout() {
-        final GameView gameView = new GameView(this);
-        setContentView(gameView);
+        final Renderer renderer = new Renderer(this);
+        setContentView(renderer);
 
         final Bot bot = new Bot(this, pixels, obsSize);
-        game = new Game(this, bot, gameView, this);
+        game = new Game(bot, renderer, this);
 
         final Resources res = getResources();
         final Drawable shape = ResourcesCompat.getDrawable(res, R.drawable.shape, null);
         dim = new FrameLayout(this);
         dim.setForeground(shape);
 
-        final int side = setSide();
+        chooseStartingPosition(setSide());
+    }
 
-        // CHOOSE THE PLACE WHERE TO START
-        gameView.setOnTouchListener((view, motionEvent) -> {
+    @SuppressLint("ClickableViewAccessibility")
+    private void chooseStartingPosition(int side) {
+        final RelativeLayout layout = new RelativeLayout(this);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.width, Shared.height);
+        addContentView(layout, layoutParams);
+        layout.setOnTouchListener((view, motionEvent) -> {
             if(view.performClick()) { return false;}
             float playerYStart = motionEvent.getY();
             float playerXStart = motionEvent.getX();
@@ -122,6 +115,16 @@ public class Normal extends AppCompatActivity {
         right.setOnClickListener(view -> game.playerTurnRight());
 
     }
+    private void backButton() {
+        back = new Button(this);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(100), Shared.setY(50));
+        back.setBackgroundResource(R.drawable.back_button);
+        this.addContentView(back, layoutParams);
+        back.setY(Shared.setY(50));
+        back.setX(Shared.setX(50));
+
+        back.setOnClickListener(v -> onBack());
+    }
 
     public void gameOver(GameStates result) {
         final RelativeLayout message_box;
@@ -149,7 +152,7 @@ public class Normal extends AppCompatActivity {
 
         play_again.setOnClickListener(view -> recreate());
 
-        alertDialog = new Dialog(this);
+        Dialog alertDialog = new Dialog(this);
         alertDialog.setContentView(message_box);
 
         if (alertDialog.getWindow() != null) {    //MAKE BACKGROUND OF DIALOG TRANSPARENT

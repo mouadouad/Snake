@@ -17,23 +17,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
-import com.example.mouad.snake.Renderer;
+import com.example.mouad.snake.components.Renderer;
 import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.components.Game;
 import com.example.mouad.snake.enums.GameStates;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-
-
 public class Multiplayer extends AppCompatActivity {
 
-    Dialog alertDialog;
-    TextView roundTextView;
-    Boolean started = false, gameFinished = false;
-    Renderer renderer;
-    int round = 1;
-
+    private Dialog alertDialog;
+    private Boolean started = false, gameFinished = false;
+    private Renderer renderer;
+    private int round = 1;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +129,7 @@ public class Multiplayer extends AppCompatActivity {
             // CHECK IF THE RIGHT SIDE IS CLICKED
             if ((Waiting.side == 1 && y < Shared.setY(800)) || (Waiting.side == 0 && y > Shared.setY(800))) {
                 if (!started) {
-                    final float[] coordinates = findClosestEdge(x, y, Waiting.side);
+                    final float[] coordinates = Game.findClosestEdge(x, y, Waiting.side);
 
                     MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width,
                             coordinates[1] / Shared.height);
@@ -141,35 +138,11 @@ public class Multiplayer extends AppCompatActivity {
             return false;
         });
     }
-    private static float[] findClosestEdge(float x, float y, int side) {
-        if (side == 0) {
-            if (Shared.setY(1600) - y < MainActivity.width - x && Shared.setY(1600) - y < x) {
-                y = MainActivity.height;
-            } else {
-                if (x > MainActivity.width - x) {
-                    x = MainActivity.width;
-                } else {
-                    x = 0;
-                }
-            }
-        } else {
-            if (y < MainActivity.width - x && y < x) {
-                y = 0;
-            } else {
-                if (x > MainActivity.width - x) {
-                    x = MainActivity.width;
-                } else {
-                    x = 0;
-                }
-            }
-        }
-        return new float[]{x, y};
-    }
     private void setRoundsTextView() {
         final Typeface fredoka = Typeface.createFromAsset(getAssets(),
                 "FredokaOne-Regular.ttf");
 
-        roundTextView = new TextView(this);
+        TextView roundTextView = new TextView(this);
         Shared.addElement(this, roundTextView, 300, 200, 400, 200);
 
         roundTextView.setTextColor(Shared.YELLOW);

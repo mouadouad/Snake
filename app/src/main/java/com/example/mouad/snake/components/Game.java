@@ -1,6 +1,5 @@
 package com.example.mouad.snake.components;
 
-import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
 
@@ -15,22 +14,20 @@ public class Game {
     private static final short TIMEOUT = 10;
     protected short timeout = TIMEOUT;
     public boolean finished = false;
-    private final Context context;
     private final Bot bot;
     private final Normal normal;
+    private final Renderer renderer;
     private static Rect topBar, bottomBar, leftBar, rightBar;
     private final Rectangles playerRectangles, botRectangles;
 
-    public Game(Context context, Bot bot, GameView gameView, Normal normal) {
-        this.context = context;
+    public Game(Bot bot, Renderer renderer, Normal normal) {
         this.bot = bot;
         this.normal = normal;
+        this.renderer = renderer;
 
-        playerRectangles = new Rectangles(context);
-        gameView.addView(playerRectangles);
-
-        botRectangles = new Rectangles(context);
-        gameView.addView(botRectangles);
+        playerRectangles = new Rectangles();
+        botRectangles = new Rectangles();
+        renderer.setVariables(playerRectangles, botRectangles);
 
         leftBar = new Rect(0, 0, 20, 1600);
         rightBar = new Rect(1080 - 20, 0, 1080, 1600);
@@ -45,7 +42,7 @@ public class Game {
         repeat();
     }
 
-    private static float[] findClosestEdge(float x, float y, int side) {
+    public static float[] findClosestEdge(float x, float y, int side) {
 
         if (side == 0) {
             if (Shared.setY(1600) - y < MainActivity.width - x && Shared.setY(1600) - y < x) {
@@ -126,15 +123,11 @@ public class Game {
         final int[] firstRect = startingRect((int) botPosition[0], (int) botPosition[1], (int) botPosition[2]);
 
         botRectangles.addRectangle(firstRect);
-        Rectangle rectangle = new Rectangle(context, firstRect, Shared.BLACK);
-        botRectangles.addView(rectangle);
 
         final float[] playerPosition = findStartingPosition(playerCoordinates[0] * 1080 / Shared.width, playerCoordinates[1] * 1770 / Shared.height);
         int[] firstRectPlayer = startingRect((int) playerPosition[0], (int) playerPosition[1], (int) playerPosition[2]);
 
         playerRectangles.addRectangle(firstRectPlayer);
-        rectangle = new Rectangle(context, firstRectPlayer, Shared.BLUE);
-        playerRectangles.addView(rectangle);
     }
 
     private static int[] startingRect(int x, int y, int angle) {
@@ -171,8 +164,7 @@ public class Game {
                     playerRectangles.getLastRectangle()[1] -= 3;
                     botRectangles.getLastRectangle()[1] -= 3;
 
-                    playerRectangles.getChildAt(playerRectangles.getChildCount() - 1).invalidate();
-                    botRectangles.getChildAt(botRectangles.getChildCount() - 1).invalidate();
+                    renderer.refresh();
                     botPlay();
                     checking();
                     repeat();
@@ -207,7 +199,6 @@ public class Game {
             if (playerChecker.intersect(rect) && i < playerRectangles.getRectangles().size() - 1) {
                 for (int remove = playerRectangles.getRectangles().size() - 1; remove > i; remove--) {
                     playerRectangles.getRectangles().remove(i + 1);
-                    playerRectangles.removeViewAt(i + 1);
                 }
 
                 final int[] ints = playerRectangles.getRectangles().get(i);
@@ -241,7 +232,6 @@ public class Game {
             if (botChecker.intersect(rect) && i < botRectangles.getRectangles().size() - 1) {
                 for (int remove = botRectangles.getRectangles().size() - 1; remove > i; remove--) {
                     botRectangles.getRectangles().remove(i + 1);
-                    botRectangles.removeViewAt(i + 1);
                 }
                 final int[] ints = botRectangles.getRectangles().get(i);
 
@@ -342,70 +332,20 @@ public class Game {
     }
 
     private void botTurnRight() {
-        final int[] lastRectangle = botRectangles.getLastRectangle();
-        int lastDirection = lastRectangle[3];
-
-        if (lastDirection == 180) {
-            lastDirection = -90;
-        } else {
-            lastDirection += 90;
-        }
-
-        final int[] rect = new int[4];
-
-        rect[0] = lastRectangle[1];
-        rect[1] = -lastRectangle[0] - 30;
-        rect[2] = -lastRectangle[0] - 30;
-        rect[3] = lastDirection;
-
-        botRectangles.addRectangle(rect);
-        final Rectangle rectangle = new Rectangle(context, rect, Shared.BLACK);
-        botRectangles.addView(rectangle);
+        turnRight(botRectangles);
     }
     private void botTurnLeft() {
-        final int[] lastRectangle = botRectangles.getLastRectangle();
-        int lastDirection = lastRectangle[3];
-
-        if (lastDirection == -90) {
-            lastDirection = 180;
-        } else {
-            lastDirection -= 90;
-        }
-
-        final int[] rect = new int[4];
-
-        rect[0] = -lastRectangle[1] - 30;
-        rect[1] = lastRectangle[0];
-        rect[2] = lastRectangle[0];
-        rect[3] = lastDirection;
-
-        botRectangles.addRectangle(rect);
-        final Rectangle rectangle = new Rectangle(context, rect, Shared.BLACK);
-        botRectangles.addView(rectangle);
+        turnLeft(botRectangles);
     }
 
     public void playerTurnRight() {
-        final int[] lastRectangle = playerRectangles.getLastRectangle();
-        int lastDirection = lastRectangle[3];
-
-        if (lastDirection == 180) {
-            lastDirection = -90;
-        } else {
-            lastDirection += 90;
-        }
-
-        final int[] rect = new int[4];
-        rect[0] = lastRectangle[1];
-        rect[1] = -lastRectangle[0] - 30;
-        rect[2] = -lastRectangle[0] - 30;
-        rect[3] = lastDirection;
-
-        playerRectangles.addRectangle(rect);
-        final Rectangle rectangle = new Rectangle(context, rect, Shared.BLUE);
-        playerRectangles.addView(rectangle);
+        turnRight(playerRectangles);
     }
     public void playerTurnLeft() {
-        final int[] lastRectangle = playerRectangles.getLastRectangle();
+        turnLeft(playerRectangles);
+    }
+    private static void turnLeft(Rectangles rectangles) {
+        final int[] lastRectangle = rectangles.getLastRectangle();
         int lastDirection = lastRectangle[3];
 
         if (lastDirection == -90) {
@@ -420,8 +360,26 @@ public class Game {
         rect[2] = lastRectangle[0];
         rect[3] = lastDirection;
 
-        playerRectangles.addRectangle(rect);
-        final Rectangle rectangle = new Rectangle(context, rect, Shared.BLUE);
-        playerRectangles.addView(rectangle);
+        rectangles.addRectangle(rect);
     }
+
+    private static void turnRight(Rectangles rectangles) {
+        final int[] lastRectangle = rectangles.getLastRectangle();
+        int lastDirection = lastRectangle[3];
+
+        if (lastDirection == 180) {
+            lastDirection = -90;
+        } else {
+            lastDirection += 90;
+        }
+
+        final int[] rect = new int[4];
+        rect[0] = lastRectangle[1];
+        rect[1] = -lastRectangle[0] - 30;
+        rect[2] = -lastRectangle[0] - 30;
+        rect[3] = lastDirection;
+
+        rectangles.addRectangle(rect);
+    }
+
 }

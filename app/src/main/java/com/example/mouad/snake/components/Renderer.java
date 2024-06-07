@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.components;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,6 +8,8 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.view.View;
 
+import com.example.mouad.snake.Shared;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 
 public class Renderer extends View {
 
-    private final ArrayList<int[]> myVariables, hisVariables;
+    private ArrayList<int[]> myVariables, hisVariables;
     private final Paint blackPaint,bluePaint,borderPaint;
     private final RectF rectangle, border;
     private final float[] topCorners, bottomCorners, leftCorners, rightCorners;
@@ -50,16 +52,23 @@ public class Renderer extends View {
         rightCorners = new float[]  {0, 0, 80, 80, 80, 80, 0, 0};
         path = new Path();
     }
-    public void setVariables(JSONArray my_array, JSONArray his_array){
+    public void setVariables(JSONArray myArray, JSONArray hisArray){
         myVariables.clear();
         hisVariables.clear();
 
         try {
-            convert(my_array, myVariables);
-            convert(his_array, hisVariables);
+            convert(myArray, myVariables);
+            convert(hisArray, hisVariables);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+    public void setVariables(Rectangles playerRectangles, Rectangles botRectangles){
+        myVariables.clear();
+        hisVariables.clear();
+
+        myVariables = playerRectangles.getRectangles();
+        hisVariables = botRectangles.getRectangles();
     }
     private void convert(JSONArray json, ArrayList<int[]> variables) throws JSONException {
         for (int i = 0; i < json.length(); i++) {
