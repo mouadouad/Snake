@@ -18,9 +18,10 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.components.Renderer;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.components.Game;
 import com.example.mouad.snake.enums.GameStates;
+import com.example.mouad.snake.shared.PlayerInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -85,11 +86,13 @@ public class Multiplayer extends AppCompatActivity {
         }));
 
         MultiplayerMenu.socket.on("gameFinished", args -> runOnUiThread(() -> {
-            GameFinished.myScore = (int) args[0];
-            GameFinished.hisScore = (int) args[1];
+            final int myScore = (int) args[0];
+            final int hisScore = (int) args[1];
             gameFinished = true;
             finish();
             final Intent intent = new Intent(Multiplayer.this, GameFinished.class);
+            intent.putExtra("myScore", myScore);
+            intent.putExtra("hisScore", hisScore);
             startActivity(intent);
         }));
 
@@ -108,7 +111,7 @@ public class Multiplayer extends AppCompatActivity {
 
         RelativeLayout.LayoutParams dimParams;
 
-        if (Waiting.side == 1) {
+        if (PlayerInfo.side == 1) {
             dim.setY(Shared.setY(800));
             dimParams = new RelativeLayout.LayoutParams((Shared.width), (Shared.height));
         } else {
@@ -127,9 +130,9 @@ public class Multiplayer extends AppCompatActivity {
             final float y = motionEvent.getY();
             final float x = motionEvent.getX();
             // CHECK IF THE RIGHT SIDE IS CLICKED
-            if ((Waiting.side == 1 && y < Shared.setY(800)) || (Waiting.side == 0 && y > Shared.setY(800))) {
+            if ((PlayerInfo.side == 1 && y < Shared.setY(800)) || (PlayerInfo.side == 0 && y > Shared.setY(800))) {
                 if (!started) {
-                    final float[] coordinates = Game.findClosestEdge(x, y, Waiting.side);
+                    final float[] coordinates = Game.findClosestEdge(x, y, PlayerInfo.side);
 
                     MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width,
                             coordinates[1] / Shared.height);
@@ -218,7 +221,6 @@ public class Multiplayer extends AppCompatActivity {
         super.onBackPressed();
         onBack();
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

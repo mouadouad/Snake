@@ -17,14 +17,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
+import com.example.mouad.snake.shared.PlayerInfo;
 
 
 public class Waiting extends AppCompatActivity {
 
-    Boolean canPlay = false, willPlay = false;
-    Button play;
-    public static int side;
+    private Boolean canPlay = false, willPlay = false;
+    private Button play;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public class Waiting extends AppCompatActivity {
             }
         }));
 
-        MultiplayerMenu.socket.on("side", args -> runOnUiThread(() -> side = (Integer) args[0]));
+        MultiplayerMenu.socket.on("side", args -> runOnUiThread(() -> PlayerInfo.side = (Integer) args[0]));
 
     }
     private void playButton() {
@@ -72,7 +72,7 @@ public class Waiting extends AppCompatActivity {
         });
     }
     private void nameOfLobbyTv() {
-        if (MultiplayerMenu.name != null) {
+        if (PlayerInfo.name != null) {
 
             final RelativeLayout div = new RelativeLayout(this);
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -84,13 +84,13 @@ public class Waiting extends AppCompatActivity {
             div.addView(nameOfLobbyTV, textViewParams);
             nameOfLobbyTV.setTextSize(Shared.setX(24));
 
-            final String nameOfLobbyText = getString(R.string.name_lobby) + MultiplayerMenu.name;
+            final String nameOfLobbyText = getString(R.string.name_lobby) + PlayerInfo.name;
 
             final SpannableString styledText = new SpannableString(nameOfLobbyText);
             final ForegroundColorSpan blue = new ForegroundColorSpan(Color.parseColor("#1D8189"));
             styledText.setSpan(blue, 0, 15, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             final ForegroundColorSpan yellow = new ForegroundColorSpan(Color.parseColor("#D18D1B"));
-            styledText.setSpan(yellow, 15, 15 + MultiplayerMenu.name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            styledText.setSpan(yellow, 15, 15 + PlayerInfo.name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             nameOfLobbyTV.setText(styledText);
             nameOfLobbyTV.setY(Shared.setY(800));

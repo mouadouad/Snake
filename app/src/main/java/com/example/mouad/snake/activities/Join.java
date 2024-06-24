@@ -9,7 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.mouad.snake.R;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
+import com.example.mouad.snake.shared.PlayerInfo;
 
 public class Join extends AppCompatActivity {
     EditText nameOfLobby;
@@ -40,12 +41,12 @@ public class Join extends AppCompatActivity {
         confirm.setBackgroundResource(R.drawable.join_button);
 
         confirm.setOnClickListener(view -> {
-            MultiplayerMenu.name = nameOfLobby.getText().toString();
-            MultiplayerMenu.socket.emit("join", MultiplayerMenu.name);
+            PlayerInfo.name = nameOfLobby.getText().toString();
+            MultiplayerMenu.socket.emit("join", PlayerInfo.name);
         });
 
         MultiplayerMenu.socket.on("joined", args -> runOnUiThread(() -> {
-            MultiplayerMenu.name = nameOfLobby.getText().toString();
+            PlayerInfo.name = nameOfLobby.getText().toString();
             Intent intent = new Intent(Join.this, Waiting.class);
             startActivity(intent);
         }));

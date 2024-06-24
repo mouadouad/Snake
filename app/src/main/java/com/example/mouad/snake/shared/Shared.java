@@ -1,4 +1,4 @@
-package com.example.mouad.snake;
+package com.example.mouad.snake.shared;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,6 +8,7 @@ import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mouad.snake.R;
 import com.example.mouad.snake.activities.MainActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -21,6 +22,7 @@ public class Shared {
     public static final int YELLOW = Color.parseColor("#D18D1B");
     public static final int BLUE = Color.parseColor("#1D8189");
     public static final int BORDER_COLOR = Color.parseColor("#3A4647");
+    public static final int BACK_COLOR= Color.parseColor("#82B2B6");
 
     public static boolean foreGround = true;
     public final static String SHARED_PREFS = "shared_prefs";

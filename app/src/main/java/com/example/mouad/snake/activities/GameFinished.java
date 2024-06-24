@@ -15,14 +15,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
+import com.example.mouad.snake.shared.PlayerInfo;
 
 public class GameFinished extends AppCompatActivity {
 
     TextView result;
     TextView levelTV;
     RelativeLayout div;
-    public static int myScore = 0, hisScore = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,44 +31,46 @@ public class GameFinished extends AppCompatActivity {
         Shared.background(this, this);
         makeTextViews();
 
-        //SEE HOW MANY XP I GOT
-        switch (GameFinished.myScore - GameFinished.hisScore) {
+        final int myScore = getIntent().getIntExtra("myScore", 0);
+        final int hisScore = getIntent().getIntExtra("hisScore", 0);
+
+        switch (myScore - hisScore) {
             case 2:
-                MultiplayerMenu.xp += 100;
+                PlayerInfo.xp += 100;
                 result.setText(R.string.won);
                 break;
             case 1:
-                MultiplayerMenu.xp += 70;
+                PlayerInfo.xp += 70;
                 result.setText(R.string.won);
                 break;
             case -1:
-                MultiplayerMenu.xp += 25;
+                PlayerInfo.xp += 25;
                 result.setText(R.string.lost);
                 break;
             case -2:
-                MultiplayerMenu.xp += 15;
+                PlayerInfo.xp += 15;
                 result.setText(R.string.lost);
                 break;
             case 0:
-                MultiplayerMenu.xp += 40;
+                PlayerInfo.xp += 40;
                 result.setText(R.string.draw);
                 break;
         }
 
-        if (GameFinished.myScore == 0 && GameFinished.hisScore == 0) {
-            MultiplayerMenu.xp += 100;
+        if (myScore == 0 && hisScore == 0) {
+            PlayerInfo.xp += 100;
             result.setText(R.string.won);
         } else {
-            result.append("\n" + GameFinished.myScore + "/" + GameFinished.hisScore);
+            result.append("\n" + myScore + "/" + hisScore);
         }
 
         //UPDATE XP AND LEVEL
-        if (MultiplayerMenu.xp >= MultiplayerMenu.level * 100) {
-            MultiplayerMenu.xp -= MultiplayerMenu.level * 100;
-            MultiplayerMenu.level++;
+        if (PlayerInfo.xp >= PlayerInfo.level * 100) {
+            PlayerInfo.xp -= PlayerInfo.level * 100;
+            PlayerInfo.level++;
         }
         levelTV.setText(R.string.level);
-        levelTV.append(String.valueOf(MultiplayerMenu.level));
+        levelTV.append(String.valueOf(PlayerInfo.level));
 
         save();
         xpBar();
@@ -90,8 +92,8 @@ public class GameFinished extends AppCompatActivity {
         final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putInt(Shared.Level, MultiplayerMenu.level);
-        editor.putInt(Shared.Xp, MultiplayerMenu.xp);
+        editor.putInt(Shared.Level, PlayerInfo.level);
+        editor.putInt(Shared.Xp, PlayerInfo.xp);
         editor.apply();
     }
 
@@ -104,7 +106,7 @@ public class GameFinished extends AppCompatActivity {
         Shared.addElement(this, container, 500, 100, 290, 800);
         container.setBackgroundResource(R.drawable.container);
 
-        final int xpBarLength = (500 * MultiplayerMenu.xp) / (MultiplayerMenu.level * 100);
+        final int xpBarLength = (500 * PlayerInfo.xp) / (PlayerInfo.level * 100);
         Shared.addElement(this, bar, xpBarLength, 100, 290, 800);
         bar.setBackgroundResource(R.drawable.bar);
     }

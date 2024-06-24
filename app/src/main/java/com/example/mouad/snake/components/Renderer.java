@@ -2,13 +2,12 @@ package com.example.mouad.snake.components;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.view.View;
 
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,8 +25,7 @@ public class Renderer extends View {
 
     public Renderer(Context context) {
         super(context);
-        int back_color= Color.parseColor("#82B2B6");
-        setBackgroundColor(back_color);
+        setBackgroundColor(Shared.BACK_COLOR);
 
         myVariables = new ArrayList<>();
         hisVariables = new ArrayList<>();
@@ -64,9 +62,6 @@ public class Renderer extends View {
         }
     }
     public void setVariables(Rectangles playerRectangles, Rectangles botRectangles){
-        myVariables.clear();
-        hisVariables.clear();
-
         myVariables = playerRectangles.getRectangles();
         hisVariables = botRectangles.getRectangles();
     }

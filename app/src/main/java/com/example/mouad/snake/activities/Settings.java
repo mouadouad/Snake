@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
 
 public class Settings extends AppCompatActivity {
 

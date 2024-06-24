@@ -17,7 +17,7 @@ import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.components.Renderer;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.components.Bot;
 import com.example.mouad.snake.components.Game;
 import com.example.mouad.snake.enums.GameStates;

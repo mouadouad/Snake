@@ -3,7 +3,7 @@ package com.example.mouad.snake.components;
 import android.graphics.Rect;
 import android.os.Handler;
 
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.activities.MainActivity;
 import com.example.mouad.snake.activities.Normal;
 import com.example.mouad.snake.enums.GameStates;

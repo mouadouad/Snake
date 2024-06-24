@@ -16,7 +16,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
+import com.example.mouad.snake.shared.PlayerInfo;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -27,9 +28,7 @@ import java.util.Calendar;
 public class MultiplayerMenu extends AppCompatActivity {
 
     //InterstitialAd mInterstitialAd;
-    public static String name;
     public static Socket socket;
-    public static int level, xp;
 
 
     @Override
@@ -44,8 +43,8 @@ public class MultiplayerMenu extends AppCompatActivity {
 
         //GET SAVED LEVEL AND XP
         SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
-        level = sharedPreferences.getInt(Shared.Level, 1);
-        xp = sharedPreferences.getInt(Shared.Xp, 0);
+        PlayerInfo.level = sharedPreferences.getInt(Shared.Level, 1);
+        PlayerInfo.xp = sharedPreferences.getInt(Shared.Xp, 0);
         xpBar();
 
         try {
@@ -76,7 +75,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         levelTV.setTypeface(fredoka);
         levelTV.setTextSize(Shared.setX(40));
         levelTV.setText(R.string.level);
-        levelTV.append(String.valueOf(MultiplayerMenu.level));
+        levelTV.append(String.valueOf(PlayerInfo.level));
 
         final ImageView container, bar;
 
@@ -86,7 +85,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         Shared.addElement(this, container, 500, 100, 290, 1300);
         container.setBackgroundResource(R.drawable.container);
 
-        final int xpBarLength = (500 * MultiplayerMenu.xp) / (MultiplayerMenu.level * 100);
+        final int xpBarLength = (500 * PlayerInfo.xp) / (PlayerInfo.level * 100);
         Shared.addElement(this, bar, xpBarLength, 100, 290, 1300);
         bar.setBackgroundResource(R.drawable.bar);
 
@@ -125,7 +124,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         });
         random.setOnClickListener(view -> {
             Intent i = new Intent(MultiplayerMenu.this, Waiting.class);
-            socket.emit("random", (MultiplayerMenu.level / 5) + 1);
+            socket.emit("random", (PlayerInfo.level / 5) + 1);
             startActivity(i);
         });
     }

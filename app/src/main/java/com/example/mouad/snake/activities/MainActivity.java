@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.mouad.snake.R;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
 
 //import com.google.android.gms.ads.InterstitialAd;
 

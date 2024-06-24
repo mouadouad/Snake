@@ -9,7 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.mouad.snake.R;
-import com.example.mouad.snake.Shared;
+import com.example.mouad.snake.shared.Shared;
+import com.example.mouad.snake.shared.PlayerInfo;
 
 
 public class Create extends AppCompatActivity {
@@ -31,12 +32,12 @@ public class Create extends AppCompatActivity {
         final Intent intent = new Intent(Create.this, Waiting.class);
 
         MultiplayerMenu.socket.on("created", args -> runOnUiThread(() -> {
-            MultiplayerMenu.name = nameOfLobby.getText().toString();
+            PlayerInfo.name = nameOfLobby.getText().toString();
             startActivity(intent);
         }));
 
         MultiplayerMenu.socket.on("generated", args -> runOnUiThread(() -> {
-            MultiplayerMenu.name = (String) args[0];
+            PlayerInfo.name = (String) args[0];
             startActivity(intent);
         }));
 
@@ -57,8 +58,8 @@ public class Create extends AppCompatActivity {
 
                 nameOfLobby.setError(getString(R.string.errorCreating));
             } else {
-                MultiplayerMenu.name = nameOfLobby.getText().toString();
-                MultiplayerMenu.socket.emit("create", MultiplayerMenu.name);
+                final String lobbyName = nameOfLobby.getText().toString();
+                MultiplayerMenu.socket.emit("create", lobbyName);
             }
 
         });
