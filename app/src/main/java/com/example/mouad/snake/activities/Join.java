@@ -80,4 +80,11 @@ public class Join extends AppCompatActivity {
             MainActivity.isMusicPlaying = false;
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MultiplayerMenu.socket.off("joined");
+        MultiplayerMenu.socket.off("errorJoining");
+    }
 }

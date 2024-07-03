@@ -1,5 +1,6 @@
 package com.example.mouad.snake.activities;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -8,6 +9,7 @@ import android.media.MediaPlayer;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -56,6 +58,14 @@ public class Waiting extends AppCompatActivity {
 
         MultiplayerMenu.socket.on("side", args -> runOnUiThread(() -> PlayerInfo.side = (Integer) args[0]));
 
+        MultiplayerMenu.socket.on("gameEndedWaiting", args -> runOnUiThread(() -> {
+            willPlay = true;
+            dialog();
+            final Handler handler = new Handler();
+            final Runnable runnable = this::finish;
+            handler.postDelayed(runnable, 2500);
+        }));
+
     }
     private void playButton() {
         play = new Button(this);
@@ -96,6 +106,23 @@ public class Waiting extends AppCompatActivity {
             nameOfLobbyTV.setY(Shared.setY(800));
         }
     }
+
+    private void dialog() {
+        final RelativeLayout messageBox;
+        messageBox = new RelativeLayout(this);
+        messageBox.setBackgroundResource(R.drawable.draw_box);
+
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
+        messageBox.setLayoutParams(layoutParams);
+
+        final Dialog alertDialog = new Dialog(this);
+        alertDialog.setContentView(messageBox);
+        if (alertDialog.getWindow() != null) {
+            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+        alertDialog.show();
+        alertDialog.setCanceledOnTouchOutside(false);
+    }
     private void onBack() {
         finish();
     }
@@ -105,5 +132,8 @@ public class Waiting extends AppCompatActivity {
         if(!willPlay) {
             MultiplayerMenu.socket.emit("quitWaiting");
         }
+        MultiplayerMenu.socket.off("gameEndedWaiting");
+        MultiplayerMenu.socket.off("canPlay");
+        MultiplayerMenu.socket.off("side");
     }
 }

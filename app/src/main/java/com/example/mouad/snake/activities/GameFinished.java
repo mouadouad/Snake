@@ -83,6 +83,7 @@ public class GameFinished extends AppCompatActivity {
         quit.setBackgroundResource(R.drawable.quit_button);
 
         quit.setOnClickListener(view -> {
+            finish();
             Intent i = new Intent(GameFinished.this, MultiplayerMenu.class);
             startActivity(i);
         });

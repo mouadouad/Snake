@@ -48,8 +48,8 @@ public class MultiplayerMenu extends AppCompatActivity {
         xpBar();
 
         try {
-            socket = IO.socket("http://192.168.1.53:3000");
-            //socket = IO.socket("http://10.0.2.2:3000"); // https://snake1234.herokuapp.com/
+            //socket = IO.socket("http://192.168.1.53:3000");
+            socket = IO.socket("http://10.0.2.2:3000"); // https://snake1234.herokuapp.com/
             socket.connect();
             ping();
         } catch (URISyntaxException e) {

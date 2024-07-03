@@ -213,8 +213,6 @@ public class Multiplayer extends AppCompatActivity {
     }
     private void onBack() {
         finish();
-        Intent intent = new Intent(Multiplayer.this, MultiplayerMenu.class);
-        startActivity(intent);
     }
     @Override
     public void onBackPressed() {
@@ -227,6 +225,14 @@ public class Multiplayer extends AppCompatActivity {
         if(!gameFinished) {
             MultiplayerMenu.socket.emit("quitGame");
         }
+        MultiplayerMenu.socket.off("gameEnded");
+        MultiplayerMenu.socket.off("startGame");
+        MultiplayerMenu.socket.off("update");
+        MultiplayerMenu.socket.off("gameFinished");
+        MultiplayerMenu.socket.off("roundFinished");
+        MultiplayerMenu.socket.off("won");
+        MultiplayerMenu.socket.off("lost");
+        MultiplayerMenu.socket.off("draw");
     }
 
 }

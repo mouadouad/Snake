@@ -107,4 +107,12 @@ public class Create extends AppCompatActivity {
             MainActivity.isMusicPlaying = false;
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MultiplayerMenu.socket.off("created");
+        MultiplayerMenu.socket.off("generated");
+        MultiplayerMenu.socket.off("errorCreating");
+    }
 }

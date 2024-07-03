@@ -175,7 +175,6 @@ public class Game {
     }
 
     private void checking() {
-
         boolean won = false, lost = false;
 
         final Rect playerChecker = getChecker(playerRectangles.getLastRectangle());
@@ -362,7 +361,6 @@ public class Game {
 
         rectangles.addRectangle(rect);
     }
-
     private static void turnRight(Rectangles rectangles) {
         final int[] lastRectangle = rectangles.getLastRectangle();
         int lastDirection = lastRectangle[3];
