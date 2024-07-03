@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.shared.PlayerInfo;
 import com.github.nkzawa.socketio.client.IO;
@@ -30,7 +31,6 @@ public class MultiplayerMenu extends AppCompatActivity {
     //InterstitialAd mInterstitialAd;
     public static Socket socket;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +38,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         Shared.background(this, this);
         Shared.banner(this, this);
         Shared.backButton(this, this,  v -> onBack());
+        getLifecycle().addObserver(MusicObserver.getInstance());
 
         setButtons();
 
@@ -132,32 +133,6 @@ public class MultiplayerMenu extends AppCompatActivity {
     private void onBack(){
         Intent intent = new Intent(MultiplayerMenu.this, MainActivity.class);
         startActivity(intent);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Shared.foreGround = true;
-        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying) {
-            MainActivity.music.start();
-            MainActivity.music.setLooping(true);
-            MainActivity.isMusicPlaying = true;
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Shared.foreGround = false;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!Shared.foreGround) {
-            MainActivity.music.pause();
-            MainActivity.isMusicPlaying = false;
-        }
     }
 
 }

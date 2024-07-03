@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.shared.PlayerInfo;
 
@@ -22,6 +23,7 @@ public class Join extends AppCompatActivity {
         Shared.background(this, this);
         Shared.banner(this, this);
         Shared.backButton(this, this,  v -> onBack());
+        getLifecycle().addObserver(MusicObserver.getInstance());
 
         setEditText();
         setConfirmButton();
@@ -54,31 +56,6 @@ public class Join extends AppCompatActivity {
 
     private void onBack() {
         finish();
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        Shared.foreGround = true;
-        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying) {
-            MainActivity.music.start();
-            MainActivity.music.setLooping(true);
-            MainActivity.isMusicPlaying = true;
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Shared.foreGround = false;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!Shared.foreGround) {
-            MainActivity.music.pause();
-            MainActivity.isMusicPlaying = false;
-        }
     }
 
     @Override

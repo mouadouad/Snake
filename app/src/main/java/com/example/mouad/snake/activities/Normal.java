@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.components.Renderer;
+import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.components.Bot;
 import com.example.mouad.snake.components.Game;
@@ -35,6 +36,7 @@ public class Normal extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initializeLayout();
         backButton();
+        getLifecycle().addObserver(MusicObserver.getInstance());
     }
 
     private void initializeLayout() {
@@ -163,28 +165,5 @@ public class Normal extends AppCompatActivity {
     }
     private void onBack() {
         this.finish();
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        Shared.foreGround = true;
-        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying){
-            MainActivity.music.start();
-            MainActivity.music.setLooping(true);
-            MainActivity.isMusicPlaying = true;
-        }
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Shared.foreGround = false;
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if(!Shared.foreGround){
-            MainActivity.music.pause();
-            MainActivity.isMusicPlaying = false;
-        }
     }
 }

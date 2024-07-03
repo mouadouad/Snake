@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.shared.PlayerInfo;
 
@@ -29,6 +30,7 @@ public class GameFinished extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Shared.background(this, this);
+        getLifecycle().addObserver(MusicObserver.getInstance());
         makeTextViews();
 
         final int myScore = getIntent().getIntExtra("myScore", 0);
@@ -150,29 +152,4 @@ public class GameFinished extends AppCompatActivity {
         Intent intent = new Intent(GameFinished.this, MultiplayerMenu.class);
         startActivity(intent);
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Shared.foreGround = true;
-        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying) {
-            MainActivity.music.start();
-            MainActivity.music.setLooping(true);
-            MainActivity.isMusicPlaying = true;
-        }
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Shared.foreGround = false;
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!Shared.foreGround) {
-            MainActivity.music.pause();
-            MainActivity.isMusicPlaying = false;
-        }
-    }
-
 }

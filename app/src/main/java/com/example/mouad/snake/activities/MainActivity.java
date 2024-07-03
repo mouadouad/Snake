@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 
 //import com.google.android.gms.ads.InterstitialAd;
@@ -22,8 +23,6 @@ import com.example.mouad.snake.shared.Shared;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static MediaPlayer music;
-    public static boolean musicBoolean, isMusicPlaying = false;
     public static int width, height;
     //InterstitialAd mInterstitialAd;
 
@@ -45,10 +44,10 @@ public class MainActivity extends AppCompatActivity {
         makeIcon();
 
         final SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
-        musicBoolean = sharedPreferences.getBoolean(Shared.MUSIC_SHARED_PREFS, true);
-
-        music = MediaPlayer.create(this, R.raw.snake_sound);
-
+        final boolean playMusic = sharedPreferences.getBoolean(Shared.MUSIC_SHARED_PREFS, true);
+        final MediaPlayer music = MediaPlayer.create(this, R.raw.snake_sound);
+        MusicObserver.setMusic(music, playMusic);
+        getLifecycle().addObserver(MusicObserver.getInstance());
 
        /*mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
@@ -97,29 +96,6 @@ public class MainActivity extends AppCompatActivity {
         Normal.setAnimation(from_bottom);
         multi.setAnimation(from_bottom);
 
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        Shared.foreGround = true;
-        if (musicBoolean && !isMusicPlaying) {
-            music.start();
-            music.setLooping(true);
-            isMusicPlaying = true;
-        }
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Shared.foreGround = false;
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!Shared.foreGround) {
-            music.pause();
-            isMusicPlaying = false;
-        }
     }
 
 }

@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.components.Renderer;
+import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.components.Game;
 import com.example.mouad.snake.enums.GameStates;
@@ -42,6 +43,7 @@ public class Multiplayer extends AppCompatActivity {
         makeScreenDim();
         setRoundsTextView();
         chooseStartingPosition();
+        getLifecycle().addObserver(MusicObserver.getInstance());
 
         MultiplayerMenu.socket.emit("enterGame");
 

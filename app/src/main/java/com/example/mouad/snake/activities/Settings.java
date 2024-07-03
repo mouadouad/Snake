@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 
 public class Settings extends AppCompatActivity {
@@ -26,6 +27,7 @@ public class Settings extends AppCompatActivity {
 
         Shared.background(this, this);
         Shared.backButton(this, this,  v -> onBack());
+        getLifecycle().addObserver(MusicObserver.getInstance());
 
         makeSwitch();
         makeTextView();
@@ -36,13 +38,7 @@ public class Settings extends AppCompatActivity {
         soundSwitch.setChecked(sharedPreferences.getBoolean(Shared.SOUND_SHARED_PREFS, true));
 
         musicSwitch.setOnClickListener(view -> {
-            if (musicSwitch.isChecked()) {
-                MainActivity.music.start();
-                MainActivity.music.setLooping(true);
-            } else {
-                MainActivity.music.pause();
-            }
-            MainActivity.musicBoolean = musicSwitch.isChecked();
+            MusicObserver.setMusic(musicSwitch.isChecked());
             save();
         });
 
@@ -101,29 +97,6 @@ public class Settings extends AppCompatActivity {
     }
     private void onBack() {
         finish();
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        Shared.foreGround = true;
-        if (MainActivity.musicBoolean && !MainActivity.isMusicPlaying) {
-            MainActivity.music.start();
-            MainActivity.music.setLooping(true);
-            MainActivity.isMusicPlaying = true;
-        }
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Shared.foreGround = false;
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!Shared.foreGround) {
-            MainActivity.music.pause();
-            MainActivity.isMusicPlaying = false;
-        }
     }
 
 }

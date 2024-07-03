@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mouad.snake.R;
+import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.shared.PlayerInfo;
 
@@ -35,6 +36,7 @@ public class Waiting extends AppCompatActivity {
         Shared.background(this, this);
         Shared.banner(this, this);
         Shared.backButton(this, this,  v -> onBack());
+        getLifecycle().addObserver(MusicObserver.getInstance());
         playButton();
         nameOfLobbyTv();
 
@@ -110,7 +112,7 @@ public class Waiting extends AppCompatActivity {
     private void dialog() {
         final RelativeLayout messageBox;
         messageBox = new RelativeLayout(this);
-        messageBox.setBackgroundResource(R.drawable.draw_box);
+        messageBox.setBackgroundResource(R.drawable.ended_box);
 
         final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
         messageBox.setLayoutParams(layoutParams);
