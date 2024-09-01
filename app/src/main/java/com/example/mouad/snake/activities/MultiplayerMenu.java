@@ -19,17 +19,20 @@ import com.example.mouad.snake.R;
 import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.shared.PlayerInfo;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
+
 
 
 import java.net.URISyntaxException;
 import java.util.Calendar;
 
+import io.socket.client.IO;
+import io.socket.client.Socket;
+
 public class MultiplayerMenu extends AppCompatActivity {
 
     //InterstitialAd mInterstitialAd;
     public static Socket socket;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +52,15 @@ public class MultiplayerMenu extends AppCompatActivity {
         xpBar();
 
         try {
-            //socket = IO.socket("http://192.168.1.53:3000");
-            socket = IO.socket("http://10.0.2.2:3000"); // https://snake1234.herokuapp.com/
+            //socket = IO.socket("http://192.168.1.53:3000");//socket = IO.socket("http://192.168.61.92:3000");
+
+            socket= IO.socket("http://10.0.2.2:3000"); // https://snake1234.herokuapp.com/
+
             socket.connect();
             ping();
+
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            Log.e("TAG", String.valueOf(e));
         }
     }
 

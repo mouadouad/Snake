@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -18,9 +19,9 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.components.Renderer;
+import com.example.mouad.snake.shared.GameMethods;
 import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
-import com.example.mouad.snake.components.Game;
 import com.example.mouad.snake.enums.GameStates;
 import com.example.mouad.snake.shared.PlayerInfo;
 
@@ -72,7 +73,7 @@ public class Multiplayer extends AppCompatActivity {
                 renderer.refresh();
 
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("TAG", String.valueOf(e));
             }
         }));
 
@@ -134,7 +135,7 @@ public class Multiplayer extends AppCompatActivity {
             // CHECK IF THE RIGHT SIDE IS CLICKED
             if ((PlayerInfo.side == 1 && y < Shared.setY(800)) || (PlayerInfo.side == 0 && y > Shared.setY(800))) {
                 if (!started) {
-                    final float[] coordinates = Game.findClosestEdge(x, y, PlayerInfo.side);
+                    final float[] coordinates = GameMethods.findClosestEdge(x, y, PlayerInfo.side);
 
                     MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width,
                             coordinates[1] / Shared.height);
