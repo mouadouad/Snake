@@ -3,11 +3,12 @@ package com.example.mouad.snake.shared;
 import android.media.MediaPlayer;
 import android.os.Handler;
 
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 
-public class MusicObserver implements LifecycleObserver {
+
+public class MusicObserver implements DefaultLifecycleObserver {
     private boolean playMusic = false;
     private boolean isMusicPlaying = false;
     private boolean foreGround = true;
@@ -48,8 +49,9 @@ public class MusicObserver implements LifecycleObserver {
 
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    public void onResumeEvent() {
+    @Override
+    public void onResume(@NonNull LifecycleOwner owner) {
+        DefaultLifecycleObserver.super.onResume(owner);
         instance.foreGround = true;
         if(instance.playMusic && !instance.isMusicPlaying) {
             instance.music.start();
@@ -58,8 +60,9 @@ public class MusicObserver implements LifecycleObserver {
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    public void onPauseEvent() {
+    @Override
+    public void onPause(@NonNull LifecycleOwner owner) {
+        DefaultLifecycleObserver.super.onPause(owner);
         instance.foreGround = false;
         final Handler handler = new Handler();
         final Runnable runnable = () -> {

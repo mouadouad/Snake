@@ -7,6 +7,8 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.example.mouad.snake.shared.Shared;
 
 import org.json.JSONArray;
@@ -80,7 +82,7 @@ public class Renderer extends View {
         hisVariables.clear();
     }
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
 
         drawRectangles(canvas, myVariables, blackPaint);

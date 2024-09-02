@@ -24,7 +24,6 @@ public class Shared {
     public static final int BORDER_COLOR = Color.parseColor("#3A4647");
     public static final int BACK_COLOR= Color.parseColor("#82B2B6");
 
-    public static boolean foreGround = true;
     public final static String SHARED_PREFS = "shared_prefs";
     public final static String MUSIC_SHARED_PREFS = "MUSIC_SHARED_PREFS";
     public final static String SOUND_SHARED_PREFS = "SOUND_SHARED_PREFS";

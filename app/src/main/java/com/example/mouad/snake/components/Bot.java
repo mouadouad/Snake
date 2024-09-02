@@ -38,20 +38,25 @@ public class Bot {
             Log.d("input", String.valueOf(tfLite.getInputTensorCount()));
             Log.d("input", Arrays.toString(tfLite.getInputTensor(0).shape()));
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("TAG", String.valueOf(e));
         }
     }
 
     private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
         try {
             AssetFileDescriptor fileDescriptor = activity.getAssets().openFd("model.tflite");
-            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-            FileChannel fileChannel = inputStream.getChannel();
-            long startOffset = fileDescriptor.getStartOffset();
-            long declaredLength = fileDescriptor.getDeclaredLength();
-            return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+            try (FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor())) {
+                FileChannel fileChannel = inputStream.getChannel();
+                long startOffset = fileDescriptor.getStartOffset();
+                long declaredLength = fileDescriptor.getDeclaredLength();
+                return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+            } catch (IOException e) {
+                Log.e("TAG", String.valueOf(e));
+            }
+
+
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("TAG", String.valueOf(e));
         }
         return null;
     }

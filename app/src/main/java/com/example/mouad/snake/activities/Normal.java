@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -128,20 +129,10 @@ public class Normal extends AppCompatActivity {
         back.setOnClickListener(v -> onBack());
     }
 
+    //TODO message dialog
+
     public void gameOver(GameStates result) {
-        final RelativeLayout message_box;
-        message_box = new RelativeLayout(this);
-
-        if (result.equals(GameStates.WON)) {
-            message_box.setBackgroundResource(R.drawable.win_box);
-        } else if (result.equals(GameStates.LOST)) {
-            message_box.setBackgroundResource(R.drawable.lost_box);
-        } else {
-            message_box.setBackgroundResource(R.drawable.draw_box);
-        }
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
-        message_box.setLayoutParams(layoutParams);
+        final RelativeLayout message_box = getMessageBox(result);
         ((ViewGroup) back.getParent()).removeView(back);
         message_box.addView(back);
 
@@ -160,9 +151,30 @@ public class Normal extends AppCompatActivity {
         if (alertDialog.getWindow() != null) {    //MAKE BACKGROUND OF DIALOG TRANSPARENT
             alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
-        alertDialog.show();
+        if(!isFinishing() && !isDestroyed()){
+            alertDialog.show();
+        }
         alertDialog.setCanceledOnTouchOutside(false);
     }
+
+    @NonNull
+    private RelativeLayout getMessageBox(GameStates result) {
+        final RelativeLayout message_box;
+        message_box = new RelativeLayout(this);
+
+        if (result.equals(GameStates.WON)) {
+            message_box.setBackgroundResource(R.drawable.win_box);
+        } else if (result.equals(GameStates.LOST)) {
+            message_box.setBackgroundResource(R.drawable.lost_box);
+        } else {
+            message_box.setBackgroundResource(R.drawable.draw_box);
+        }
+
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
+        message_box.setLayoutParams(layoutParams);
+        return message_box;
+    }
+
     private void onBack() {
         this.finish();
     }

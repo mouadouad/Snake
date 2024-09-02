@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -183,6 +184,21 @@ public class Multiplayer extends AppCompatActivity {
 
     }
     private void gameOver(GameStates result) {
+        final RelativeLayout message_box = getMessageBox(result);
+
+        alertDialog = new Dialog(this);
+        alertDialog.setContentView(message_box);
+        if (alertDialog.getWindow() != null) {
+            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+        if(!isFinishing() && !isDestroyed()){
+            alertDialog.show();
+        }
+        alertDialog.setCanceledOnTouchOutside(false);
+    }
+
+    @NonNull
+    private RelativeLayout getMessageBox(GameStates result) {
         final RelativeLayout message_box;
         message_box = new RelativeLayout(this);
 
@@ -195,15 +211,9 @@ public class Multiplayer extends AppCompatActivity {
         }
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.setX(700), Shared.setY(300));
         message_box.setLayoutParams(layoutParams);
-
-        alertDialog = new Dialog(this);
-        alertDialog.setContentView(message_box);
-        if (alertDialog.getWindow() != null) {
-            alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-        alertDialog.show();
-        alertDialog.setCanceledOnTouchOutside(false);
+        return message_box;
     }
+
     private void refresh() {
         started = false;
         gameFinished = false;
