@@ -25,6 +25,8 @@ public class Renderer extends View {
     private  float[] corners;
     private final Path path;
 
+    private float scaleFactor;
+
     public Renderer(Context context) {
         super(context);
         setBackgroundColor(Shared.BACK_COLOR);
@@ -51,6 +53,10 @@ public class Renderer extends View {
         leftCorners = new float[]   {80, 80, 0, 0, 0, 0, 80, 80};
         rightCorners = new float[]  {0, 0, 80, 80, 80, 80, 0, 0};
         path = new Path();
+    }
+
+    private void calculateVariables(){
+
     }
     public void setVariables(JSONArray myArray, JSONArray hisArray){
         myVariables.clear();

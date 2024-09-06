@@ -12,9 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -35,6 +42,7 @@ public class Multiplayer extends AppCompatActivity {
     private Boolean started = false, gameFinished = false;
     private Renderer renderer;
     private int round = 1;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,30 +166,77 @@ public class Multiplayer extends AppCompatActivity {
         roundTextView.setText(R.string.round);
         roundTextView.append(String.valueOf(round));
     }
-    private void placeControllers() {
-        final Button left = new Button(this);
-        final Button right = new Button(this);
 
-        left.setBackgroundResource(R.drawable.left_button);
-        right.setBackgroundResource(R.drawable.right_button);
+    @SuppressLint("ClickableViewAccessibility")
+    private void placeControllers() {
+        LinearLayout parentLayout = new LinearLayout(this);
+        parentLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams parentLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+        );
+
+        RelativeLayout leftLayout = new RelativeLayout(this);
+        LinearLayout.LayoutParams leftLayoutParams = new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                1.0f
+        );
+
+        ImageView leftImg = new ImageView(this);
+        leftImg.setBackgroundResource(R.drawable.left);
+        RelativeLayout.LayoutParams leftImgParams = new RelativeLayout.LayoutParams(500, 500);
+        leftImgParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        leftLayout.addView(leftImg, leftImgParams);
+
+        RelativeLayout rightLayout = new RelativeLayout(this);
+        LinearLayout.LayoutParams rightLayoutParams = new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                1.0f
+        );
+
+        ImageView rightImg = new ImageView(this);
+        rightImg.setBackgroundResource(R.drawable.right);
+        RelativeLayout.LayoutParams rightImgParams = new RelativeLayout.LayoutParams(500, 500);
+        rightImgParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        rightLayout.addView(rightImg, rightImgParams);
+
+        parentLayout.addView(leftLayout, leftLayoutParams);
+        parentLayout.addView(rightLayout, rightLayoutParams);
+        rightLayout.setVisibility(View.INVISIBLE);
+
+        this.addContentView(parentLayout, parentLayoutParams);
+
+        Animation animation = new AlphaAnimation(1, 0);
+        animation.setDuration(1000);
+        animation.setInterpolator(new LinearInterpolator());
+        leftLayout.startAnimation(animation);
+        leftLayout.setVisibility(View.INVISIBLE);
+
+        final Handler handler = new Handler();
+        final Runnable runnable = () -> {
+            rightLayout.setVisibility(View.VISIBLE);
+            rightLayout.startAnimation(animation);
+            rightLayout.setVisibility(View.INVISIBLE);
+
+        };
+        handler.postDelayed(runnable, 250);
 
         final RelativeLayout layout = new RelativeLayout(this);
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(Shared.width, Shared.height);
         addContentView(layout, layoutParams);
-
-        final RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(Shared.setX(120), Shared.setY(120));
-        buttonParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        buttonParams.bottomMargin = Shared.setY(200);
-        layout.addView(left, buttonParams);
-        layout.addView(right, buttonParams);
-
-        left.setX(Shared.setX(415));
-        right.setX(Shared.setX(565));
-
-        left.setOnClickListener(view -> MultiplayerMenu.socket.emit("turnLeft"));
-        right.setOnClickListener(view -> MultiplayerMenu.socket.emit("turnRight"));
-
+        layout.setOnTouchListener((view, motionEvent) -> {
+            Log.d("tg", "placeControllers: ");
+            if(view.performClick()) { return false;}
+            float x = motionEvent.getX();
+            if (x < Shared.setX(540)){
+                MultiplayerMenu.socket.emit("turnLeft");
+            }else {
+                MultiplayerMenu.socket.emit("turnRight");
+            }
+            return false;
+        });
     }
     private void gameOver(GameStates result) {
         final RelativeLayout message_box = getMessageBox(result);
