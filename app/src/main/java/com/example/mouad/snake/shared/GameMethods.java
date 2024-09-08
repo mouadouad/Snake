@@ -1,26 +1,24 @@
 package com.example.mouad.snake.shared;
 
-import com.example.mouad.snake.activities.MainActivity;
-
 public class GameMethods {
     public static float[] findClosestEdge(float x, float y, int side) {
 
         if (side == 0) {
-            if (Shared.setY(1600) - y < MainActivity.width - x && Shared.setY(1600) - y < x) {
-                y = MainActivity.height;
+            if (Constants.mapHeight - y < Constants.mapWidth - x && Constants.mapHeight - y < x) {
+                y = Constants.mapHeight;
             } else {
-                if (x > MainActivity.width - x) {
-                    x = MainActivity.width;
+                if (x > Constants.mapHeight - x) {
+                    x = Constants.mapWidth;
                 } else {
                     x = 0;
                 }
             }
         } else {
-            if (y < MainActivity.width - x && y < x) {
+            if (y < Constants.mapWidth - x && y < x) {
                 y = 0;
             } else {
-                if (x > MainActivity.width - x) {
-                    x = MainActivity.width;
+                if (x > Constants.mapWidth - x) {
+                    x = Constants.mapWidth;
                 } else {
                     x = 0;
                 }

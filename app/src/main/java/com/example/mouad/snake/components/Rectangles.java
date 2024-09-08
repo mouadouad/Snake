@@ -4,17 +4,17 @@ import java.util.ArrayList;
 
 public class Rectangles{
 
-    final private ArrayList<int[]> Variables;
+    final private ArrayList<float[]> Variables;
 
-    public void addRectangle(int[] rect) {
+    public void addRectangle(float[] rect) {
         Variables.add(rect);
     }
 
-    public int[] getLastRectangle() {
+    public float[] getLastRectangle() {
         return Variables.get(Variables.size() - 1);
     }
 
-    public ArrayList<int[]> getRectangles() {
+    public ArrayList<float[]> getRectangles() {
         return Variables;
     }
 

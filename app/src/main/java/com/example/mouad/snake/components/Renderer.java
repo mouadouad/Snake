@@ -9,6 +9,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.example.mouad.snake.activities.MainActivity;
 import com.example.mouad.snake.shared.Shared;
 
 import org.json.JSONArray;
@@ -18,14 +19,22 @@ import java.util.ArrayList;
 
 public class Renderer extends View {
 
-    private ArrayList<int[]> myVariables, hisVariables;
+    private ArrayList<float[]> myVariables, hisVariables;
     private final Paint blackPaint,bluePaint,borderPaint;
     private final RectF rectangle, border;
     private final float[] topCorners, bottomCorners, leftCorners, rightCorners;
     private  float[] corners;
     private final Path path;
 
+    private float offsetX;
+    private float offsetY;
     private float scaleFactor;
+    private static final float mapWidth = 1080;
+    private static final float mapHeight = 1600;
+    private static final float borderWidth = 20;
+    private static final float snakeWidth = 30;
+    private static final float screenWidth = MainActivity.width;
+    private static final float screenHeight = MainActivity.height;
 
     public Renderer(Context context) {
         super(context);
@@ -53,11 +62,47 @@ public class Renderer extends View {
         leftCorners = new float[]   {80, 80, 0, 0, 0, 0, 80, 80};
         rightCorners = new float[]  {0, 0, 80, 80, 80, 80, 0, 0};
         path = new Path();
+
+        calculateVariables();
     }
 
     private void calculateVariables(){
+        final float scaleFactorX = mapWidth / screenWidth;
+        final float scaleFactorY = mapHeight / screenHeight;
 
+        offsetX = (screenWidth - mapWidth) / 2;
+        offsetY = (screenHeight - mapHeight) / 2;
+
+        if(scaleFactorX < scaleFactorY){
+            scaleFactor = scaleFactorY;
+            offsetY = 0;
+        }else {
+            scaleFactor = scaleFactorX;
+            offsetX = 0;
+        }
+
+        if(scaleFactor > 1){
+            scaleFactor = 1 / scaleFactor;
+        }
     }
+
+    private float computeX(float x){
+        return (x + offsetX) * scaleFactor;
+    }
+
+    private float computeY(float y){
+        return (y + offsetY) * scaleFactor;
+    }
+
+    public float getX(float x){
+        return (x / scaleFactor) - offsetX;
+    }
+
+    public float getY(float y){
+        return (y / scaleFactor) - offsetY;
+    }
+
+
     public void setVariables(JSONArray myArray, JSONArray hisArray){
         myVariables.clear();
         hisVariables.clear();
@@ -73,14 +118,13 @@ public class Renderer extends View {
         myVariables = playerRectangles.getRectangles();
         hisVariables = botRectangles.getRectangles();
     }
-    private void convert(JSONArray json, ArrayList<int[]> variables) throws JSONException {
+    private void convert(JSONArray json, ArrayList<float[]> variables) throws JSONException {
         for (int i = 0; i < json.length(); i++) {
-            final int[] Jint;
-            Jint = new int[4];
+            final float[] converted = new float[4];
             for (int a1 = 0; a1 < 4; a1++) {
-                Jint[a1] = json.getJSONArray(i).getInt(a1);
+                converted[a1] = (float) json.getJSONArray(i).getDouble(a1);
             }
-            variables.add(Jint);
+            variables.add(converted);
         }
     }
     public void clear(){
@@ -94,36 +138,36 @@ public class Renderer extends View {
         drawRectangles(canvas, myVariables, blackPaint);
         drawRectangles(canvas, hisVariables, bluePaint);
         
-        border.set(0,0,Shared.setX(20),Shared.setY(1600));
+        border.set(computeX(0),computeY(0),computeX(borderWidth),computeY(1600));
         canvas.drawRect(border,borderPaint);
-        border.set(Shared.width-Shared.setX(20),0,Shared.width,Shared.setY(1600));
+        border.set(computeX(mapWidth-borderWidth),computeY(0),computeX(mapWidth),computeY(1600));
         canvas.drawRect(border,borderPaint);
-        border.set(0,0,Shared.width,Shared.setY(20));
+        border.set(computeX(0),computeY(0),computeX(mapWidth),computeY(borderWidth));
         canvas.drawRect(border,borderPaint);
-        border.set(0,Shared.setY(1580),Shared.width,Shared.setY(1600));
+        border.set(computeX(0),computeY(mapHeight - borderWidth),computeX(mapWidth), computeY(1600));
         canvas.drawRect(border,borderPaint);
     }
-    private void drawRectangles(Canvas canvas, ArrayList<int[]>  variables, Paint paint){
+    private void drawRectangles(Canvas canvas, ArrayList<float[]>  variables, Paint paint){
         for (int i = 0; i < variables.size(); i++){
-            final int left = variables.get(i)[0];
-            final int top = variables.get(i)[1];
-            final int bottom = variables.get(i)[2];
+            final float left = variables.get(i)[0];
+            final float top = variables.get(i)[1];
+            final float bottom = variables.get(i)[2];
 
-            switch (variables.get(i)[3]) {
+            switch ((int) variables.get(i)[3]) {
                 case 90:
-                    rectangle.set(Shared.setX(-bottom), Shared.setY(left), Shared.setX(-top), Shared.setY(left + 30));
+                    rectangle.set(computeX(-bottom), computeY(left), computeX(-top), computeY(left + snakeWidth));
                     corners = rightCorners;
                     break;
                 case -90:
-                    rectangle.set(Shared.setX(top), Shared.setY(-left - 30), Shared.setX(bottom), Shared.setY(-left));
+                    rectangle.set(computeX(top), computeY(-left - snakeWidth), computeX(bottom), computeY(-left));
                     corners = leftCorners;
                     break;
                 case 180:
-                    rectangle.set(Shared.setX(-left - 30), Shared.setY(-bottom), Shared.setX(-left), Shared.setY(-top));
+                    rectangle.set(computeX(-left - snakeWidth), computeY(-bottom), computeX(-left), computeY(-top));
                     corners = bottomCorners;
                     break;
                 case 0:
-                    rectangle.set(Shared.setX(left), Shared.setY(top), Shared.setX(left + 30), Shared.setY(bottom));
+                    rectangle.set(computeX(left), computeY(top), computeX(left + snakeWidth), computeY(bottom));
                     corners = topCorners;
                     break;
             }

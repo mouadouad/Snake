@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.content.res.AssetFileDescriptor;
 import android.util.Log;
 
+import com.example.mouad.snake.shared.Constants;
+
 import org.tensorflow.lite.Interpreter;
 
 import java.io.FileInputStream;
@@ -86,46 +88,51 @@ public class Bot {
         return index;
     }
 
-    private static void addToGrid(Iterable<int[]> variables, float[][][] arr) {
-        for (int[] border : variables) {
-            int x0 = border[0];
-            int x1 = border[1];
-            int x2 = border[2];
-            int x3 = border[3];
+    private static void addToGrid(Iterable<float[]> variables, float[][][] arr, short pixels) {
+        final short numbRows = (short) (Constants.mapHeight / pixels);
+        final short numbColumns = (short) (Constants.mapWidth / pixels);
+
+        for (float[] border : variables) {
+            float x0 = border[0];
+            float x1 = border[1];
+            float x2 = border[2];
+            float x3 = border[3];
+
+            int clm, row, j;
 
             if (x3 == 0) {
-                int clm = x0 / 30;
-                if (clm > 35) {
-                    clm = 35;
+                clm = (int) (x0 / pixels);
+                if (clm > numbColumns) {
+                    clm = numbColumns;
                 }
-                for (int j = x1 / 30; j < x2 / 30; j++) {
+                for (j = (int) (x1 / pixels); j < x2 / pixels; j++) {
                     arr[0][j][clm] = -1;
                 }
             }
 
             if (x3 == 180) {
-                int clm = abs(x0 / 30);
-                if (clm > 36) {
-                    clm = 36;
+                clm = (int) abs(x0 / pixels);
+                if (clm > numbRows) {
+                    clm = numbRows;
                 }
-                for (int j = x1 / 30; j < x2 / 30; j++) {
+                for (j = (int) (x1 / pixels); j < x2 / pixels; j++) {
                     arr[0][abs(j) - 1][clm - 1] = -1;
                 }
             }
 
             if (x3 == 90) {
-                int row = abs(x0 / 30);
-                if (x1 < -1080) {
-                    x1 = -1080;
+                row = (int) abs(x0 / pixels);
+                if (x1 < -Constants.mapWidth) {
+                    x1 = -Constants.mapWidth;
                 }
-                for (int j = x1 / 30; j < x2 / 30; j++) {
+                for (j = (int) (x1 / pixels); j < x2 / pixels; j++) {
                     arr[0][row][abs(j) - 1] = -1;
                 }
             }
 
             if (x3 == -90) {
-                int row = abs(x0 / 30);
-                for (int j = x1 / 30; j < x2 / 30; j++) {
+                row = (int) abs(x0 / pixels);
+                for (j = (int) (x1 / pixels); j < x2 / pixels; j++) {
                     arr[0][row - 1][j] = -1;
                 }
             }
@@ -133,66 +140,66 @@ public class Bot {
         }
     }
 
-    private float[][][] preprocess(ArrayList<int[]> botVariables, ArrayList<int[]> playerVariables) {
-        final int gridRows = 1600 / pixels;
-        final int gridColumns = 1080 / pixels;
+    private float[][][] preprocess(ArrayList<float[]> botVariables, ArrayList<float[]> playerVariables) {
+        final int gridRows = (int) (Constants.mapHeight / pixels);
+        final int gridColumns = (int) (Constants.mapWidth / pixels);
         float[][][] arr = new float[1][gridRows][gridColumns];
         int[] last = new int[2];
 
-        final ArrayList<int[]> borders = new ArrayList<>();
-        borders.add(new int[]{0, 0, 1080, 0});
-        borders.add(new int[]{1080 - 30, 0, 1080, 0});
-        borders.add(new int[]{0, -1080, 0, 90});
-        borders.add(new int[]{1570, -1080, 0, 90});
+        final ArrayList<float[]> borders = new ArrayList<>();
+        borders.add(new float[]{0, 0, Constants.mapWidth, 0});
+        borders.add(new float[]{Constants.mapWidth - Constants.borderWidth, 0, Constants.mapWidth, 0});
+        borders.add(new float[]{0, -Constants.mapWidth, 0, 90});
+        borders.add(new float[]{Constants.mapWidth - Constants.borderWidth, -Constants.mapWidth, 0, 90});
 
-        addToGrid(playerVariables, arr);
-        addToGrid(borders, arr);
+        addToGrid(playerVariables, arr,pixels);
+        addToGrid(borders, arr, pixels);
 
         for (int i = 0; i < botVariables.size(); i++) {
-            int x0 = botVariables.get(i)[0];
-            int x1 = botVariables.get(i)[1];
-            int x2 = botVariables.get(i)[2];
-            int x3 = botVariables.get(i)[3];
+            float x0 = botVariables.get(i)[0];
+            float x1 = botVariables.get(i)[1];
+            float x2 = botVariables.get(i)[2];
+            float x3 = botVariables.get(i)[3];
             int clm, row;
-            switch(x3) {
+            switch((int) x3) {
                 case 0:
-                    clm = x0 / 30;
-                    if (clm > 35) {
-                        clm = 35;
+                    clm = (int) (x0 / pixels);
+                    if (clm > gridColumns) {
+                        clm = gridColumns;
                     }
-                    last[0] = x1 / 30;
+                    last[0] = (int) (x1 / pixels);
                     last[1] = clm;
-                    for (int j = x1 / 30; j < x2 / 30; j++) {
+                    for (int j = (int) (x1 / pixels); j < x2 / pixels; j++) {
                         arr[0][j][clm] = 1;
                     }
                     break;
                 case 180:
-                    clm = abs(x0 / 30);
-                    if (clm > 36) {
-                        clm = 36;
+                    clm = (int) abs(x0 / pixels);
+                    if (clm > gridRows) {
+                        clm = gridRows;
                     }
-                    for (int j = x1 / 30; j < x2 / 30; j++) {
+                    for (int j = (int) (x1 / pixels); j < x2 / pixels; j++) {
                         arr[0][abs(j) - 1][clm - 1] = 1;
-                        last[0] = abs(x1 / 30) - 1;
+                        last[0] = (int) (abs(x1 / pixels) - 1);
                         last[1] = clm - 1;
                     }
                     break;
                 case 90:
-                    row = abs(x0 / 30);
-                    if (x1 < -1080) {
-                        x1 = -1080;
+                    row = (int) abs(x0 / pixels);
+                    if (x1 < -Constants.mapWidth) {
+                        x1 = (int) -Constants.mapWidth;
                     }
-                    for (int j = x1 / 30; j < x2 / 30; j++) {
+                    for (int j = (int) (x1 / pixels); j < x2 / pixels; j++) {
                         arr[0][row][abs(j) - 1] = 1;
                         last[0] = row;
-                        last[1] = abs(x1 / 30) - 1;
+                        last[1] = (int) (abs(x1 / pixels) - 1);
                     }
                     break;
                 case -90:
-                    row = abs(x0 / 30);
+                    row = (int) abs(x0 / pixels);
                     last[0] = row - 1;
-                    last[1] = x1 / 30;
-                    for (int j = x1 / 30; j < x2 / 30; j++) {
+                    last[1] = (int) (x1 / pixels);
+                    for (int j = (int) (x1 / pixels); j < x2 / pixels; j++) {
                         arr[0][row - 1][j] = 1;
                     }
                     break;
@@ -208,7 +215,7 @@ public class Bot {
             for (int j = 0; j < obsSize; j++) {
                 int x = last[0] - obsSize / 2 + i;
                 int y = last[1] - obsSize / 2 + j;
-                if (x < 0 || x >= 54 || y < 0 || y >= 36) {
+                if (x < 0 || x >= gridRows || y < 0 || y >= gridColumns) {
                     result[0][i][j] = -1;
                 } else {
                     result[0][i][j] = arr[0][x][y];

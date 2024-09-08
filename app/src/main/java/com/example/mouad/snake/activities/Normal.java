@@ -33,12 +33,12 @@ import com.example.mouad.snake.enums.GameStates;
 import java.util.Random;
 
 public class Normal extends AppCompatActivity {
-    private static final short pixels = 30, obsSize = 5;
+    private static final short pixels = 40, obsSize = 5;
     private Boolean started = false;
     private Game game;
     private FrameLayout dim;
     private Button back;
-
+    Dialog alertDialog;
     private RelativeLayout layout;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,15 +193,16 @@ public class Normal extends AppCompatActivity {
 
         play_again.setOnClickListener(view -> recreate());
 
-        Dialog alertDialog = new Dialog(this);
+        alertDialog = new Dialog(this);
         alertDialog.setContentView(message_box);
 
         if (alertDialog.getWindow() != null) {    //MAKE BACKGROUND OF DIALOG TRANSPARENT
             alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
-        if(!isFinishing() && !isDestroyed()){
+        if(!isFinishing() || !isDestroyed()){
             alertDialog.show();
         }
+
         alertDialog.setCanceledOnTouchOutside(false);
     }
 
@@ -225,5 +226,11 @@ public class Normal extends AppCompatActivity {
 
     private void onBack() {
         this.finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        alertDialog.dismiss();
     }
 }
