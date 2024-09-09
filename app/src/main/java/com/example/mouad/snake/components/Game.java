@@ -2,6 +2,7 @@ package com.example.mouad.snake.components;
 
 import android.graphics.Rect;
 import android.os.Handler;
+import android.util.Log;
 
 import com.example.mouad.snake.shared.Constants;
 import com.example.mouad.snake.shared.GameMethods;
@@ -16,7 +17,7 @@ public class Game {
     public boolean finished = false;
     private final Bot bot;
     private final Normal normal;
-    private final Renderer renderer;
+    public final Renderer renderer;
     private static Rect topBar, bottomBar, leftBar, rightBar;
     private final Rectangles playerRectangles, botRectangles;
 
@@ -29,14 +30,14 @@ public class Game {
         botRectangles = new Rectangles();
         renderer.setVariables(playerRectangles, botRectangles);
 
-        leftBar = new Rect(0, 0, 20, 1600);
-        rightBar = new Rect(1080 - 20, 0, 1080, 1600);
-        topBar = new Rect(0, 0, 1080, 20);
-        bottomBar = new Rect(0, 1580, 1080, 1600);
+        leftBar = new Rect(0, 0, (int) Constants.borderWidth, (int) Constants.mapHeight);
+        rightBar = new Rect((int) (Constants.mapWidth - Constants.borderWidth), 0, (int) Constants.mapWidth, (int) Constants.mapHeight);
+        topBar = new Rect(0, 0, (int) Constants.mapWidth, (int) Constants.borderWidth);
+        bottomBar = new Rect(0, (int) (Constants.mapHeight - Constants.borderWidth), (int) Constants.mapWidth, (int) Constants.mapHeight);
     }
 
     public void start(float playerXStart, float playerYStart, int side) {
-        final float[] playerCoordinates = GameMethods.findClosestEdge(renderer.getX(playerXStart), renderer.getY(playerYStart), side);
+        final float[] playerCoordinates = GameMethods.findClosestEdge(playerXStart, playerYStart, side);
         final float[] botCoordinates = generateBotPosition(side);
         addStartingRectangles(playerCoordinates, botCoordinates);
         repeat();
@@ -52,42 +53,45 @@ public class Game {
         return GameMethods.findClosestEdge(renderer.getX(x), renderer.getY(y), (hisSide + 1) % 2);
     }
 
+    // TODO - cst
     private static float[] findStartingPosition(float x, float y) {
+        Log.d("TAG", "findStartingPosition: "+x);
+        Log.d("TAG", "findStartingPosition: "+y);
         int angle = 0;
-
         if (y == 0) {
             angle = 180;
-            if (x <= (20 + Constants.snakeWidth)) {
-                x = (20 + 1 + Constants.snakeWidth);
+            if (x <= (Constants.borderWidth + Constants.snakeWidth)) {
+                x = (Constants.borderWidth + 1 + Constants.snakeWidth);
             }
-            if (x >= (1060)) {
-                x = (1060 - 1);
+            if (x >= (Constants.mapWidth - Constants.borderWidth)) {
+                x = (Constants.mapWidth - Constants.borderWidth - 1);
             }
         } else if (x == 0) {
             angle = 90;
-            if (y >= (1580 - Constants.snakeWidth)) {
-                y = (1580 - 1 - Constants.snakeWidth);
+            if (y >= (Constants.mapHeight - Constants.borderWidth - Constants.snakeWidth)) {
+                y = (Constants.mapHeight - Constants.borderWidth - 1 - Constants.snakeWidth);
             }
             if (y <= (Constants.snakeWidth)) {
-                y = (20 + 1);
+                y = (Constants.borderWidth + 1);
             }
-        } else if (x == 1080) {
+        } else if (x == Constants.mapWidth) {
             angle = -90;
-            if (y >= (1580)) {
-                y = (1580 - 1);
+            if (y >= (Constants.mapHeight - Constants.borderWidth)) {
+                y = (Constants.mapHeight - Constants.borderWidth - 1);
             }
-            if (y <= (20 + Constants.snakeWidth)) {
-                y = (20 + 1 + Constants.snakeWidth);
+            if (y <= (Constants.borderWidth + Constants.snakeWidth)) {
+                y = (Constants.borderWidth + 1 + Constants.snakeWidth);
             }
         } else {
-            if (x <= (20)) {
-                x = (20 + 1);
+            if (x <= (Constants.borderWidth)) {
+                x = (Constants.borderWidth + 1);
             }
-            if (x >= (1060 - Constants.snakeWidth)) {
-                x = (1060 - 1 - Constants.snakeWidth);
+            if (x >= (Constants.mapWidth - Constants.borderWidth - Constants.snakeWidth)) {
+                x = (Constants.mapWidth - Constants.borderWidth - 1 - Constants.snakeWidth);
             }
         }
-
+        Log.d("TAG", "findStartingPosition: "+x);
+        Log.d("TAG", "findStartingPosition: "+y);
         return new float[]{x, y, angle};
     }
 
@@ -110,8 +114,8 @@ public class Game {
 
         if (angle == 0) {
             firstRect[0] = x;
-            firstRect[1] = 1600 - 10;
-            firstRect[2] = 1600;
+            firstRect[1] = Constants.mapHeight - 10;
+            firstRect[2] = Constants.mapHeight;
         } else if (angle == 180) {
             firstRect[0] = -x;
             firstRect[1] = -10;
@@ -244,7 +248,7 @@ public class Game {
                 checker.intersect(rightBar) || checker.intersect(bottomBar);
         final float playerRectangleLength = rectangles.getLastRectangle()[2] - rectangles.getLastRectangle()[1];
 
-        return HitBorder && (rectangles.getRectangles().size() > 1 || playerRectangleLength > 20);
+        return HitBorder && (rectangles.getRectangles().size() > 1 || playerRectangleLength > Constants.borderWidth);
     }
 
     private static Rect getChecker(float[] variable) {

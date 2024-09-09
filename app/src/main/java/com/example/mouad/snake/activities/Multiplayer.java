@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.components.Renderer;
+import com.example.mouad.snake.shared.Constants;
 import com.example.mouad.snake.shared.GameMethods;
 import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
@@ -124,11 +125,9 @@ public class Multiplayer extends AppCompatActivity {
         RelativeLayout.LayoutParams dimParams;
 
         if (PlayerInfo.side == 1) {
-            dim.setY(Shared.setY(800));
-            dimParams = new RelativeLayout.LayoutParams((Shared.width), (Shared.height));
-        } else {
-            dimParams = new RelativeLayout.LayoutParams((Shared.width), (Shared.setY(1600) / 2));
+            dim.setY((float) MainActivity.height / 2);
         }
+        dimParams = new RelativeLayout.LayoutParams((Shared.width), (MainActivity.height / 2));
         addContentView(dim, dimParams);
         dim.getForeground().setAlpha(200);
     }
@@ -139,15 +138,15 @@ public class Multiplayer extends AppCompatActivity {
         addContentView(layout, layoutParams);
 
         layout.setOnTouchListener((view, motionEvent) -> {
-            final float y = motionEvent.getY();
-            final float x = motionEvent.getX();
+            float y = renderer.getY(motionEvent.getY());
+            float x = renderer.getX(motionEvent.getX());
             // CHECK IF THE RIGHT SIDE IS CLICKED
-            if ((PlayerInfo.side == 1 && y < Shared.setY(800)) || (PlayerInfo.side == 0 && y > Shared.setY(800))) {
+            if ((PlayerInfo.side == 1 && y < Constants.mapHeight / 2 || (PlayerInfo.side == 0 && y > Constants.mapHeight / 2))) {
                 if (!started) {
                     final float[] coordinates = GameMethods.findClosestEdge(x, y, PlayerInfo.side);
 
-                    MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width,
-                            coordinates[1] / Shared.height);
+                    MultiplayerMenu.socket.emit("ready", coordinates[0],
+                            coordinates[1]);
                 }
             }
             return false;
