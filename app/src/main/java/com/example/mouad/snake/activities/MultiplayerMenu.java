@@ -49,6 +49,7 @@ public class MultiplayerMenu extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         PlayerInfo.level = sharedPreferences.getInt(Shared.Level, 1);
         PlayerInfo.xp = sharedPreferences.getInt(Shared.Xp, 0);
+        PlayerInfo.name = null;
         xpBar();
 
         try {

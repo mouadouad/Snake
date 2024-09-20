@@ -3,8 +3,8 @@
   <component name="deploymentTargetSelector">
     <selectionStates>
       <SelectionState runConfigName="app">
-        <option name="selectionMode" value="DIALOG" />
-        <DropdownSelection timestamp="2024-09-07T12:15:09.814156200Z">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2024-09-20T11:13:57.934269300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=H:\avd\Copy_of_Pixel_3a_API_30.avd" />
@@ -15,12 +15,12 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="LocalEmulator" identifier="path=H:\avd\Copy_of_Pixel_3a_API_30.avd" />
+                <DeviceId pluginId="LocalEmulator" identifier="path=H:\avd\Pixel_3a_API_30.avd" />
               </handle>
             </Target>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="LocalEmulator" identifier="path=H:\avd\Pixel_3a_API_30.avd" />
+                <DeviceId pluginId="LocalEmulator" identifier="path=H:\avd\Pixel_Fold_API_35.avd" />
               </handle>
             </Target>
           </targets>

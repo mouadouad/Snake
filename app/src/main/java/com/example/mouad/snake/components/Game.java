@@ -45,18 +45,15 @@ public class Game {
 
     private float[] generateBotPosition(int hisSide) {
         final Random random = new Random();
-        final int x = random.nextInt((int) Constants.mapWidth);
-        int y = random.nextInt((int) (Constants.mapHeight / 2));
+        final int x = random.nextInt((int) Renderer.screenWidth);
+        int y = random.nextInt((int) (Renderer.screenHeight / 2));
         if (hisSide == 1) {
-            y += (int) (Constants.mapHeight / 2);
+            y += (int) (Renderer.screenHeight / 2);
         }
         return GameMethods.findClosestEdge(renderer.getX(x), renderer.getY(y), (hisSide + 1) % 2);
     }
 
-    // TODO - cst
     private static float[] findStartingPosition(float x, float y) {
-        Log.d("TAG", "findStartingPosition: "+x);
-        Log.d("TAG", "findStartingPosition: "+y);
         int angle = 0;
         if (y == 0) {
             angle = 180;
@@ -82,16 +79,17 @@ public class Game {
             if (y <= (Constants.borderWidth + Constants.snakeWidth)) {
                 y = (Constants.borderWidth + 1 + Constants.snakeWidth);
             }
-        } else {
+        } else if (y == Constants.mapHeight) {
             if (x <= (Constants.borderWidth)) {
                 x = (Constants.borderWidth + 1);
             }
             if (x >= (Constants.mapWidth - Constants.borderWidth - Constants.snakeWidth)) {
                 x = (Constants.mapWidth - Constants.borderWidth - 1 - Constants.snakeWidth);
             }
+        } else {
+            Log.d("error", "findStartingPosition: ");
         }
-        Log.d("TAG", "findStartingPosition: "+x);
-        Log.d("TAG", "findStartingPosition: "+y);
+
         return new float[]{x, y, angle};
     }
 
@@ -108,7 +106,6 @@ public class Game {
         playerRectangles.addRectangle(firstRectPlayer);
     }
 
-    // TODO - constants
     private static float[] startingRect(float x, float y, float angle) {
         final float[] firstRect = new float[4];
 

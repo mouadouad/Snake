@@ -10,6 +10,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.example.mouad.snake.activities.MainActivity;
+import com.example.mouad.snake.shared.Constants;
 import com.example.mouad.snake.shared.Shared;
 
 import org.json.JSONArray;
@@ -25,16 +26,15 @@ public class Renderer extends View {
     private final float[] topCorners, bottomCorners, leftCorners, rightCorners;
     private  float[] corners;
     private final Path path;
-
-    private float offsetX;
-    private float offsetY;
+    private final float offsetX = 0;
+    private float offsetY = 0;
     private float scaleFactor;
-    private static final float mapWidth = 1080;
-    private static final float mapHeight = 1600;
-    private static final float borderWidth = 20;
-    private static final float snakeWidth = 30;
-    private static final float screenWidth = MainActivity.width;
-    private static final float screenHeight = MainActivity.height;
+    private static final float mapWidth = Constants.mapWidth;
+    private static final float mapHeight = Constants.mapHeight;
+    private static final float borderWidth = Constants.borderWidth;
+    private static final float snakeWidth = Constants.snakeWidth;
+    public static final float screenWidth = MainActivity.width;
+    public static final float screenHeight = MainActivity.height;
 
     public Renderer(Context context) {
         super(context);
@@ -67,39 +67,44 @@ public class Renderer extends View {
     }
 
     private void calculateVariables(){
-        final float scaleFactorX = mapWidth / screenWidth;
-        final float scaleFactorY = mapHeight / screenHeight;
 
-        offsetX = (screenWidth - mapWidth) / 2;
-        offsetY = (screenHeight - mapHeight) / 2;
+        float scaleFactorX = mapWidth / screenWidth;
+        float scaleFactorY = mapHeight / screenHeight;
 
-        if(scaleFactorX < scaleFactorY){
-            scaleFactor = scaleFactorY;
-            offsetY = 0;
+        if ((scaleFactorX < 1 && scaleFactorY < 1) ) {
+                scaleFactor = 1 / scaleFactorX;
+
+
+            offsetY = Math.abs(screenHeight - (mapHeight * scaleFactor)) / 2;
+        }else if ((scaleFactorX > 1 && scaleFactorY > 1)){
+                scaleFactor = scaleFactorX;
+            scaleFactor = 1 / scaleFactor;
+            offsetY = Math.abs(screenHeight - (mapHeight * scaleFactor)) / 2;
+
         }else {
             scaleFactor = scaleFactorX;
-            offsetX = 0;
+            if(scaleFactor > 1){
+                scaleFactor = 1 / scaleFactor;
+            }
+            offsetY = Math.abs(screenHeight - (mapHeight * scaleFactor)) / 2;
         }
 
-        if(scaleFactor > 1){
-            scaleFactor = 1 / scaleFactor;
-        }
     }
 
     private float computeX(float x){
-        return (x + offsetX) * scaleFactor;
+        return (x* scaleFactor + offsetX);
     }
 
     private float computeY(float y){
-        return (y + offsetY) * scaleFactor;
+        return (y * scaleFactor + offsetY);
     }
 
     public float getX(float x){
-        return (x / scaleFactor) - offsetX;
+        return (x- offsetX) / scaleFactor ;
     }
 
     public float getY(float y){
-        return (y / scaleFactor) - offsetY;
+        return (y- offsetY) / scaleFactor ;
     }
 
 
@@ -138,13 +143,13 @@ public class Renderer extends View {
         drawRectangles(canvas, myVariables, blackPaint);
         drawRectangles(canvas, hisVariables, bluePaint);
         
-        border.set(computeX(0),computeY(0),computeX(borderWidth),computeY(1600));
+        border.set(computeX(0),computeY(0),computeX(borderWidth),computeY(mapHeight));
         canvas.drawRect(border,borderPaint);
-        border.set(computeX(mapWidth-borderWidth),computeY(0),computeX(mapWidth),computeY(1600));
+        border.set(computeX(mapWidth-borderWidth),computeY(0),computeX(mapWidth),computeY(mapHeight));
         canvas.drawRect(border,borderPaint);
         border.set(computeX(0),computeY(0),computeX(mapWidth),computeY(borderWidth));
         canvas.drawRect(border,borderPaint);
-        border.set(computeX(0),computeY(mapHeight - borderWidth),computeX(mapWidth), computeY(1600));
+        border.set(computeX(0),computeY(mapHeight - borderWidth),computeX(mapWidth), computeY(mapHeight));
         canvas.drawRect(border,borderPaint);
     }
     private void drawRectangles(Canvas canvas, ArrayList<float[]>  variables, Paint paint){
