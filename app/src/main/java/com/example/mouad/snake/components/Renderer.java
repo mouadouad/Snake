@@ -33,8 +33,8 @@ public class Renderer extends View {
     private static final float mapHeight = Constants.mapHeight;
     private static final float borderWidth = Constants.borderWidth;
     private static final float snakeWidth = Constants.snakeWidth;
-    public static final float screenWidth = MainActivity.width;
-    public static final float screenHeight = MainActivity.height;
+    public static float screenWidth;
+    public static float screenHeight;
 
     public Renderer(Context context) {
         super(context);
@@ -63,10 +63,12 @@ public class Renderer extends View {
         rightCorners = new float[]  {0, 0, 80, 80, 80, 80, 0, 0};
         path = new Path();
 
-        calculateVariables();
     }
 
     private void calculateVariables(){
+
+        screenHeight = this.getMeasuredHeight();
+        screenWidth = this.getMeasuredWidth();
 
         float scaleFactorX = mapWidth / screenWidth;
         float scaleFactorY = mapHeight / screenHeight;
@@ -74,20 +76,17 @@ public class Renderer extends View {
         if ((scaleFactorX < 1 && scaleFactorY < 1) ) {
                 scaleFactor = 1 / scaleFactorX;
 
-
-            offsetY = Math.abs(screenHeight - (mapHeight * scaleFactor)) / 2;
         }else if ((scaleFactorX > 1 && scaleFactorY > 1)){
                 scaleFactor = scaleFactorX;
             scaleFactor = 1 / scaleFactor;
-            offsetY = Math.abs(screenHeight - (mapHeight * scaleFactor)) / 2;
 
         }else {
             scaleFactor = scaleFactorX;
             if(scaleFactor > 1){
                 scaleFactor = 1 / scaleFactor;
             }
-            offsetY = Math.abs(screenHeight - (mapHeight * scaleFactor)) / 2;
         }
+        offsetY = Math.abs(screenHeight - (mapHeight * scaleFactor)) / 2;
 
     }
 
@@ -139,6 +138,8 @@ public class Renderer extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
+
+        calculateVariables();
 
         drawRectangles(canvas, myVariables, blackPaint);
         drawRectangles(canvas, hisVariables, bluePaint);

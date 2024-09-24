@@ -137,16 +137,17 @@ public class Game {
             final Handler handler = new Handler();
             final Runnable runnable = () -> {
                 if (!finished) {
-                    playerRectangles.getLastRectangle()[1] -= 3;
-                    botRectangles.getLastRectangle()[1] -= 3;
+                    botPlay();
+                    playerRectangles.getLastRectangle()[1] -= 4;
+                    botRectangles.getLastRectangle()[1] -= 4;
 
                     renderer.refresh();
-                    botPlay();
+
                     checking();
                     repeat();
                 }
             };
-            handler.postDelayed(runnable, 10);
+            handler.postDelayed(runnable, 15);
         }
     }
 
@@ -329,13 +330,16 @@ public class Game {
             lastDirection -= 90;
         }
 
-        final float[] rect = new float[4];
-        rect[0] = -lastRectangle[1] - Constants.snakeWidth;
-        rect[1] = lastRectangle[0];
-        rect[2] = lastRectangle[0];
-        rect[3] = lastDirection;
+        //CHECK IF LAST TURN IS COMPLETE
+        if (lastRectangle[2] - lastRectangle[1] > Constants.snakeWidth + 2) {
+            final float[] rect = new float[4];
+            rect[0] = -lastRectangle[1] - Constants.snakeWidth;
+            rect[1] = lastRectangle[0];
+            rect[2] = lastRectangle[0];
+            rect[3] = lastDirection;
 
-        rectangles.addRectangle(rect);
+            rectangles.addRectangle(rect);
+        }
     }
     private static void turnRight(Rectangles rectangles) {
         final float[] lastRectangle = rectangles.getLastRectangle();
@@ -347,13 +351,15 @@ public class Game {
             lastDirection += 90;
         }
 
-        final float[] rect = new float[4];
-        rect[0] = lastRectangle[1];
-        rect[1] = -lastRectangle[0] - Constants.snakeWidth;
-        rect[2] = -lastRectangle[0] - Constants.snakeWidth;
-        rect[3] = lastDirection;
+        if (lastRectangle[2] - lastRectangle[1] > Constants.snakeWidth + 2) {
+            final float[] rect = new float[4];
+            rect[0] = lastRectangle[1];
+            rect[1] = -lastRectangle[0] - Constants.snakeWidth;
+            rect[2] = -lastRectangle[0] - Constants.snakeWidth;
+            rect[3] = lastDirection;
 
-        rectangles.addRectangle(rect);
+            rectangles.addRectangle(rect);
+        }
     }
 
 }
