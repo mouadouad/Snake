@@ -288,6 +288,9 @@ public class Multiplayer extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(alertDialog != null) {
+            alertDialog.dismiss();
+        }
         if(!gameFinished) {
             MultiplayerMenu.socket.emit("quitGame");
         }
