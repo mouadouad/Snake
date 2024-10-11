@@ -2,9 +2,10 @@ package com.example.mouad.snake.components;
 
 import android.graphics.Rect;
 import android.os.Handler;
+import android.util.Log;
 
-import com.example.mouad.snake.shared.Shared;
-import com.example.mouad.snake.activities.MainActivity;
+import com.example.mouad.snake.shared.Constants;
+import com.example.mouad.snake.shared.GameMethods;
 import com.example.mouad.snake.activities.Normal;
 import com.example.mouad.snake.enums.GameStates;
 
@@ -16,7 +17,7 @@ public class Game {
     public boolean finished = false;
     private final Bot bot;
     private final Normal normal;
-    private final Renderer renderer;
+    public final Renderer renderer;
     private static Rect topBar, bottomBar, leftBar, rightBar;
     private final Rectangles playerRectangles, botRectangles;
 
@@ -29,89 +30,64 @@ public class Game {
         botRectangles = new Rectangles();
         renderer.setVariables(playerRectangles, botRectangles);
 
-        leftBar = new Rect(0, 0, 20, 1600);
-        rightBar = new Rect(1080 - 20, 0, 1080, 1600);
-        topBar = new Rect(0, 0, 1080, 20);
-        bottomBar = new Rect(0, 1580, 1080, 1600);
+        leftBar = new Rect(0, 0, (int) Constants.borderWidth, (int) Constants.mapHeight);
+        rightBar = new Rect((int) (Constants.mapWidth - Constants.borderWidth), 0, (int) Constants.mapWidth, (int) Constants.mapHeight);
+        topBar = new Rect(0, 0, (int) Constants.mapWidth, (int) Constants.borderWidth);
+        bottomBar = new Rect(0, (int) (Constants.mapHeight - Constants.borderWidth), (int) Constants.mapWidth, (int) Constants.mapHeight);
     }
 
     public void start(float playerXStart, float playerYStart, int side) {
-        final float[] playerCoordinates = findClosestEdge(playerXStart, playerYStart, side);
+        final float[] playerCoordinates = GameMethods.findClosestEdge(playerXStart, playerYStart, side);
         final float[] botCoordinates = generateBotPosition(side);
         addStartingRectangles(playerCoordinates, botCoordinates);
         repeat();
     }
 
-    public static float[] findClosestEdge(float x, float y, int side) {
-
-        if (side == 0) {
-            if (Shared.setY(1600) - y < MainActivity.width - x && Shared.setY(1600) - y < x) {
-                y = MainActivity.height;
-            } else {
-                if (x > MainActivity.width - x) {
-                    x = MainActivity.width;
-                } else {
-                    x = 0;
-                }
-            }
-        } else {
-            if (y < MainActivity.width - x && y < x) {
-                y = 0;
-            } else {
-                if (x > MainActivity.width - x) {
-                    x = MainActivity.width;
-                } else {
-                    x = 0;
-                }
-            }
-        }
-        return new float[]{x, y};
-    }
-
-    private static float[] generateBotPosition(int hisSide) {
+    private float[] generateBotPosition(int hisSide) {
         final Random random = new Random();
-        final int x = random.nextInt(MainActivity.width);
-        int y = random.nextInt(Shared.setY(800));
+        final int x = random.nextInt((int) Renderer.screenWidth);
+        int y = random.nextInt((int) (Renderer.screenHeight / 2));
         if (hisSide == 1) {
-            y += Shared.setY(800);
+            y += (int) (Renderer.screenHeight / 2);
         }
-        return findClosestEdge(x, y, (hisSide + 1) % 2);
+        return GameMethods.findClosestEdge(renderer.getX(x), renderer.getY(y), (hisSide + 1) % 2);
     }
 
     private static float[] findStartingPosition(float x, float y) {
         int angle = 0;
-
         if (y == 0) {
             angle = 180;
-            if (x <= (20 + 30)) {
-                x = (20 + 1 + 30);
+            if (x <= (Constants.borderWidth + Constants.snakeWidth)) {
+                x = (Constants.borderWidth + 1 + Constants.snakeWidth);
             }
-            if (x >= (1060)) {
-                x = (1060 - 1);
+            if (x >= (Constants.mapWidth - Constants.borderWidth)) {
+                x = (Constants.mapWidth - Constants.borderWidth - 1);
             }
         } else if (x == 0) {
             angle = 90;
-            if (y >= (1580 - 30)) {
-                y = (1580 - 1 - 30);
+            if (y >= (Constants.mapHeight - Constants.borderWidth - Constants.snakeWidth)) {
+                y = (Constants.mapHeight - Constants.borderWidth - 1 - Constants.snakeWidth);
             }
-            if (y <= (30)) {
-                y = (20 + 1);
+            if (y <= (Constants.snakeWidth)) {
+                y = (Constants.borderWidth + 1);
             }
-        } else if (x == 1080) {
+        } else if (x == Constants.mapWidth) {
             angle = -90;
-            if (y >= (1580)) {
-                y = (1580 - 1);
+            if (y >= (Constants.mapHeight - Constants.borderWidth)) {
+                y = (Constants.mapHeight - Constants.borderWidth - 1);
             }
-            if (y <= (20 + 30)) {
-                y = (20 + 1 + 30);
+            if (y <= (Constants.borderWidth + Constants.snakeWidth)) {
+                y = (Constants.borderWidth + 1 + Constants.snakeWidth);
+            }
+        } else if (y == Constants.mapHeight) {
+            if (x <= (Constants.borderWidth)) {
+                x = (Constants.borderWidth + 1);
+            }
+            if (x >= (Constants.mapWidth - Constants.borderWidth - Constants.snakeWidth)) {
+                x = (Constants.mapWidth - Constants.borderWidth - 1 - Constants.snakeWidth);
             }
         } else {
-            if (x <= (20)) {
-                x = (20 + 1);
-            }
-            if (x >= (1060 - 30)) {
-                x = (1060 - 1 - 30);
-            }
+            Log.d("error", "findStartingPosition: ");
         }
 
         return new float[]{x, y, angle};
@@ -120,23 +96,23 @@ public class Game {
     private void addStartingRectangles(float[] playerCoordinates, float[] botCoordinates) {
 
         final float[] botPosition = findStartingPosition(botCoordinates[0], botCoordinates[1]);
-        final int[] firstRect = startingRect((int) botPosition[0], (int) botPosition[1], (int) botPosition[2]);
+        final float[] firstRect = startingRect( botPosition[0], botPosition[1],botPosition[2]);
 
         botRectangles.addRectangle(firstRect);
 
-        final float[] playerPosition = findStartingPosition(playerCoordinates[0] * 1080 / Shared.width, playerCoordinates[1] * 1770 / Shared.height);
-        int[] firstRectPlayer = startingRect((int) playerPosition[0], (int) playerPosition[1], (int) playerPosition[2]);
+        final float[] playerPosition = findStartingPosition(playerCoordinates[0],playerCoordinates[1]);
+        float[] firstRectPlayer = startingRect(playerPosition[0], playerPosition[1],playerPosition[2]);
 
         playerRectangles.addRectangle(firstRectPlayer);
     }
 
-    private static int[] startingRect(int x, int y, int angle) {
-        final int[] firstRect = new int[4];
+    private static float[] startingRect(float x, float y, float angle) {
+        final float[] firstRect = new float[4];
 
         if (angle == 0) {
             firstRect[0] = x;
-            firstRect[1] = 1600 - 10;
-            firstRect[2] = 1600;
+            firstRect[1] = Constants.mapHeight - 10;
+            firstRect[2] = Constants.mapHeight;
         } else if (angle == 180) {
             firstRect[0] = -x;
             firstRect[1] = -10;
@@ -161,16 +137,17 @@ public class Game {
             final Handler handler = new Handler();
             final Runnable runnable = () -> {
                 if (!finished) {
-                    playerRectangles.getLastRectangle()[1] -= 3;
-                    botRectangles.getLastRectangle()[1] -= 3;
+                    botPlay();
+                    playerRectangles.getLastRectangle()[1] -= 4;
+                    botRectangles.getLastRectangle()[1] -= 4;
 
                     renderer.refresh();
-                    botPlay();
+
                     checking();
                     repeat();
                 }
             };
-            handler.postDelayed(runnable, 10);
+            handler.postDelayed(runnable, 15);
         }
     }
 
@@ -200,20 +177,20 @@ public class Game {
                     playerRectangles.getRectangles().remove(i + 1);
                 }
 
-                final int[] ints = playerRectangles.getRectangles().get(i);
+                final float[] ints = playerRectangles.getRectangles().get(i);
 
-                switch (ints[3]) {
+                switch ((int) ints[3]) {
                     case 90:
-                        ints[1] = -(playerChecker.left * 1080) / MainActivity.width;
+                        ints[1] = -playerChecker.left;
                         break;
                     case -90:
-                        ints[1] = (playerChecker.left * 1080) / MainActivity.width;
+                        ints[1] = playerChecker.left;
                         break;
                     case 180:
-                        ints[1] = -(playerChecker.top * 1770) / MainActivity.height;
+                        ints[1] = -playerChecker.top;
                         break;
                     case 0:
-                        ints[1] = (playerChecker.top * 1770) / MainActivity.height;
+                        ints[1] = playerChecker.top;
                         break;
                 }
                 playerRectangles.getRectangles().set(i, ints);
@@ -232,20 +209,20 @@ public class Game {
                 for (int remove = botRectangles.getRectangles().size() - 1; remove > i; remove--) {
                     botRectangles.getRectangles().remove(i + 1);
                 }
-                final int[] ints = botRectangles.getRectangles().get(i);
+                final float[] ints = botRectangles.getRectangles().get(i);
 
-                switch (ints[3]) {
+                switch ((int) ints[3]) {
                     case 90:
-                        ints[1] = -(botChecker.left * 1080) / MainActivity.width;
+                        ints[1] = -botChecker.left;
                         break;
                     case -90:
-                        ints[1] = (botChecker.left * 1080) / MainActivity.width;
+                        ints[1] = botChecker.left;
                         break;
                     case 180:
-                        ints[1] = -(botChecker.top * 1770) / MainActivity.height;
+                        ints[1] = -botChecker.top;
                         break;
                     case 0:
-                        ints[1] = (botChecker.top * 1770) / MainActivity.height;
+                        ints[1] = botChecker.top;
                         break;
                 }
                 botRectangles.getRectangles().set(i, ints);
@@ -267,49 +244,49 @@ public class Game {
     static private boolean hitBorder(Rect checker, Rectangles rectangles) {
         final boolean HitBorder = checker.intersect(topBar) || checker.intersect(leftBar) ||
                 checker.intersect(rightBar) || checker.intersect(bottomBar);
-        final int playerRectangleLength = rectangles.getLastRectangle()[2] - rectangles.getLastRectangle()[1];
+        final float playerRectangleLength = rectangles.getLastRectangle()[2] - rectangles.getLastRectangle()[1];
 
-        return HitBorder && (rectangles.getRectangles().size() > 1 || playerRectangleLength > 20);
+        return HitBorder && (rectangles.getRectangles().size() > 1 || playerRectangleLength > Constants.borderWidth);
     }
 
-    private static Rect getChecker(int[] variable) {
+    private static Rect getChecker(float[] variable) {
         final Rect checker = new Rect();
-        int left = variable[0];
-        int top = variable[1];
-        switch (variable[3]) {
+        float left = variable[0];
+        float top = variable[1];
+        switch ((int) variable[3]) {
             case 90:
-                checker.set((-top - 1), (left), (-top), (left + 30));
+                checker.set((int) (-top - 1), (int) left, (int) -top, (int) (left + Constants.snakeWidth));
                 break;
             case -90:
-                checker.set((top), (-left - 30), (top - 1), (-left));
+                checker.set((int) top, (int) (-left - Constants.snakeWidth), (int) (top - 1), (int) -left);
                 break;
             case 180:
-                checker.set((-left - 30), (-top - 1), (-left), (-top));
+                checker.set((int) (-left - Constants.snakeWidth), (int) (-top - 1), (int) -left, (int) -top);
                 break;
             case 0:
-                checker.set((left), (top), (left + 30), (top + 1));
+                checker.set((int) left, (int) top, (int) (left + Constants.snakeWidth), (int) (top + 1));
                 break;
         }
         return checker;
     }
 
-    private static Rect getRect(int[] variable) {
+    private static Rect getRect(float[] variable) {
         final Rect rect = new Rect();
-        int left = variable[0];
-        int top = variable[1];
-        int bot = variable[2];
-        switch (variable[3]) {
+        float left = variable[0];
+        float top = variable[1];
+        float bot = variable[2];
+        switch ((int) variable[3]) {
             case 90:
-                rect.set(-bot, (left), -top, left + 30);
+                rect.set((int) -bot, (int) left, (int) -top, (int) (left + Constants.snakeWidth));
                 break;
             case -90:
-                rect.set((top), -left - 30, bot, -left);
+                rect.set((int) top, (int) (-left - Constants.snakeWidth), (int) bot, (int) -left);
                 break;
             case 180:
-                rect.set(-left - 30, -bot, -left, -top);
+                rect.set((int) (-left - Constants.snakeWidth), (int) -bot, (int) -left, (int) -top);
                 break;
             case 0:
-                rect.set(left, top, left + 30, bot);
+                rect.set((int) left, (int) top, (int) (left + Constants.snakeWidth), (int) bot);
                 break;
         }
         return rect;
@@ -344,8 +321,8 @@ public class Game {
         turnLeft(playerRectangles);
     }
     private static void turnLeft(Rectangles rectangles) {
-        final int[] lastRectangle = rectangles.getLastRectangle();
-        int lastDirection = lastRectangle[3];
+        final float[] lastRectangle = rectangles.getLastRectangle();
+        float lastDirection = lastRectangle[3];
 
         if (lastDirection == -90) {
             lastDirection = 180;
@@ -353,17 +330,20 @@ public class Game {
             lastDirection -= 90;
         }
 
-        final int[] rect = new int[4];
-        rect[0] = -lastRectangle[1] - 30;
-        rect[1] = lastRectangle[0];
-        rect[2] = lastRectangle[0];
-        rect[3] = lastDirection;
+        //CHECK IF LAST TURN IS COMPLETE
+        if (lastRectangle[2] - lastRectangle[1] > Constants.snakeWidth + 2) {
+            final float[] rect = new float[4];
+            rect[0] = -lastRectangle[1] - Constants.snakeWidth;
+            rect[1] = lastRectangle[0];
+            rect[2] = lastRectangle[0];
+            rect[3] = lastDirection;
 
-        rectangles.addRectangle(rect);
+            rectangles.addRectangle(rect);
+        }
     }
     private static void turnRight(Rectangles rectangles) {
-        final int[] lastRectangle = rectangles.getLastRectangle();
-        int lastDirection = lastRectangle[3];
+        final float[] lastRectangle = rectangles.getLastRectangle();
+        float lastDirection = lastRectangle[3];
 
         if (lastDirection == 180) {
             lastDirection = -90;
@@ -371,13 +351,15 @@ public class Game {
             lastDirection += 90;
         }
 
-        final int[] rect = new int[4];
-        rect[0] = lastRectangle[1];
-        rect[1] = -lastRectangle[0] - 30;
-        rect[2] = -lastRectangle[0] - 30;
-        rect[3] = lastDirection;
+        if (lastRectangle[2] - lastRectangle[1] > Constants.snakeWidth + 2) {
+            final float[] rect = new float[4];
+            rect[0] = lastRectangle[1];
+            rect[1] = -lastRectangle[0] - Constants.snakeWidth;
+            rect[2] = -lastRectangle[0] - Constants.snakeWidth;
+            rect[3] = lastDirection;
 
-        rectangles.addRectangle(rect);
+            rectangles.addRectangle(rect);
+        }
     }
 
 }

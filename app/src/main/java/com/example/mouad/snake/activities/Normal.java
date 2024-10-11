@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.components.Renderer;
+import com.example.mouad.snake.shared.Constants;
 import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
 import com.example.mouad.snake.components.Bot;
@@ -33,12 +34,12 @@ import com.example.mouad.snake.enums.GameStates;
 import java.util.Random;
 
 public class Normal extends AppCompatActivity {
-    private static final short pixels = 30, obsSize = 5;
+    private static final short pixels = 40, obsSize = 5;
     private Boolean started = false;
     private Game game;
     private FrameLayout dim;
     private Button back;
-
+    Dialog alertDialog;
     private RelativeLayout layout;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +71,10 @@ public class Normal extends AppCompatActivity {
         addContentView(layout, layoutParams);
         layout.setOnTouchListener((view, motionEvent) -> {
             if(view.performClick()) { return false;}
-            float playerYStart = motionEvent.getY();
-            float playerXStart = motionEvent.getX();
+            float playerYStart = game.renderer.getY(motionEvent.getY());
+            float playerXStart = game.renderer.getX(motionEvent.getX());
             // CHECK IF THE RIGHT SIDE IS CLICKED
-            if ((side == 1 && playerYStart < Shared.setY(800)) || (side == 0 && playerYStart > Shared.setY(800))) {
+            if ((side == 1 && playerYStart < Constants.mapHeight / 2 || (side == 0 && playerYStart > Constants.mapHeight / 2))) {
                 if (!started) {
                     start(playerXStart, playerYStart, side);
                 }
@@ -86,8 +87,9 @@ public class Normal extends AppCompatActivity {
         final Random random = new Random();
         final int side = random.nextInt(2);
 
-        dim.setY(side * Shared.setY(800));
-        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(MainActivity.width, Shared.setY(800) + Shared.setY(800) * side);
+        dim.setY(side * ((float) MainActivity.height / 2));
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                MainActivity.width, (MainActivity.height / 2) + (MainActivity.height / 2) * side);
         addContentView(dim, layoutParams);
 
         dim.getForeground().setAlpha(200);
@@ -193,15 +195,16 @@ public class Normal extends AppCompatActivity {
 
         play_again.setOnClickListener(view -> recreate());
 
-        Dialog alertDialog = new Dialog(this);
+        alertDialog = new Dialog(this);
         alertDialog.setContentView(message_box);
 
         if (alertDialog.getWindow() != null) {    //MAKE BACKGROUND OF DIALOG TRANSPARENT
             alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
-        if(!isFinishing() && !isDestroyed()){
+        if(!isFinishing() || !isDestroyed()){
             alertDialog.show();
         }
+
         alertDialog.setCanceledOnTouchOutside(false);
     }
 
@@ -225,5 +228,13 @@ public class Normal extends AppCompatActivity {
 
     private void onBack() {
         this.finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(alertDialog != null) {
+            alertDialog.dismiss();
+        }
     }
 }

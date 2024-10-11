@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,6 +26,7 @@ import android.widget.TextView;
 
 import com.example.mouad.snake.R;
 import com.example.mouad.snake.components.Renderer;
+import com.example.mouad.snake.shared.Constants;
 import com.example.mouad.snake.shared.GameMethods;
 import com.example.mouad.snake.shared.MusicObserver;
 import com.example.mouad.snake.shared.Shared;
@@ -65,25 +65,21 @@ public class Multiplayer extends AppCompatActivity {
         }));
 
         MultiplayerMenu.socket.on("update", args -> runOnUiThread(() -> {
-            final JSONArray room = (JSONArray) args[0];
-            try {
-                final JSONArray myJson = room.getJSONObject(0).getJSONArray("variables");
-                final JSONArray hisJson = room.getJSONObject(1).getJSONArray("variables");
 
-                renderer.setVariables(myJson, hisJson);
+            final JSONArray myJson = (JSONArray) args[0];
+            final JSONArray hisJson = (JSONArray) args[1];
 
-                if(!started) {
-                    started = true;
-                    setContentView(renderer);
-                    placeControllers();
-                    Shared.backButton(this, this, v -> onBack());
-                }
+            renderer.setVariables(myJson, hisJson);
 
-                renderer.refresh();
-
-            } catch (JSONException e) {
-                Log.e("TAG", String.valueOf(e));
+            if(!started) {
+                started = true;
+                setContentView(renderer);
+                placeControllers();
+                Shared.backButton(this, this, v -> onBack());
             }
+
+            renderer.refresh();
+
         }));
 
         MultiplayerMenu.socket.on("won", args -> runOnUiThread(() -> gameOver(GameStates.WON)));
@@ -124,11 +120,9 @@ public class Multiplayer extends AppCompatActivity {
         RelativeLayout.LayoutParams dimParams;
 
         if (PlayerInfo.side == 1) {
-            dim.setY(Shared.setY(800));
-            dimParams = new RelativeLayout.LayoutParams((Shared.width), (Shared.height));
-        } else {
-            dimParams = new RelativeLayout.LayoutParams((Shared.width), (Shared.setY(1600) / 2));
+            dim.setY((float) MainActivity.height / 2);
         }
+        dimParams = new RelativeLayout.LayoutParams((Shared.width), (MainActivity.height / 2));
         addContentView(dim, dimParams);
         dim.getForeground().setAlpha(200);
     }
@@ -139,15 +133,15 @@ public class Multiplayer extends AppCompatActivity {
         addContentView(layout, layoutParams);
 
         layout.setOnTouchListener((view, motionEvent) -> {
-            final float y = motionEvent.getY();
-            final float x = motionEvent.getX();
+            float y = renderer.getY(motionEvent.getY());
+            float x = renderer.getX(motionEvent.getX());
             // CHECK IF THE RIGHT SIDE IS CLICKED
-            if ((PlayerInfo.side == 1 && y < Shared.setY(800)) || (PlayerInfo.side == 0 && y > Shared.setY(800))) {
+            if ((PlayerInfo.side == 1 && y < Constants.mapHeight / 2 || (PlayerInfo.side == 0 && y > Constants.mapHeight / 2))) {
                 if (!started) {
                     final float[] coordinates = GameMethods.findClosestEdge(x, y, PlayerInfo.side);
 
-                    MultiplayerMenu.socket.emit("ready", coordinates[0] / Shared.width,
-                            coordinates[1] / Shared.height);
+                    MultiplayerMenu.socket.emit("ready", coordinates[0],
+                            coordinates[1]);
                 }
             }
             return false;
@@ -230,10 +224,14 @@ public class Multiplayer extends AppCompatActivity {
             Log.d("tg", "placeControllers: ");
             if(view.performClick()) { return false;}
             float x = motionEvent.getX();
-            if (x < Shared.setX(540)){
+            if(started){
+                Log.d("tg", "m: ");
+
+                if (x < Shared.setX(540)){
                 MultiplayerMenu.socket.emit("turnLeft");
             }else {
                 MultiplayerMenu.socket.emit("turnRight");
+            }
             }
             return false;
         });
@@ -290,6 +288,9 @@ public class Multiplayer extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(alertDialog != null) {
+            alertDialog.dismiss();
+        }
         if(!gameFinished) {
             MultiplayerMenu.socket.emit("quitGame");
         }

@@ -24,6 +24,7 @@ import com.example.mouad.snake.shared.PlayerInfo;
 
 import java.net.URISyntaxException;
 import java.util.Calendar;
+import java.util.UUID;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -32,6 +33,7 @@ public class MultiplayerMenu extends AppCompatActivity {
 
     //InterstitialAd mInterstitialAd;
     public static Socket socket;
+    private static final String TOKEN_KEY = "device_token";
 
 
     @Override
@@ -49,19 +51,37 @@ public class MultiplayerMenu extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
         PlayerInfo.level = sharedPreferences.getInt(Shared.Level, 1);
         PlayerInfo.xp = sharedPreferences.getInt(Shared.Xp, 0);
+        PlayerInfo.name = null;
         xpBar();
 
         try {
-            //socket = IO.socket("http://192.168.1.53:3000");//socket = IO.socket("http://192.168.61.92:3000");
-
-            socket= IO.socket("http://10.0.2.2:3000"); // https://snake1234.herokuapp.com/
-
-            socket.connect();
-            ping();
-
+            if(socket==null || !socket.connected()){
+                String token = getDeviceToken();
+                IO.Options opts = new IO.Options();
+                opts.query = "token=" + token;
+//              socket= IO.socket("http://10.0.2.2:3000", opts); // https://snake1234.herokuapp.com/
+                socket = IO.socket("http://192.168.1.13:80", opts);
+                socket.connect();
+                ping();
+            }
         } catch (URISyntaxException e) {
             Log.e("TAG", String.valueOf(e));
         }
+    }
+
+
+    public String getDeviceToken() {
+        SharedPreferences prefs = this.getSharedPreferences(Shared.SHARED_PREFS, MODE_PRIVATE);
+        String token = prefs.getString(TOKEN_KEY, null);
+
+        if (token == null) {
+            token = UUID.randomUUID().toString();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(TOKEN_KEY, token);
+            editor.apply();
+        }
+
+        return token;
     }
 
     public void xpBar() {
@@ -130,9 +150,12 @@ public class MultiplayerMenu extends AppCompatActivity {
             startActivity(i);
         });
         random.setOnClickListener(view -> {
+            random.setEnabled(false);
             Intent i = new Intent(MultiplayerMenu.this, Waiting.class);
             socket.emit("random", (PlayerInfo.level / 5) + 1);
             startActivity(i);
+            random.setEnabled(true);
+
         });
     }
 

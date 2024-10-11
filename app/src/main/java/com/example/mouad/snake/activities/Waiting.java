@@ -92,9 +92,7 @@ public class Waiting extends AppCompatActivity {
 
             final TextView nameOfLobbyTV = new TextView(this);
             RelativeLayout.LayoutParams textViewParams = new RelativeLayout.LayoutParams(Shared.setX(600), RelativeLayout.LayoutParams.WRAP_CONTENT);
-            textViewParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-            div.addView(nameOfLobbyTV, textViewParams);
-            nameOfLobbyTV.setTextSize(Shared.setX(24));
+
 
             final String nameOfLobbyText = getString(R.string.name_lobby) + PlayerInfo.name;
 
@@ -106,6 +104,10 @@ public class Waiting extends AppCompatActivity {
 
             nameOfLobbyTV.setText(styledText);
             nameOfLobbyTV.setY(Shared.setY(800));
+
+            textViewParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            div.addView(nameOfLobbyTV, textViewParams);
+            nameOfLobbyTV.setTextSize(Shared.setX(24));
         }
     }
 
