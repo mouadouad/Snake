@@ -55,15 +55,15 @@ public class MultiplayerMenu extends AppCompatActivity {
         xpBar();
 
         try {
-            //socket = IO.socket("http://192.168.61.92:3000");
-            String token = getDeviceToken();
-            IO.Options opts = new IO.Options();
-            opts.query = "token=" + token;
-//            socket= IO.socket("http://10.0.2.2:3000", opts); // https://snake1234.herokuapp.com/
-            socket = IO.socket("http://192.168.1.13:3000",opts);
-            socket.connect();
-            ping();
-
+            if(socket==null || !socket.connected()){
+                String token = getDeviceToken();
+                IO.Options opts = new IO.Options();
+                opts.query = "token=" + token;
+//              socket= IO.socket("http://10.0.2.2:3000", opts); // https://snake1234.herokuapp.com/
+                socket = IO.socket("http://192.168.1.13:80", opts);
+                socket.connect();
+                ping();
+            }
         } catch (URISyntaxException e) {
             Log.e("TAG", String.valueOf(e));
         }
@@ -150,9 +150,12 @@ public class MultiplayerMenu extends AppCompatActivity {
             startActivity(i);
         });
         random.setOnClickListener(view -> {
+            random.setEnabled(false);
             Intent i = new Intent(MultiplayerMenu.this, Waiting.class);
             socket.emit("random", (PlayerInfo.level / 5) + 1);
             startActivity(i);
+            random.setEnabled(true);
+
         });
     }
 

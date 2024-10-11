@@ -65,25 +65,21 @@ public class Multiplayer extends AppCompatActivity {
         }));
 
         MultiplayerMenu.socket.on("update", args -> runOnUiThread(() -> {
-            final JSONArray room = (JSONArray) args[0];
-            try {
-                final JSONArray myJson = room.getJSONObject(0).getJSONArray("variables");
-                final JSONArray hisJson = room.getJSONObject(1).getJSONArray("variables");
 
-                renderer.setVariables(myJson, hisJson);
+            final JSONArray myJson = (JSONArray) args[0];
+            final JSONArray hisJson = (JSONArray) args[1];
 
-                if(!started) {
-                    started = true;
-                    setContentView(renderer);
-                    placeControllers();
-                    Shared.backButton(this, this, v -> onBack());
-                }
+            renderer.setVariables(myJson, hisJson);
 
-                renderer.refresh();
-
-            } catch (JSONException e) {
-                Log.e("TAG", String.valueOf(e));
+            if(!started) {
+                started = true;
+                setContentView(renderer);
+                placeControllers();
+                Shared.backButton(this, this, v -> onBack());
             }
+
+            renderer.refresh();
+
         }));
 
         MultiplayerMenu.socket.on("won", args -> runOnUiThread(() -> gameOver(GameStates.WON)));
@@ -228,10 +224,14 @@ public class Multiplayer extends AppCompatActivity {
             Log.d("tg", "placeControllers: ");
             if(view.performClick()) { return false;}
             float x = motionEvent.getX();
-            if (x < Shared.setX(540)){
+            if(started){
+                Log.d("tg", "m: ");
+
+                if (x < Shared.setX(540)){
                 MultiplayerMenu.socket.emit("turnLeft");
             }else {
                 MultiplayerMenu.socket.emit("turnRight");
+            }
             }
             return false;
         });
